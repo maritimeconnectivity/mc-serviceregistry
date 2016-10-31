@@ -1,0 +1,24 @@
+{
+    "mcsrApp": {
+        "xsd" : {
+            "home": {
+                "title": "Xsds",
+                "createLabel": "Xsd erstellen",
+                "createOrEditLabel": "Xsd erstellen oder bearbeiten",
+                "search": "Suche nach Xsd"
+            },
+            "created": "Xsd erstellt mit ID {{ param }}",
+            "updated": "Xsd aktualisiert mit ID {{ param }}",
+            "deleted": "Xsd gelöscht mit ID {{ param }}",
+            "delete": {
+                "question": "Soll Xsd {{ id }} wirklich dauerhaft gelöscht werden?"
+            },
+            "detail": {
+                "title": "Xsd"
+            },
+            "name": "Name",
+            "comment": "Comment",
+            "content": "Content"
+        }
+    }
+}

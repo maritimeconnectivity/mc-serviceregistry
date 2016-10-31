@@ -1,0 +1,174 @@
+/**
+ * Which specificaiton template types are known to the registry.
+ *
+ * Templates all have the same structure. Typically they consist
+ * of an XSD and some accompanying documents.
+ * They serve different purposes though, defined via the type,
+ * which is enumerated here.
+ * As of know we know
+ * - SEPCIFCATOIN
+ * - DESIGN
+ * - INSTANCE
+ * For further details please refer to the service specification
+ * guidelines.
+ */
+enum SpecificationTemplateType {
+	SPECIFICATION, DESIGN, INSTANCE
+}
+
+/**
+ * A doc represents a human readable document that can be attached to various objects.
+ *
+ * This could be an office document containing guidelines linked,
+ * to a service specification, or a Getting Started PDF attached to
+ * an service instance.
+ *
+ */
+entity Doc {
+	name String required,
+    comment String,
+    mimetype String required,
+    filecontent Blob required
+}
+
+/**
+ * A SpecificationTemplate contains information on how to define a aspects of
+ * a service.
+ * It has a type do differentiate between e.g. logical definitions and
+ * concrete service instances.
+ * Templates will evolve, that's why they have a version.
+ */
+entity SpecificationTemplate {
+	name String required,
+    version String required,
+    type SpecificationTemplateType required,
+    comment String,
+    xsd Blob required
+}
+relationship ManyToOne {
+	SpecificationTemplate{guidelineDoc(name)} to Doc 
+}
+relationship ManyToOne {
+	SpecificationTemplate{templateDoc(name)} to Doc 
+}
+relationship ManyToMany {
+	SpecificationTemplate{docs(name)} to Doc 
+}
+
+/**
+ * It defines a list of compatible SpecificationTemplates of
+ * different type.
+ * Typically Templates will evolve and be released as package.
+ */
+entity SpecificationTemplateSet {
+	name String required,
+    version String required,
+    comment String
+}
+relationship ManyToMany {
+	SpecificationTemplateSet{templates} to SpecificationTemplate
+}
+relationship ManyToMany {
+	SpecificationTemplateSet{docs(name)} to Doc 
+}
+
+/**
+ * A technical way to describe aspects if a service.
+ * 
+ * The Xml should validate against a XSD from a SpecificationTemplate.
+ */
+entity Xml {
+	name String required,
+    comment String,
+    content Blob required
+}
+
+/**
+ * Holds a logical description of a service.
+ * A specification can be compatible to one or more 
+ * specification templates.
+ * It has at least a technical representation of the service
+ * descriptiion in form of an XML and a filled out service template
+ * as e.g. word document.
+ */ 
+entity Specification {
+	name String required,
+    version String required,
+    comment String required
+}
+relationship ManyToOne {
+	Specification{implementedSpecificationVersion(name)} to SpecificationTemplate
+}
+relationship OneToOne {
+	Specification{specAsXml} to Xml
+}
+relationship OneToOne {
+	Specification{specAsDoc(name)} to Doc
+}
+relationship ManyToMany {
+	Specification{docs(name)} to Doc{specification}
+}
+
+/**
+ * Holds a description of a technical design.
+ * A design can be compatible to one or more 
+ * specification templates.
+ * It has at least a technical representation of the 
+ * descriptiion in form of an XML and a filled out template
+ * as e.g. word document.
+ */ 
+entity Design {
+	name String required,
+    version String required,
+    comment String required
+}
+relationship ManyToOne {
+	Design{implementedSpecificationVersion(name)} to SpecificationTemplate
+}
+relationship ManyToMany {
+	Design{specifications(name)} to Specification
+}
+relationship OneToOne {
+	Design{designAsXml} to Xml
+}
+relationship OneToOne {
+	Design{designAsDoc(name)} to Doc
+}
+relationship ManyToMany {
+	Design{docs(name)} to Doc{design}
+}
+
+/**
+ * Holds a description of an service instance.
+ * An instance can be compatible to one or more 
+ * specification templates.
+ * It has at least a technical representation of the 
+ * descriptiion in form of an XML and a filled out template
+ * as e.g. word document.
+ */ 
+entity Instance {
+	name String required,
+    version String required,
+    comment String required,
+    geometry Blob
+}
+relationship ManyToOne {
+	Instance{implementedSpecificationVersion(name)} to SpecificationTemplate
+}
+relationship ManyToMany {
+	Instance{designs(name)} to Design{instances(name)}
+}
+relationship OneToOne {
+	Instance{instanceAsXml} to Xml
+}
+relationship OneToOne {
+	Instance{instanceAsDoc(name)} to Doc
+}
+relationship ManyToMany {
+	Instance{docs(name)} to Doc{instance}
+}
+
+paginate all with pagination
+service all with serviceClass
+
+	

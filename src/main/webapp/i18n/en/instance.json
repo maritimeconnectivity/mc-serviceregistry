@@ -1,0 +1,37 @@
+{
+    "mcsrApp": {
+        "instance" : {
+            "home": {
+                "title": "Instances",
+                "createLabel": "Create a new Instance",
+                "createOrEditLabel": "Create or edit a Instance",
+                "search": "Search for Instance"
+            },
+            "created": "A new Instance is created with identifier {{ param }}",
+            "updated": "A Instance is updated with identifier {{ param }}",
+            "deleted": "A Instance is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Instance {{ id }}?"
+            },
+            "detail": {
+                "title": "Instance"
+            },
+            "name": "Name",
+            "version": "Version",
+            "comment": "Comment",
+            "geometry": "Geometry",
+            "instanceId": "Instance Id",
+            "keywords": "Keywords",
+            "status": "Status",
+            "organizationId": "Organization Id",
+            "unlocode": "Unlocode",
+            "endpointUri": "Endpoint Uri",
+            "endpointType": "Endpoint Type",
+            "instanceAsXml": "Instance As Xml",
+            "instanceAsDoc": "Instance As Doc",
+            "implementedSpecificationVersion": "Implemented Specification Version",
+            "designs": "Designs",
+            "docs": "Docs"
+        }
+    }
+}

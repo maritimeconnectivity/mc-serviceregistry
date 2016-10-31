@@ -1,0 +1,72 @@
+
+<form name="editForm" role="form" novalidate ng-submit="vm.save()" show-validation>
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                ng-click="vm.clear()">&times;</button>
+        <h4 class="modal-title" id="myXsdLabel" translate="mcsrApp.xsd.home.createOrEditLabel">Create or edit a Xsd</h4>
+    </div>
+    <div class="modal-body">
+        <jhi-alert-error></jhi-alert-error>
+        <div class="form-group" ng-show="vm.xsd.id">
+            <label for="id" translate="global.field.id">ID</label>
+            <input type="text" class="form-control" id="id" name="id"
+                    ng-model="vm.xsd.id" readonly />
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="mcsrApp.xsd.name" for="field_name">Name</label>
+            <input type="text" class="form-control" name="name" id="field_name"
+                    ng-model="vm.xsd.name"
+                    required />
+            <div ng-show="editForm.name.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.name.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="mcsrApp.xsd.comment" for="field_comment">Comment</label>
+            <input type="text" class="form-control" name="comment" id="field_comment"
+                    ng-model="vm.xsd.comment"
+                     />
+        </div>
+        <div class="form-group" ngf-drop ngf-change="vm.setContent($file, vm.xsd)">
+            <label class="control-label" translate="mcsrApp.xsd.content" for="field_content">Content</label>
+            <div>
+                <div ng-if="vm.xsd.content" class="help-block clearfix">
+                    <a class="pull-left" ng-click="vm.openFile(vm.xsd.contentContentType, vm.xsd.content)" translate="entity.action.open">open</a><br>
+                    <span class="pull-left">{{vm.xsd.contentContentType}}, {{vm.byteSize(vm.xsd.content)}}</span>
+                    <button ng-click="vm.xsd.content=null;vm.xsd.contentContentType=null;"
+                            class="btn btn-default btn-xs pull-right">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </button>
+                </div>
+                <button type="file" ngf-select class="btn btn-default btn-block"
+                        ngf-change="vm.setContent($file, vm.xsd)" translate="entity.action.addblob">
+                    Add blob
+                </button>
+            </div>
+            <input type="hidden" class="form-control" name="content" id="field_content"
+                    ng-model="vm.xsd.content"
+                    required />
+            <input type="hidden" class="form-control" name="contentContentType" id="field_contentContentType"
+                    ng-model="vm.xsd.contentContentType" />
+            <div ng-show="editForm.content.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.content.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.clear()">
+            <span class="glyphicon glyphicon-ban-circle"></span>&nbsp;<span translate="entity.action.cancel">Cancel</span>
+        </button>
+        <button type="submit" ng-disabled="editForm.$invalid || vm.isSaving" class="btn btn-primary">
+            <span class="glyphicon glyphicon-save"></span>&nbsp;<span translate="entity.action.save">Save</span>
+        </button>
+    </div>
+</form>

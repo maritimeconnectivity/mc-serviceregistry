@@ -1,0 +1,55 @@
+
+<div>
+    <h2><span translate="mcsrApp.specificationTemplate.detail.title">Specification Template</span> {{vm.specificationTemplate.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span translate="mcsrApp.specificationTemplate.name">Name</span></dt>
+        <dd>
+            <span>{{vm.specificationTemplate.name}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.specificationTemplate.version">Version</span></dt>
+        <dd>
+            <span>{{vm.specificationTemplate.version}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.specificationTemplate.type">Type</span></dt>
+        <dd>
+            <span translate="{{'mcsrApp.SpecificationTemplateType.' + vm.specificationTemplate.type}}">{{vm.specificationTemplate.type}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.specificationTemplate.comment">Comment</span></dt>
+        <dd>
+            <span>{{vm.specificationTemplate.comment}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.specificationTemplate.guidelineDoc">Guideline Doc</span></dt>
+        <dd>
+            <a ui-sref="doc-detail({id:vm.specificationTemplate.guidelineDoc.id})">{{vm.specificationTemplate.guidelineDoc.name}}</a>
+        </dd>
+        <dt><span translate="mcsrApp.specificationTemplate.templateDoc">Template Doc</span></dt>
+        <dd>
+            <a ui-sref="doc-detail({id:vm.specificationTemplate.templateDoc.id})">{{vm.specificationTemplate.templateDoc.name}}</a>
+        </dd>
+        <dt><span translate="mcsrApp.specificationTemplate.docs">Docs</span></dt>
+        <dd>
+            <span ng-repeat="docs in vm.specificationTemplate.docs">
+                <a ui-sref="doc-detail({id: docs.id})">{{docs.name}}</a>{{$last ? '' : ', '}}
+            </span>
+        </dd>
+        <dt><span translate="mcsrApp.specificationTemplate.xsds">Xsds</span></dt>
+        <dd>
+            <span ng-repeat="xsds in vm.specificationTemplate.xsds">
+                <a ui-sref="xsd-detail({id: xsds.id})">{{xsds.name}}</a>{{$last ? '' : ', '}}
+            </span>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span translate="entity.action.back"> Back</span>
+    </button>
+
+    <button type="button" ui-sref="specification-template-detail.edit({id:vm.specificationTemplate.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-xs hidden-sm" translate="entity.action.edit"> Edit</span>
+    </button>
+</div>

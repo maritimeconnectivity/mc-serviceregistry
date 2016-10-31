@@ -1,0 +1,29 @@
+{
+    "mcsrApp": {
+        "specificationTemplate" : {
+            "home": {
+                "title": "Specification Templates",
+                "createLabel": "Specification Template erstellen",
+                "createOrEditLabel": "Specification Template erstellen oder bearbeiten",
+                "search": "Suche nach Specification Template"
+            },
+            "created": "Specification Template erstellt mit ID {{ param }}",
+            "updated": "Specification Template aktualisiert mit ID {{ param }}",
+            "deleted": "Specification Template gelöscht mit ID {{ param }}",
+            "delete": {
+                "question": "Soll Specification Template {{ id }} wirklich dauerhaft gelöscht werden?"
+            },
+            "detail": {
+                "title": "Specification Template"
+            },
+            "name": "Name",
+            "version": "Version",
+            "type": "Type",
+            "comment": "Comment",
+            "guidelineDoc": "Guideline Doc",
+            "templateDoc": "Template Doc",
+            "docs": "Docs",
+            "xsds": "Xsds"
+        }
+    }
+}

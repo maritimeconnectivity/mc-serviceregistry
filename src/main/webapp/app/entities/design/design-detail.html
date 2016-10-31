@@ -1,0 +1,71 @@
+
+<div>
+    <h2><span translate="mcsrApp.design.detail.title">Design</span> {{vm.design.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span translate="mcsrApp.design.name">Name</span></dt>
+        <dd>
+            <span>{{vm.design.name}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.design.version">Version</span></dt>
+        <dd>
+            <span>{{vm.design.version}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.design.comment">Comment</span></dt>
+        <dd>
+            <span>{{vm.design.comment}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.design.designId">Design Id</span></dt>
+        <dd>
+            <span>{{vm.design.designId}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.design.organisationId">Organisation Id</span></dt>
+        <dd>
+            <span>{{vm.design.organisationId}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.design.status">Status</span></dt>
+        <dd>
+            <span>{{vm.design.status}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.design.organizationId">Organization Id</span></dt>
+        <dd>
+            <span>{{vm.design.organizationId}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.design.designAsXml">Design As Xml</span></dt>
+        <dd>
+            <a ui-sref="xml-detail({id:vm.design.designAsXml.id})">{{vm.design.designAsXml.id}}</a>
+        </dd>
+        <dt><span translate="mcsrApp.design.designAsDoc">Design As Doc</span></dt>
+        <dd>
+            <a ui-sref="doc-detail({id:vm.design.designAsDoc.id})">{{vm.design.designAsDoc.name}}</a>
+        </dd>
+        <dt><span translate="mcsrApp.design.implementedSpecificationVersion">Implemented Specification Version</span></dt>
+        <dd>
+            <a ui-sref="specification-template-detail({id:vm.design.implementedSpecificationVersion.id})">{{vm.design.implementedSpecificationVersion.version}}</a>
+        </dd>
+        <dt><span translate="mcsrApp.design.specifications">Specifications</span></dt>
+        <dd>
+            <span ng-repeat="specifications in vm.design.specifications">
+                <a ui-sref="specification-detail({id: specifications.id})">{{specifications.name}}</a>{{$last ? '' : ', '}}
+            </span>
+        </dd>
+        <dt><span translate="mcsrApp.design.docs">Docs</span></dt>
+        <dd>
+            <span ng-repeat="docs in vm.design.docs">
+                <a ui-sref="doc-detail({id: docs.id})">{{docs.name}}</a>{{$last ? '' : ', '}}
+            </span>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span translate="entity.action.back"> Back</span>
+    </button>
+
+    <button type="button" ui-sref="design-detail.edit({id:vm.design.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-xs hidden-sm" translate="entity.action.edit"> Edit</span>
+    </button>
+</div>

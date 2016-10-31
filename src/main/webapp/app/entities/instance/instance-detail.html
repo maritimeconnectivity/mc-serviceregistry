@@ -1,0 +1,90 @@
+
+<div>
+    <h2><span translate="mcsrApp.instance.detail.title">Instance</span> {{vm.instance.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span translate="mcsrApp.instance.name">Name</span></dt>
+        <dd>
+            <span>{{vm.instance.name}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.instance.version">Version</span></dt>
+        <dd>
+            <span>{{vm.instance.version}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.instance.comment">Comment</span></dt>
+        <dd>
+            <span>{{vm.instance.comment}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.instance.geometry">Geometry</span></dt>
+        <dd>
+            <div ng-if="vm.instance.geometry">
+                <a ng-click="vm.openFile(vm.instance.geometryContentType, vm.instance.geometry)" translate="entity.action.open">open</a>
+                {{vm.instance.geometryContentType}}, {{vm.byteSize(vm.instance.geometry)}}
+            </div>
+        </dd>
+        <dt><span translate="mcsrApp.instance.instanceId">Instance Id</span></dt>
+        <dd>
+            <span>{{vm.instance.instanceId}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.instance.keywords">Keywords</span></dt>
+        <dd>
+            <span>{{vm.instance.keywords}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.instance.status">Status</span></dt>
+        <dd>
+            <span>{{vm.instance.status}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.instance.organizationId">Organization Id</span></dt>
+        <dd>
+            <span>{{vm.instance.organizationId}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.instance.unlocode">Unlocode</span></dt>
+        <dd>
+            <span>{{vm.instance.unlocode}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.instance.endpointUri">Endpoint Uri</span></dt>
+        <dd>
+            <span>{{vm.instance.endpointUri}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.instance.endpointType">Endpoint Type</span></dt>
+        <dd>
+            <span>{{vm.instance.endpointType}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.instance.instanceAsXml">Instance As Xml</span></dt>
+        <dd>
+            <a ui-sref="xml-detail({id:vm.instance.instanceAsXml.id})">{{vm.instance.instanceAsXml.id}}</a>
+        </dd>
+        <dt><span translate="mcsrApp.instance.instanceAsDoc">Instance As Doc</span></dt>
+        <dd>
+            <a ui-sref="doc-detail({id:vm.instance.instanceAsDoc.id})">{{vm.instance.instanceAsDoc.name}}</a>
+        </dd>
+        <dt><span translate="mcsrApp.instance.implementedSpecificationVersion">Implemented Specification Version</span></dt>
+        <dd>
+            <a ui-sref="specification-template-detail({id:vm.instance.implementedSpecificationVersion.id})">{{vm.instance.implementedSpecificationVersion.version}}</a>
+        </dd>
+        <dt><span translate="mcsrApp.instance.designs">Designs</span></dt>
+        <dd>
+            <span ng-repeat="designs in vm.instance.designs">
+                <a ui-sref="design-detail({id: designs.id})">{{designs.name}}</a>{{$last ? '' : ', '}}
+            </span>
+        </dd>
+        <dt><span translate="mcsrApp.instance.docs">Docs</span></dt>
+        <dd>
+            <span ng-repeat="docs in vm.instance.docs">
+                <a ui-sref="doc-detail({id: docs.id})">{{docs.name}}</a>{{$last ? '' : ', '}}
+            </span>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span translate="entity.action.back"> Back</span>
+    </button>
+
+    <button type="button" ui-sref="instance-detail.edit({id:vm.instance.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-xs hidden-sm" translate="entity.action.edit"> Edit</span>
+    </button>
+</div>

@@ -1,0 +1,33 @@
+{
+    "mcsrApp": {
+        "specification" : {
+            "home": {
+                "title": "Specifications",
+                "createLabel": "Create a new Specification",
+                "createOrEditLabel": "Create or edit a Specification",
+                "search": "Search for Specification"
+            },
+            "created": "A new Specification is created with identifier {{ param }}",
+            "updated": "A Specification is updated with identifier {{ param }}",
+            "deleted": "A Specification is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Specification {{ id }}?"
+            },
+            "detail": {
+                "title": "Specification"
+            },
+            "name": "Name",
+            "version": "Version",
+            "comment": "Comment",
+            "organisationId": "Organisation Id",
+            "keywords": "Keywords",
+            "specificationId": "Specification Id",
+            "status": "Status",
+            "organizationId": "Organization Id",
+            "specAsXml": "Spec As Xml",
+            "specAsDoc": "Spec As Doc",
+            "implementedSpecificationVersion": "Implemented Specification Version",
+            "docs": "Docs"
+        }
+    }
+}

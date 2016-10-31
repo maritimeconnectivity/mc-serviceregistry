@@ -1,0 +1,26 @@
+{
+    "mcsrApp": {
+        "specificationTemplateSet" : {
+            "home": {
+                "title": "Specification Template Sets",
+                "createLabel": "Create a new Specification Template Set",
+                "createOrEditLabel": "Create or edit a Specification Template Set",
+                "search": "Search for Specification Template Set"
+            },
+            "created": "A new Specification Template Set is created with identifier {{ param }}",
+            "updated": "A Specification Template Set is updated with identifier {{ param }}",
+            "deleted": "A Specification Template Set is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Specification Template Set {{ id }}?"
+            },
+            "detail": {
+                "title": "Specification Template Set"
+            },
+            "name": "Name",
+            "version": "Version",
+            "comment": "Comment",
+            "templates": "Templates",
+            "docs": "Docs"
+        }
+    }
+}

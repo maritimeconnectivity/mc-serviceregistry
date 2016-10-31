@@ -1,0 +1,43 @@
+
+<div>
+    <h2><span translate="mcsrApp.specificationTemplateSet.detail.title">Specification Template Set</span> {{vm.specificationTemplateSet.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span translate="mcsrApp.specificationTemplateSet.name">Name</span></dt>
+        <dd>
+            <span>{{vm.specificationTemplateSet.name}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.specificationTemplateSet.version">Version</span></dt>
+        <dd>
+            <span>{{vm.specificationTemplateSet.version}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.specificationTemplateSet.comment">Comment</span></dt>
+        <dd>
+            <span>{{vm.specificationTemplateSet.comment}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.specificationTemplateSet.templates">Templates</span></dt>
+        <dd>
+            <span ng-repeat="templates in vm.specificationTemplateSet.templates">
+                <a ui-sref="specification-template-detail({id: templates.id})">{{templates.id}}</a>{{$last ? '' : ', '}}
+            </span>
+        </dd>
+        <dt><span translate="mcsrApp.specificationTemplateSet.docs">Docs</span></dt>
+        <dd>
+            <span ng-repeat="docs in vm.specificationTemplateSet.docs">
+                <a ui-sref="doc-detail({id: docs.id})">{{docs.name}}</a>{{$last ? '' : ', '}}
+            </span>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span translate="entity.action.back"> Back</span>
+    </button>
+
+    <button type="button" ui-sref="specification-template-set-detail.edit({id:vm.specificationTemplateSet.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-xs hidden-sm" translate="entity.action.edit"> Edit</span>
+    </button>
+</div>

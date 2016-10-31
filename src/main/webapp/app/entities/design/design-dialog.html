@@ -1,0 +1,118 @@
+
+<form name="editForm" role="form" novalidate ng-submit="vm.save()" show-validation>
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                ng-click="vm.clear()">&times;</button>
+        <h4 class="modal-title" id="myDesignLabel" translate="mcsrApp.design.home.createOrEditLabel">Create or edit a Design</h4>
+    </div>
+    <div class="modal-body">
+        <jhi-alert-error></jhi-alert-error>
+        <div class="form-group" ng-show="vm.design.id">
+            <label for="id" translate="global.field.id">ID</label>
+            <input type="text" class="form-control" id="id" name="id"
+                    ng-model="vm.design.id" readonly />
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="mcsrApp.design.name" for="field_name">Name</label>
+            <input type="text" class="form-control" name="name" id="field_name"
+                    ng-model="vm.design.name"
+                    required />
+            <div ng-show="editForm.name.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.name.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="mcsrApp.design.version" for="field_version">Version</label>
+            <input type="text" class="form-control" name="version" id="field_version"
+                    ng-model="vm.design.version"
+                    required />
+            <div ng-show="editForm.version.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.version.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="mcsrApp.design.comment" for="field_comment">Comment</label>
+            <input type="text" class="form-control" name="comment" id="field_comment"
+                    ng-model="vm.design.comment"
+                    required />
+            <div ng-show="editForm.comment.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.comment.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="mcsrApp.design.designId" for="field_designId">Design Id</label>
+            <input type="text" class="form-control" name="designId" id="field_designId"
+                    ng-model="vm.design.designId"
+                    required />
+            <div ng-show="editForm.designId.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.designId.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="mcsrApp.design.organisationId" for="field_organisationId">Organisation Id</label>
+            <input type="text" class="form-control" name="organisationId" id="field_organisationId"
+                    ng-model="vm.design.organisationId"
+                     />
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="mcsrApp.design.status" for="field_status">Status</label>
+            <input type="text" class="form-control" name="status" id="field_status"
+                    ng-model="vm.design.status"
+                     />
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="mcsrApp.design.organizationId" for="field_organizationId">Organization Id</label>
+            <input type="text" class="form-control" name="organizationId" id="field_organizationId"
+                    ng-model="vm.design.organizationId"
+                     />
+        </div>
+
+        <div class="form-group">
+            <label translate="mcsrApp.design.designAsXml" for="field_designAsXml">Design As Xml</label>
+            <select class="form-control" id="field_designAsXml" name="designAsXml" ng-model="vm.design.designAsXml" ng-options="xml as xml.id for xml in vm.designasxmls | orderBy:'id' track by xml.id">
+                <option value=""></option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label translate="mcsrApp.design.designAsDoc" for="field_designAsDoc">Design As Doc</label>
+            <select class="form-control" id="field_designAsDoc" name="designAsDoc" ng-model="vm.design.designAsDoc" ng-options="doc as doc.name for doc in vm.designasdocs | orderBy:'id' track by doc.id">
+                <option value=""></option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label translate="mcsrApp.design.implementedSpecificationVersion" for="field_implementedSpecificationVersion">Implemented Specification Version</label>
+            <select class="form-control" id="field_implementedSpecificationVersion" name="implementedSpecificationVersion" ng-model="vm.design.implementedSpecificationVersion" ng-options="specificationTemplate as specificationTemplate.version for specificationTemplate in vm.specificationtemplates track by specificationTemplate.id">
+                <option value=""></option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label translate="mcsrApp.design.specifications" for="field_specifications">Specifications</label>
+            <select class="form-control" id="field_specifications" multiple name="specifications" ng-model="vm.design.specifications" ng-options="specification as specification.name for specification in vm.specifications track by specification.id"></select>
+        </div>
+        <div class="form-group">
+            <label translate="mcsrApp.design.docs" for="field_docs">Docs</label>
+            <select class="form-control" id="field_docs" multiple name="docs" ng-model="vm.design.docs" ng-options="doc as doc.name for doc in vm.docs track by doc.id"></select>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.clear()">
+            <span class="glyphicon glyphicon-ban-circle"></span>&nbsp;<span translate="entity.action.cancel">Cancel</span>
+        </button>
+        <button type="submit" ng-disabled="editForm.$invalid || vm.isSaving" class="btn btn-primary">
+            <span class="glyphicon glyphicon-save"></span>&nbsp;<span translate="entity.action.save">Save</span>
+        </button>
+    </div>
+</form>
