@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
@@ -189,6 +190,25 @@ public class DesignService {
             designs = designSearchRepository.search(queryStringQuery("design_id=\""+domainId), pageable);
         } catch (Exception e) {
             log.debug("Could not find design for domain id {}", domainId);
+            e.printStackTrace();
+        }
+        return designs;
+    }
+
+    /**
+     *  Get all designs by specification id (for example, maritime id).
+     *
+     *  @param specificationId the domain specific id of the specification this design is for
+     *  @return the list of entities
+     */
+    @Transactional(readOnly = true)
+    public List<Design> findAllBySpecificationId(String specificationId) {
+        log.debug("Request to get Design by specification id {}", specificationId);
+        List<Design> designs = null;
+        try {
+            designs = designRepository.findBySpecificationId(specificationId);
+        } catch (Exception e) {
+            log.debug("Could not find design for domain id {}", specificationId);
             e.printStackTrace();
         }
         return designs;

@@ -18,7 +18,9 @@
 package com.frequentis.maritime.mcsr.web.rest.registry;
 
 import com.codahale.metrics.annotation.Timed;
+import com.frequentis.maritime.mcsr.domain.Design;
 import com.frequentis.maritime.mcsr.domain.Instance;
+import com.frequentis.maritime.mcsr.domain.Specification;
 import com.frequentis.maritime.mcsr.domain.Xml;
 import com.frequentis.maritime.mcsr.service.InstanceService;
 import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
@@ -65,7 +67,7 @@ public class ServiceInstanceResource {
         method = RequestMethod.POST,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Instance> createInstance(@Valid @RequestBody Instance instance, @RequestHeader("Authorization") String bearerToken) throws URISyntaxException {
+    public ResponseEntity<Instance> createInstance(@Valid @RequestBody Instance instance, @RequestHeader(value = "Authorization", required=false) String bearerToken) throws URISyntaxException {
         log.debug("REST request to save Instance : {}", instance);
         String organizationId = "";
         try {
@@ -85,6 +87,18 @@ public class ServiceInstanceResource {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
+        if (instance.getDesigns() != null && instance.getDesigns().size() > 0) {
+            Design design = instance.getDesigns().iterator().next();
+            if (design != null) {
+                instance.setDesignId(design.getDesignId());
+                if (design.getSpecifications() != null && design.getSpecifications().size()> 0) {
+                    Specification specification = design.getSpecifications().iterator().next();
+                    if (specification != null) {
+                        instance.setSpecificationId(specification.getSpecificationId());
+                    }
+                }
+            }
+        }
         Instance result = instanceService.save(instance);
         try {
             result = InstanceUtil.parseInstanceGeometryFromXML(result);
@@ -111,7 +125,7 @@ public class ServiceInstanceResource {
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Instance> updateInstance(@Valid @RequestBody Instance instance, @RequestHeader("Authorization") String bearerToken) throws URISyntaxException {
+    public ResponseEntity<Instance> updateInstance(@Valid @RequestBody Instance instance, @RequestHeader(value = "Authorization", required=false) String bearerToken) throws URISyntaxException {
         log.debug("REST request to update Instance : {}", instance);
 
         try {
@@ -134,6 +148,18 @@ public class ServiceInstanceResource {
         if (instance.getOrganizationId() != null && instance.getOrganizationId().length() > 0 && !organizationId.equals(instance.getOrganizationId())) {
             log.warn("Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+instance.getOrganizationId());
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        if (instance.getDesigns() != null && instance.getDesigns().size() > 0) {
+            Design design = instance.getDesigns().iterator().next();
+            if (design != null) {
+                instance.setDesignId(design.getDesignId());
+                if (design.getSpecifications() != null && design.getSpecifications().size()> 0) {
+                    Specification specification = design.getSpecifications().iterator().next();
+                    if (specification != null) {
+                        instance.setSpecificationId(specification.getSpecificationId());
+                    }
+                }
+            }
         }
 
         Instance result = instanceService.save(instance);
@@ -160,10 +186,16 @@ public class ServiceInstanceResource {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<List<Instance>> getAllInstances(Pageable pageable)
+    public ResponseEntity<List<Instance>> getAllInstances(@RequestParam(defaultValue = "false") String includeDoc, @RequestHeader(value = "Authorization", required=false) String bearerToken, Pageable pageable)
         throws URISyntaxException {
         log.debug("REST request to get a page of Instances");
         Page<Instance> page = instanceService.findAll(pageable);
+        if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
+            for(Instance instance:page.getContent()) {
+                instance.setDocs(null);
+                instance.setInstanceAsDoc(null);
+            }
+        }
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/serviceInstance");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -180,13 +212,17 @@ public class ServiceInstanceResource {
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @ApiOperation(value = "getInstance", notes = "Returns the service instance with the specified id and version. Use version 'latest' to get the newest one.")
-    public ResponseEntity<Instance> getInstance(@PathVariable String id, @PathVariable String version) {
+    public ResponseEntity<Instance> getInstance(@PathVariable String id, @PathVariable String version, @RequestParam(defaultValue = "false") String includeDoc, @RequestHeader(value = "Authorization", required=false) String bearerToken) {
         log.debug("REST request to get Instance via domain id {} and version {}", id, version);
         Instance instance = null;
         if (version.equalsIgnoreCase("latest")) {
             instance = instanceService.findLatestVersionByDomainId(id);
         } else {
             instance = instanceService.findByDomainId(id, version);
+        }
+        if (instance != null && "true".equalsIgnoreCase(includeDoc) == false) {
+            instance.setDocs(null);
+            instance.setInstanceAsDoc(null);
         }
         return Optional.ofNullable(instance)
             .map(result -> new ResponseEntity<>(
@@ -205,10 +241,16 @@ public class ServiceInstanceResource {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<List<Instance>> getAllInstancesById(@PathVariable String id, Pageable pageable)
+    public ResponseEntity<List<Instance>> getAllInstancesById(@PathVariable String id, @RequestParam(defaultValue = "false") String includeDoc, @RequestHeader(value = "Authorization", required=false) String bearerToken, Pageable pageable)
         throws URISyntaxException {
         log.debug("REST request to get a page of Instances by id {}", id);
         Page<Instance> page = instanceService.findAllByDomainId(id, pageable);
+        if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
+            for(Instance instance:page.getContent()) {
+                instance.setDocs(null);
+                instance.setInstanceAsDoc(null);
+            }
+        }
         HttpHeaders headers = PaginationUtil.generateSearchPaginationNoQueryHttpHeaders(page, "/api/serviceInstance/"+id);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -224,7 +266,7 @@ public class ServiceInstanceResource {
         method = RequestMethod.DELETE,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Void> deleteInstance(@PathVariable String id, @PathVariable String version, @RequestHeader("Authorization") String bearerToken) {
+    public ResponseEntity<Void> deleteInstance(@PathVariable String id, @PathVariable String version, @RequestHeader(value = "Authorization", required=false) String bearerToken) {
         log.debug("REST request to delete Instance id {} version {}", id, version);
         Instance instance = instanceService.findByDomainId(id, version);
 
@@ -254,10 +296,16 @@ public class ServiceInstanceResource {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<List<Instance>> searchInstances(@RequestParam String query, Pageable pageable)
+    public ResponseEntity<List<Instance>> searchInstances(@RequestParam String query, @RequestParam(defaultValue = "false") String includeDoc, @RequestHeader(value = "Authorization", required=false) String bearerToken, Pageable pageable)
         throws URISyntaxException {
         log.debug("REST request to search for a page of Instances for query {}", query);
         Page<Instance> page = instanceService.search(query, pageable);
+        if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
+            for(Instance instance:page.getContent()) {
+                instance.setDocs(null);
+                instance.setInstanceAsDoc(null);
+            }
+        }
         HttpHeaders headers = PaginationUtil.generateSearchPaginationHttpHeaders(query, page, "/api/_search/serviceInstance");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -273,10 +321,16 @@ public class ServiceInstanceResource {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<List<Instance>> searchInstancesByKeywords(@RequestParam String query, Pageable pageable)
+    public ResponseEntity<List<Instance>> searchInstancesByKeywords(@RequestParam String query, @RequestParam(defaultValue = "false") String includeDoc, @RequestHeader(value = "Authorization", required=false) String bearerToken, Pageable pageable)
         throws URISyntaxException {
         log.debug("REST request to search for a page of Instances for keywords {}", query);
         Page<Instance> page = instanceService.searchKeywords(query, pageable);
+        if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
+            for(Instance instance:page.getContent()) {
+                instance.setDocs(null);
+                instance.setInstanceAsDoc(null);
+            }
+        }
         HttpHeaders headers = PaginationUtil.generateSearchPaginationHttpHeaders(query, page, "/api/_searchKeywords/serviceInstance");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -293,10 +347,16 @@ public class ServiceInstanceResource {
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @ApiOperation(value = "searchInstancesByUnlocode", notes = "Returns all service instances matching the specified UnLoCode.")
-    public ResponseEntity<List<Instance>> searchInstancesByUnlocode(@RequestParam String query, Pageable pageable)
+    public ResponseEntity<List<Instance>> searchInstancesByUnlocode(@RequestParam String query, @RequestParam(defaultValue = "false") String includeDoc, @RequestHeader(value = "Authorization", required=false) String bearerToken, Pageable pageable)
         throws URISyntaxException {
         log.debug("REST request to search for a page of Instances for unlocode {}", query);
         Page<Instance> page = instanceService.searchUnlocode(query, pageable);
+        if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
+            for(Instance instance:page.getContent()) {
+                instance.setDocs(null);
+                instance.setInstanceAsDoc(null);
+            }
+        }
         HttpHeaders headers = PaginationUtil.generateSearchPaginationHttpHeaders(query, page, "/api/_searchUnlocode/serviceInstance");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -314,11 +374,17 @@ public class ServiceInstanceResource {
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @ApiOperation(value = "searchInstancesByLocation", notes = "Returns all service instances matching the specified Lat/Lon coordinates.")
-    public ResponseEntity<List<Instance>> searchInstancesByLocation(@RequestParam String latitude, @RequestParam String longitude, Pageable pageable)
+    public ResponseEntity<List<Instance>> searchInstancesByLocation(@RequestParam String latitude, @RequestParam(defaultValue = "false") String includeDoc, @RequestParam String longitude, @RequestParam String query, @RequestHeader(value = "Authorization", required=false) String bearerToken, Pageable pageable)
         throws URISyntaxException {
         log.debug("REST request to get Instance by lat {} long {}", latitude, longitude);
-        Page<Instance> page = instanceService.findByLocation(Double.parseDouble(latitude), Double.parseDouble(longitude), pageable);
-        //TODO: pagination headers only support one query parameter, need to find out if we even need this for the API
+        Page<Instance> page = instanceService.findByLocation(Double.parseDouble(latitude), Double.parseDouble(longitude), query, pageable);
+        if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
+            for(Instance instance:page.getContent()) {
+                instance.setDocs(null);
+                instance.setInstanceAsDoc(null);
+            }
+        }
+//TODO: pagination headers only support one query parameter, need to find out if we even need this for the API
         HttpHeaders headers = PaginationUtil.generateSearchPaginationHttpHeaders(latitude, page, "/api/_searchLocation/serviceInstance");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -328,6 +394,7 @@ public class ServiceInstanceResource {
      * to the supplied position
      *
      * @param geometry the search geometry in geojson format
+     * @param query additional query filters in elasticsearch queryString syntax
      * @return the result of the search
      */
     @RequestMapping(value = "/_searchGeometryGeoJSON/serviceInstance",
@@ -335,10 +402,16 @@ public class ServiceInstanceResource {
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @ApiOperation(value = "searchInstancesByGeometryGeojson", notes = "Returns all service instances matching the specified GeoJson shape.")
-    public ResponseEntity<List<Instance>> searchInstancesByGeometryGeojson(@RequestParam String geometry, Pageable pageable)
+    public ResponseEntity<List<Instance>> searchInstancesByGeometryGeojson(@RequestParam String geometry, @RequestParam(defaultValue = "false") String includeDoc, @RequestParam String query, @RequestHeader(value = "Authorization", required=false) String bearerToken, Pageable pageable)
         throws URISyntaxException {
         log.debug("REST request to get Instance by geojson ", geometry);
-        Page<Instance> page = instanceService.findByGeoshape(geometry, pageable);
+        Page<Instance> page = instanceService.findByGeoshape(geometry, query, pageable);
+        if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
+            for(Instance instance:page.getContent()) {
+                instance.setDocs(null);
+                instance.setInstanceAsDoc(null);
+            }
+        }
         HttpHeaders headers = PaginationUtil.generateSearchPaginationHttpHeaders(geometry, page, "/api/_searchGeometry/serviceInstance");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -348,6 +421,7 @@ public class ServiceInstanceResource {
      * to the supplied position
      *
      * @param geometry the search geometry in WKT format
+     * @param query additional query filters in elasticsearch queryString syntax
      * @return the result of the search
      */
     @RequestMapping(value = "/_searchGeometryWKT/serviceInstance",
@@ -355,7 +429,7 @@ public class ServiceInstanceResource {
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @ApiOperation(value = "searchInstancesByGeometryWKT", notes = "Returns all service instances matching the specified WKT shape.")
-    public ResponseEntity<List<Instance>> searchInstancesByGeometryWKT(@RequestParam String geometry, Pageable pageable)
+    public ResponseEntity<List<Instance>> searchInstancesByGeometryWKT(@RequestParam String geometry, @RequestParam String query, @RequestParam(defaultValue = "false") String includeDoc, @RequestHeader(value = "Authorization", required=false) String bearerToken, Pageable pageable)
         throws URISyntaxException {
         log.debug("REST request to get Instance by wkt ", geometry);
         String geoJson = null;
@@ -366,7 +440,13 @@ public class ServiceInstanceResource {
             log.error("Error parsing wkt: ", e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        Page<Instance> page = instanceService.findByGeoshape(geoJson, pageable);
+        Page<Instance> page = instanceService.findByGeoshape(geoJson, query, pageable);
+        if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
+            for(Instance instance:page.getContent()) {
+                instance.setDocs(null);
+                instance.setInstanceAsDoc(null);
+            }
+        }
         HttpHeaders headers = PaginationUtil.generateSearchPaginationHttpHeaders(geoJson, page, "/api/_searchGeometry/serviceInstance");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -383,7 +463,7 @@ public class ServiceInstanceResource {
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Void> updateInstanceStatus(@PathVariable String id, @PathVariable String version, @RequestParam String status, @RequestHeader("Authorization") String bearerToken) {
+    public ResponseEntity<Void> updateInstanceStatus(@PathVariable String id, @PathVariable String version, @RequestParam String status, @RequestHeader(value = "Authorization", required=false) String bearerToken) {
         log.debug("REST request to update status of Instance {} version {}", id, version);
         try {
             Instance instance = instanceService.findByDomainId(id, version);

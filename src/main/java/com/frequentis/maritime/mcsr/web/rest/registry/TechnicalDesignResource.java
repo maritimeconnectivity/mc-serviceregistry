@@ -184,6 +184,23 @@ public class TechnicalDesignResource {
     }
 
     /**
+     * GET  /_searchSpecificationId/technicalDesign?id=:id : get all designs for specification id "id" across all versions.
+     *
+     * @param id the domain id of the specification for which all designs are to be retrieved
+     * @return the result of the search
+     */
+    @RequestMapping(value = "/_searchSpecificationId/technicalDesign",
+        method = RequestMethod.GET,
+        produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<List<Design>> getAllDesignsBySpecificationId(@RequestParam String id, Pageable pageable)
+        throws URISyntaxException {
+        log.debug("REST request to get a page of Instances by id {}", id);
+        List<Design> designs = designService.findAllBySpecificationId(id);
+        return new ResponseEntity<>(designs, new HttpHeaders(), HttpStatus.OK);
+    }
+
+    /**
      * DELETE  /technicalDesign/:id/:version : delete the "id" design of version "version".
      *
      * @param id the id of the design to delete

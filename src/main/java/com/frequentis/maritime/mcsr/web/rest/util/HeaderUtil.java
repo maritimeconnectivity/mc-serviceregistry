@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 
 import javax.xml.bind.DatatypeConverter;
-import java.io.IOException;
 
 /**
  * Utility class for HTTP headers creation.
@@ -64,10 +63,15 @@ public class HeaderUtil {
         return headers;
     }
 
-    public static String extractOrganizationIdFromToken(String tokenHeader) throws IOException {
-        String tokenJson = DatatypeConverter.printBase64Binary(tokenHeader.getBytes());
+    public static String extractOrganizationIdFromToken(String tokenHeader) throws Exception {
+        String payload = tokenHeader.substring(tokenHeader.indexOf('.') + 1, tokenHeader.indexOf('.', tokenHeader.indexOf('.') + 1));
+        //Make sure string length is a multiple of 4 to avoid issue in parseBase64Binary function
+        while (payload.length()%4 != 0) {
+            payload += "=";
+        }
+        String tokenJson = new String(DatatypeConverter.parseBase64Binary(payload), "UTF-8");
         ObjectMapper mapper = new ObjectMapper();
         JsonNode json = mapper.readTree(tokenJson);
-        return json.get("org").toString();
+        return json.get("org").textValue();
     }
 }
