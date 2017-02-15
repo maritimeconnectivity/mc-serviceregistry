@@ -19,8 +19,8 @@
 package com.frequentis.maritime.mcsr.repository;
 
 import com.frequentis.maritime.mcsr.domain.Instance;
-
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
@@ -38,9 +38,15 @@ public interface InstanceRepository extends JpaRepository<Instance,Long> {
     Instance findOneWithEagerRelationships(@Param("id") Long id);
 
     @Query("select distinct instance from Instance instance left join fetch instance.designs left join fetch instance.docs where instance.instanceId = :id")
-    List<Instance> findByDomainId(@Param("id") String id);
+    List<Instance> findByDomainIdEagerRelationships(@Param("id") String id);
 
     @Query("select distinct instance from Instance instance left join fetch instance.designs left join fetch instance.docs where instance.instanceId = :id and instance.version = :version")
+    List<Instance> findByDomainIdAndVersionEagerRelationships(@Param("id") String id, @Param("version") String version);
+
+    @Query("select distinct instance from Instance instance where instance.instanceId = :id")
+    List<Instance> findByDomainId(@Param("id") String id);
+
+    @Query("select distinct instance from Instance instance where instance.instanceId = :id and instance.version = :version")
     List<Instance> findByDomainIdAndVersion(@Param("id") String id, @Param("version") String version);
 
 }

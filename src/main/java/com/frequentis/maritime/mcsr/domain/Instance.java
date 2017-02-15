@@ -18,6 +18,7 @@
 
 package com.frequentis.maritime.mcsr.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.frequentis.maritime.mcsr.domain.util.JsonNodeConverter;
 import io.swagger.annotations.ApiModel;
@@ -26,11 +27,11 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Holds a description of an service instance.An instance can be compatible to one or morespecification templates.It has at least a technical representation of thedescriptiion in form of an XML and a filled out templateas e.g. word document.
@@ -46,6 +47,7 @@ import java.util.Objects;
 public class Instance implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    public static final String SERVICESTATUS_LIVE = "live";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -92,6 +94,21 @@ public class Instance implements Serializable {
     @Column(name = "endpoint_type")
     private String endpointType;
 
+    @Column(name = "mmsi")
+    private String mmsi;
+
+    @Column(name = "imo")
+    private String imo;
+
+    @Column(name = "service_type")
+    private String serviceType;
+
+    @Column(name = "design_id")
+    private String designId;
+
+    @Column(name = "specification_id")
+    private String specificationId;
+
     @OneToOne
     @JoinColumn(unique = true)
     private Xml instanceAsXml;
@@ -103,14 +120,15 @@ public class Instance implements Serializable {
     @ManyToOne
     private SpecificationTemplate implementedSpecificationVersion;
 
-    @ManyToMany
+    @ManyToMany(fetch=FetchType.LAZY)
+    @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JoinTable(name = "instance_designs",
                joinColumns = @JoinColumn(name="instances_id", referencedColumnName="ID"),
                inverseJoinColumns = @JoinColumn(name="designs_id", referencedColumnName="ID"))
     private Set<Design> designs = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(fetch=FetchType.LAZY)
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JoinTable(name = "instance_docs",
                joinColumns = @JoinColumn(name="instances_id", referencedColumnName="ID"),
@@ -221,6 +239,26 @@ public class Instance implements Serializable {
         this.endpointType = endpointType;
     }
 
+    public String getMmsi() { return mmsi; }
+
+    public void setMmsi(String mmsi) { this.mmsi = mmsi; }
+
+    public String getImo() { return imo; }
+
+    public void setImo(String imo) { this.imo = imo; }
+
+    public String getServiceType() { return serviceType; }
+
+    public void setServiceType(String serviceType) { this.serviceType = serviceType; }
+
+    public String getDesignId() { return designId; }
+
+    public void setDesignId(String designId) { this.designId = designId; }
+
+    public String getSpecificationId() { return specificationId; }
+
+    public void setSpecificationId(String specificationId) { this.specificationId = specificationId; }
+
     public Xml getInstanceAsXml() {
         return instanceAsXml;
     }
@@ -297,6 +335,11 @@ public class Instance implements Serializable {
             ", unlocode='" + unlocode + "'" +
             ", endpointUri='" + endpointUri + "'" +
             ", endpointType='" + endpointType + "'" +
+            ", designId='" + designId + "'" +
+            ", specificationId='" + specificationId + "'" +
+            ", mmsi='" + mmsi + "'" +
+            ", imo='" + imo+ "'" +
+            ", serviceType='" + serviceType + "'" +
             '}';
     }
 }

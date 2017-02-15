@@ -21,8 +21,6 @@ package com.frequentis.maritime.mcsr.web.rest.util;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.frequentis.maritime.mcsr.domain.Instance;
-import com.frequentis.maritime.mcsr.web.rest.InstanceResource;
-import com.frequentis.maritime.mcsr.web.rest.registry.ServiceInstanceResource;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
@@ -72,6 +70,9 @@ public class InstanceUtil {
         instance.setStatus(xPath.compile("/*[local-name()='serviceInstance']/*[local-name()='status']").evaluate(doc, XPathConstants.STRING).toString());
         instance.setComment(xPath.compile("/*[local-name()='serviceInstance']/*[local-name()='description']").evaluate(doc, XPathConstants.STRING).toString());
         instance.setEndpointUri(xPath.compile("/*[local-name()='serviceInstance']/*[local-name()='URL']").evaluate(doc, XPathConstants.STRING).toString());
+        instance.setMmsi(xPath.compile("/*[local-name()='serviceInstance']/*[local-name()='MMSI']").evaluate(doc, XPathConstants.STRING).toString());
+        instance.setImo(xPath.compile("/*[local-name()='serviceInstance']/*[local-name()='IMO']").evaluate(doc, XPathConstants.STRING).toString());
+        instance.setServiceType(xPath.compile("/*[local-name()='serviceInstance']/*[local-name()='serviceType']").evaluate(doc, XPathConstants.STRING).toString());
 
         String unLoCode = xPath.compile("/*[local-name()='serviceInstance']/*[local-name()='unLoCode']").evaluate(doc, XPathConstants.STRING).toString();
         if (unLoCode != null && unLoCode.length() > 0) {
@@ -96,16 +97,14 @@ public class InstanceUtil {
         XPathFactory xPathFactory = XPathFactory.newInstance();
         XPath xPath = xPathFactory.newXPath();
 
-        String unLoCode = xPath.compile("/*[local-name()='serviceInstance']/*[local-name()='unLoCode']").evaluate(doc, XPathConstants.STRING).toString();
+        String unLoCode = xPath.compile("/*[local-name()='serviceInstance']/*[local-name()='coversAreas']/*[local-name()='unLoCode']").evaluate(doc, XPathConstants.STRING).toString();
+        String geometryAsWKT = xPath.compile("/*[local-name()='serviceInstance']/*[local-name()='coversAreas']/*[local-name()='coversArea']/*[local-name()='geometryAsWKT']").evaluate(doc);
         if (unLoCode != null && unLoCode.length() > 0) {
             instance.setUnlocode(unLoCode);
             mapUnLoCodeToLocation(instance, unLoCode);
-        } else {
-            String geometryAsWKT = xPath.compile("/*[local-name()='serviceInstance']/*[local-name()='coversAreas']/*[local-name()='coversArea']/*[local-name()='geometryAsWKT']").evaluate(doc);
-            if (geometryAsWKT != null) {
-                JsonNode geometryAsGeoJson = convertWKTtoGeoJson(geometryAsWKT);
-                instance.setGeometry(geometryAsGeoJson);
-            }
+        } else if (geometryAsWKT != null && geometryAsWKT.length() > 0) {
+            JsonNode geometryAsGeoJson = convertWKTtoGeoJson(geometryAsWKT);
+            instance.setGeometry(geometryAsGeoJson);
         }
         return instance;
     }

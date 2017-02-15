@@ -42,4 +42,7 @@ public interface DesignRepository extends JpaRepository<Design,Long> {
 
     @Query("select distinct design from Design design left join fetch design.specifications left join fetch design.docs where design.designId = :id and design.version = :version")
     List<Design> findByDomainIdAndVersion(@Param("id") String id, @Param("version") String version);
+
+    @Query("select distinct design from Design design left join fetch design.specifications left join fetch design.docs join design.specifications as specification where specification.specificationId = :id")
+    List<Design> findBySpecificationId(@Param("id") String id);
 }
