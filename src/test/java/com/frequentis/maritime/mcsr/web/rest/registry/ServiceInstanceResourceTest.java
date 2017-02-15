@@ -20,25 +20,60 @@ package com.frequentis.maritime.mcsr.web.rest.registry;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.frequentis.maritime.mcsr.McsrApp;
 import com.frequentis.maritime.mcsr.domain.Instance;
 import com.frequentis.maritime.mcsr.domain.Xml;
-import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
+import com.frequentis.maritime.mcsr.repository.InstanceRepository;
+import com.frequentis.maritime.mcsr.repository.XmlRepository;
+import com.frequentis.maritime.mcsr.repository.search.InstanceSearchRepository;
+import com.frequentis.maritime.mcsr.repository.search.XmlSearchRepository;
+import com.frequentis.maritime.mcsr.service.InstanceService;
+import com.frequentis.maritime.mcsr.service.XmlService;
+import com.frequentis.maritime.mcsr.web.rest.InstanceResource;
+import com.frequentis.maritime.mcsr.web.rest.TestUtil;
+import com.frequentis.maritime.mcsr.web.rest.XmlResource;
 import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.IntegrationTest;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.w3c.dom.Document;
 
 import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
+
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringBufferInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test class for the ServiceInstanceResource REST controller.
@@ -278,15 +313,6 @@ public class ServiceInstanceResourceTest {
         assertThat(i.getGeometry().toString().length() > 0).isTrue();
         assertEquals(comparisonGeoJson.toString(),i.getGeometry().toString());
     }
-
-    @Test
-    public void parseOrganization() throws Exception {
-        String jwtToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImp0aSI6IjE4OTFlZDVmLWNmZTktNGNkYy04ZjhiLWVhYWNkYzUwNWNiYSIsImlhdCI6MTQ4MTcwNjIyNywiZXhwIjoxNDgxNzExNzY2LCJvcmciOiJ0ZXN0In0.pqhTKJlDPmVAI-GjXUKdVY1fxDXaJ3UkOv3I7PCATBA";
-        String organization = HeaderUtil.extractOrganizationIdFromToken(jwtToken);
-        String expectedResult = "test";
-        assertEquals(organization, expectedResult);
-    }
-
 
 /*    @Test
     public void searchGeometry() throws Exception{

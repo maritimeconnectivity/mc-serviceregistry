@@ -67,21 +67,6 @@
             <column name="endpoint_type" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="mmsi" type="varchar(255)">
-                <constraints nullable="true" />
-            </column>
-            <column name="imo" type="varchar(255)">
-                <constraints nullable="true" />
-            </column>
-            <column name="service_type" type="varchar(255)">
-                <constraints nullable="true" />
-            </column>
-            <column name="design_id" type="varchar(255)">
-                <constraints nullable="true" />
-            </column>
-            <column name="specification_id" type="varchar(255)">
-                <constraints nullable="true" />
-            </column>
                         <column name="instance_as_xml_id" type="bigint">
                 <constraints unique="true" nullable="true" />
             </column>            <column name="instance_as_doc_id" type="bigint">

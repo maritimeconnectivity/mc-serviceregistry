@@ -19,9 +19,7 @@
 package com.frequentis.maritime.mcsr.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import com.frequentis.maritime.mcsr.domain.Design;
 import com.frequentis.maritime.mcsr.domain.Instance;
-import com.frequentis.maritime.mcsr.domain.Specification;
 import com.frequentis.maritime.mcsr.service.InstanceService;
 import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
@@ -43,6 +41,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * REST controller for managing Instance.
@@ -78,18 +80,6 @@ public class InstanceResource {
         } catch (Exception e) {
             log.debug("Error parsing xml: ", e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if (instance.getDesigns() != null && instance.getDesigns().size() > 0) {
-            Design design = instance.getDesigns().iterator().next();
-            if (design != null) {
-                instance.setDesignId(design.getDesignId());
-                if (design.getSpecifications() != null && design.getSpecifications().size()> 0) {
-                    Specification specification = design.getSpecifications().iterator().next();
-                    if (specification != null) {
-                        instance.setSpecificationId(specification.getSpecificationId());
-                    }
-                }
-            }
         }
         Instance result = instanceService.save(instance);
         try {
@@ -127,18 +117,6 @@ public class InstanceResource {
         } catch (Exception e) {
             log.debug("Error parsing xml: ", e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if (instance.getDesigns() != null && instance.getDesigns().size() > 0) {
-            Design design = instance.getDesigns().iterator().next();
-            if (design != null) {
-                instance.setDesignId(design.getDesignId());
-                if (design.getSpecifications() != null && design.getSpecifications().size()> 0) {
-                    Specification specification = design.getSpecifications().iterator().next();
-                    if (specification != null) {
-                        instance.setSpecificationId(specification.getSpecificationId());
-                    }
-                }
-            }
         }
         Instance result = instanceService.save(instance);
         try {

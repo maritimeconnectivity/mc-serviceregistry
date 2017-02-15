@@ -24,7 +24,6 @@ import com.frequentis.maritime.mcsr.domain.Instance;
 import com.frequentis.maritime.mcsr.repository.InstanceRepository;
 import com.frequentis.maritime.mcsr.repository.search.InstanceSearchRepository;
 import com.vividsolutions.jts.geom.Geometry;
-import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.elasticsearch.common.geo.builders.ShapeBuilder;
 import org.elasticsearch.common.xcontent.XContentParser;
@@ -41,7 +40,6 @@ import javax.inject.Inject;
 import java.io.IOException;
 
 import static org.elasticsearch.common.geo.builders.ShapeBuilder.newPoint;
-import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.geoShapeQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
@@ -111,8 +109,7 @@ public class InstanceService {
     @Transactional(readOnly = true)
     public Page<Instance> findAll(Pageable pageable) {
         log.debug("Request to get all Instances");
-        Page<Instance> result = null;
-        result = instanceRepository.findAll(pageable);
+        Page<Instance> result = instanceRepository.findAll(pageable);
         return result;
     }
 
@@ -201,7 +198,7 @@ public class InstanceService {
         log.debug("Request to get Instance by domain id {} and version {}", domainId, version);
         Instance instance = null;
         try {
-            Iterable<Instance> instances = instanceRepository.findByDomainIdAndVersionEagerRelationships(domainId, version);
+            Iterable<Instance> instances = instanceRepository.findByDomainIdAndVersion(domainId, version);
             if (instances.iterator().hasNext()) {
                 instance = instances.iterator().next();
             }
@@ -224,18 +221,18 @@ public class InstanceService {
         Instance instance = null;
         DefaultArtifactVersion latestVersion = new DefaultArtifactVersion("0.0");
         try {
-            Iterable<Instance> instances = instanceRepository.findByDomainIdEagerRelationships(domainId);
+            Iterable<Instance> instances = instanceRepository.findByDomainId(domainId);
             if (instances.iterator().hasNext()) {
                 Instance i = instances.iterator().next();
                 //Compare version numbers, save the instance if it's a newer version
                 DefaultArtifactVersion iv = new DefaultArtifactVersion(i.getVersion());
-                if (iv.compareTo(latestVersion) > 0 && i.getStatus().equalsIgnoreCase(Instance.SERVICESTATUS_LIVE)) {
+                if (iv.compareTo(latestVersion) > 0) {
                     instance = i;
                     latestVersion = iv;
                 }
             }
         } catch (Exception e) {
-            log.debug("Could not find a live instance for domain id {}", domainId);
+            log.debug("Could not find instance for domain id {}", domainId);
             e.printStackTrace();
         }
         return instance;
@@ -249,10 +246,10 @@ public class InstanceService {
      */
     @Transactional(readOnly = true)
     public Page<Instance> findAllByDomainId(String domainId, Pageable pageable) {
-        log.debug("Request to get Instance by domain id {}", QueryParser.escape(domainId));
+        log.debug("Request to get Instance by domain id {}", domainId);
         Page<Instance> instances = null;
         try {
-            instances = instanceSearchRepository.search(queryStringQuery("instanceId:" + QueryParser.escape(domainId)), pageable);
+            instances = instanceSearchRepository.search(queryStringQuery("instance_id=\""+domainId), pageable);
         } catch (Exception e) {
             log.debug("Could not find instance for domain id {}", domainId);
             e.printStackTrace();
@@ -268,15 +265,13 @@ public class InstanceService {
      *  @return the entity
      */
     @Transactional(readOnly = true)
-    public Page<Instance> findByLocation(double latitude, double longitude, String query, Pageable pageable) {
-        log.debug("Request to get Instance by lat {} long {} and query {}", latitude, longitude, query);
+    public Page<Instance> findByLocation(double latitude, double longitude, Pageable pageable) {
+        log.debug("Request to get Instance by lat {} long {}", latitude, longitude);
         Page<Instance> instances = null;
         try {
             Geometry g;
             ShapeBuilder sb = newPoint(longitude, latitude);
-            QueryBuilder qb = boolQuery()
-                .must(geoShapeQuery("geometry", sb))
-                .must(queryStringQuery(query));
+            QueryBuilder qb = geoShapeQuery("geometry", sb);
             instances = instanceSearchRepository.search(qb, pageable);
         } catch (Exception e) {
             log.debug("Could not find instance for lat {} long {}", latitude, longitude);
@@ -292,16 +287,14 @@ public class InstanceService {
      *  @return the entity
      */
     @Transactional(readOnly = true)
-    public Page<Instance> findByGeoshape(String geoJson, String query, Pageable pageable) {
-        log.debug("Request to get Instance by query {} and geojson {}", query, geoJson);
+    public Page<Instance> findByGeoshape(String geoJson, Pageable pageable) {
+        log.debug("Request to get Instance by geojson ", geoJson);
         Page<Instance> instances = null;
         try {
             XContentParser parser = JsonXContent.jsonXContent.createParser(geoJson);
             parser.nextToken();
             ShapeBuilder sb = ShapeBuilder.parse(parser);
-            QueryBuilder qb = boolQuery()
-                .must(geoShapeQuery("geometry", sb))
-                .must(queryStringQuery(query));
+            QueryBuilder qb = geoShapeQuery("geometry", sb);
             instances = instanceSearchRepository.search(qb, pageable);
         } catch (Exception e) {
             log.debug("Could not find instance for the given geojson");
