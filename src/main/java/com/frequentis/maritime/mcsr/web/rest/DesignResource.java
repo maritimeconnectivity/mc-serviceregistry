@@ -23,6 +23,7 @@ import com.frequentis.maritime.mcsr.domain.Design;
 import com.frequentis.maritime.mcsr.service.DesignService;
 import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
+import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -40,10 +41,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * REST controller for managing Design.
@@ -74,6 +71,16 @@ public class DesignResource {
         if (design.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("design", "idexists", "A new design cannot already have an ID")).body(null);
         }
+        try {
+            String xml = design.getDesignAsXml().getContent().toString();
+            log.info("XML:" + xml);
+            XmlUtil.validateXml(xml, "ServiceDesignSchema.xsd");
+        } catch (Exception e) {
+            log.error("Error parsing xml: ", e);
+            return ResponseEntity.badRequest()
+                .headers(HeaderUtil.createFailureAlert("design", e.getMessage(), e.toString()))
+                .body(design);
+        }
         Design result = designService.save(design);
         return ResponseEntity.created(new URI("/api/designs/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("design", result.getId().toString()))
@@ -98,6 +105,17 @@ public class DesignResource {
         if (design.getId() == null) {
             return createDesign(design);
         }
+        try {
+            String xml = design.getDesignAsXml().getContent().toString();
+            log.info("XML:" + xml);
+            XmlUtil.validateXml(xml, "ServiceDesignSchema.xsd");
+        } catch (Exception e) {
+            log.error("Error parsing xml: ", e);
+            return ResponseEntity.badRequest()
+                .headers(HeaderUtil.createFailureAlert("design", e.getMessage(), e.toString()))
+                .body(design);
+        }
+
         Design result = designService.save(design);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert("design", design.getId().toString()))

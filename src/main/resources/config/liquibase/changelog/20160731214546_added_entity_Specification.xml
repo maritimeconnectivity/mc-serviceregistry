@@ -74,6 +74,7 @@
         </createTable>
 
         <addPrimaryKey columnNames="specifications_id, docs_id" tableName="specification_docs"/>
+	<addUniqueConstraint columnNames="specification_id, version" tableName="specification"/>
         
     </changeSet>
 </databaseChangeLog>

@@ -70,7 +70,8 @@
         </createTable>
 
         <addPrimaryKey columnNames="designs_id, specifications_id" tableName="design_specifications"/>
-        
+	<addUniqueConstraint columnNames="design_id, version" tableName="design"/>
+
         <createTable tableName="design_docs">
             <column name="docs_id" type="bigint">
                 <constraints nullable="false"/>

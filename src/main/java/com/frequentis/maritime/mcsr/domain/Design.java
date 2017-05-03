@@ -23,6 +23,9 @@ import io.swagger.annotations.ApiModel;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldIndex;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -64,12 +67,15 @@ public class Design implements Serializable {
 
     @NotNull
     @Column(name = "design_id", nullable = false)
+    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
     private String designId;
 
     @Column(name = "status")
+    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
     private String status;
 
     @Column(name = "organization_id")
+    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
     private String organizationId;
 
     @OneToOne

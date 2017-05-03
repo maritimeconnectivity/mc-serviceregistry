@@ -23,6 +23,7 @@ import com.frequentis.maritime.mcsr.domain.Specification;
 import com.frequentis.maritime.mcsr.service.SpecificationService;
 import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
+import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -40,10 +41,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * REST controller for managing Specification.
@@ -74,6 +71,16 @@ public class SpecificationResource {
         if (specification.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("specification", "idexists", "A new specification cannot already have an ID")).body(null);
         }
+        try {
+            String xml = specification.getSpecAsXml().getContent().toString();
+            log.info("XML:" + xml);
+            XmlUtil.validateXml(xml, "ServiceSpecificationSchema.xsd");
+        } catch (Exception e) {
+            log.error("Error parsing xml: ", e);
+            return ResponseEntity.badRequest()
+                .headers(HeaderUtil.createFailureAlert("specification", e.getMessage(), e.toString()))
+                .body(specification);
+        }
         Specification result = specificationService.save(specification);
         return ResponseEntity.created(new URI("/api/specifications/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("specification", result.getId().toString()))
@@ -97,6 +104,16 @@ public class SpecificationResource {
         log.debug("REST request to update Specification : {}", specification);
         if (specification.getId() == null) {
             return createSpecification(specification);
+        }
+        try {
+            String xml = specification.getSpecAsXml().getContent().toString();
+            log.info("XML:" + xml);
+            XmlUtil.validateXml(xml, "ServiceSpecificationSchema.xsd");
+        } catch (Exception e) {
+            log.error("Error parsing xml: ", e);
+            return ResponseEntity.badRequest()
+                .headers(HeaderUtil.createFailureAlert("specification", e.getMessage(), e.toString()))
+                .body(specification);
         }
         Specification result = specificationService.save(specification);
         return ResponseEntity.ok()

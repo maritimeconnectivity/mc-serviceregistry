@@ -76,6 +76,17 @@ public class ServiceSpecificationResource {
         if (specification.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("specification", "idexists", "A new specification cannot already have an ID")).body(null);
         }
+        try {
+            String xml = specification.getSpecAsXml().getContent().toString();
+            log.info("XML:" + xml);
+            XmlUtil.validateXml(xml, "ServiceSpecificationSchema.xsd");
+        } catch (Exception e) {
+            log.error("Error parsing xml: ", e);
+            return ResponseEntity.badRequest()
+                .headers(HeaderUtil.createFailureAlert("specification", e.getMessage(), e.toString()))
+                .body(specification);
+        }
+
         specification.setOrganizationId(organizationId);
         Specification result = specificationService.save(specification);
         return ResponseEntity.created(new URI("/api/specifications/" + result.getId()))
@@ -111,6 +122,16 @@ public class ServiceSpecificationResource {
         if (specification.getOrganizationId() != null && specification.getOrganizationId().length() > 0 && !organizationId.equals(specification.getOrganizationId())) {
             log.warn("Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+specification.getOrganizationId());
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        try {
+            String xml = specification.getSpecAsXml().getContent().toString();
+            log.info("XML:" + xml);
+            XmlUtil.validateXml(xml, "ServiceSpecificationSchema.xsd");
+        } catch (Exception e) {
+            log.error("Error parsing xml: ", e);
+            return ResponseEntity.badRequest()
+                .headers(HeaderUtil.createFailureAlert("specification", e.getMessage(), e.toString()))
+                .body(specification);
         }
 
         Specification result = specificationService.save(specification);

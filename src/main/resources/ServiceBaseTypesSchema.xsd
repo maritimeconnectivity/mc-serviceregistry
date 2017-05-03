@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ServiceSpecificationSchema="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceSpecificationSchema.xsd" targetNamespace="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceSpecificationSchema.xsd" elementFormDefault="qualified" version="1.0.2" xml:lang="EN">
+	<annotation>
+		<documentation>
+    		Authors:
+    		    EfficienSea2 WP 3 Partners
+    			Thomas Lutz
+    			Christoph Rihacek
+    			Josef Jahn
+    			Hubert Künig
+  		</documentation>
+	</annotation>
+	<annotation>
+		<documentation>
+    		This file contains basic data type definitions for service specification, design and instance
+    		descriptions.
+  		</documentation>
+	</annotation>
+	<complexType name="AuthorInfo">
+		<annotation>
+			<documentation>
+				Describes an author of a service specification or requirement.
+
+				Elements of an authorInfo are:
+
+				- id          Unique identifier of the author.
+
+				- name        Human readable name of the author.
+
+				- description Human readable description of the author.
+
+				- contactInfo Human readable contact information of the author.
+				
+				- organizationId Unique identifier of the organization, the author belongs to.
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="id" type="string" minOccurs="1" maxOccurs="1"/>
+			<element name="name" type="string" minOccurs="1" maxOccurs="1"/>
+			<element name="description" type="string" minOccurs="1" maxOccurs="1"/>
+			<element name="contactInfo" type="string" minOccurs="1" maxOccurs="1"/>
+			<element name="organizationId" type="string" minOccurs="0" maxOccurs="1"/>
+		</sequence>
+	</complexType>
+	<complexType name="VendorInfo">
+		<annotation>
+			<documentation>
+                Describes the vendor producing and/or providing the service instance. Contains the same information as the
+                AuthorInfo plus the isCommercial flag.
+
+                - isCommercial:  Optional indication on the commercial status of the vendor.
+            </documentation>
+		</annotation>
+		<complexContent>
+			<extension base="ServiceSpecificationSchema:AuthorInfo">
+			   <sequence>
+			      <element name="isCommercial" type="boolean" minOccurs="0" maxOccurs="1"/>
+			   </sequence>
+			</extension>
+		</complexContent>
+
+	</complexType>
+	<simpleType name="ServiceIdentifier">
+		<annotation>
+			<documentation>
+				Service identifier type to be used by service specifications, designs, instances.
+				Currently, the identifier is defined as a string.
+			</documentation>
+		</annotation>
+		<restriction base="string"/>
+	</simpleType>
+	<simpleType name="ServiceVersion">
+		<annotation>
+			<documentation>
+				Service version indicator type to be used by service specifications, designs, instances.
+				Currently, the version indicator is defined as a string.
+			</documentation>
+		</annotation>
+		<restriction base="string"/>
+	</simpleType>
+	<simpleType name="ServiceStatus" final="restriction">
+		<annotation>
+			<documentation>
+				Service status may be one of the values listed below. Service specifications,
+				service designs and service instances each have their own status value. 
+					provisional		the service specification/design is not officially released, the service instance is available, but not in official operation
+					released		the service specification/design/instance is officially released / in operation
+					deprecated	the service specification/design/instance is still available, but end of life is already envisaged.
+					deleted			the service specification/design/instance is not available any more.
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<enumeration value="provisional"/>
+			<enumeration value="released"/>
+			<enumeration value="deprecated"/>
+			<enumeration value="deleted"/>
+		</restriction>
+	</simpleType>
+</schema>

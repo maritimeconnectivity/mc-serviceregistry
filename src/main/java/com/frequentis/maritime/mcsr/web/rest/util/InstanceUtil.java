@@ -143,8 +143,7 @@ public class InstanceUtil {
      */
     public static void mapUnLoCodeToLocation(Instance instance, String unLoCode) throws IOException {
         if (UnLoCodeMap == null) {
-            File unLoCodeFile = new File("file://UnLoCodeLists.json");
-            InputStream s = new FileInputStream(unLoCodeFile);
+            InputStream s = InstanceUtil.class.getClassLoader().getResourceAsStream("UnLoCodeLists.json");
             loadUnLoCodeMapping(s);
         }
 

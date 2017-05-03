@@ -104,6 +104,7 @@
         </createTable>
 
         <addPrimaryKey columnNames="instances_id, designs_id" tableName="instance_designs"/>
+        <addUniqueConstraint columnNames="instance_id, version" tableName="instance"/>
         
         <createTable tableName="instance_docs">
             <column name="docs_id" type="bigint">

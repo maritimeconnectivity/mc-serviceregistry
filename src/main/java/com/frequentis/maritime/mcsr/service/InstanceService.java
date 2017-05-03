@@ -274,9 +274,15 @@ public class InstanceService {
         try {
             Geometry g;
             ShapeBuilder sb = newPoint(longitude, latitude);
-            QueryBuilder qb = boolQuery()
-                .must(geoShapeQuery("geometry", sb))
-                .must(queryStringQuery(query));
+            QueryBuilder qb;
+            if (query != null && query != "") {
+                qb = boolQuery()
+                    .must(geoShapeQuery("geometry", sb))
+                    .must(queryStringQuery(query));
+            } else {
+                qb = boolQuery()
+                    .must(geoShapeQuery("geometry", sb));
+            }
             instances = instanceSearchRepository.search(qb, pageable);
         } catch (Exception e) {
             log.debug("Could not find instance for lat {} long {}", latitude, longitude);
@@ -299,9 +305,15 @@ public class InstanceService {
             XContentParser parser = JsonXContent.jsonXContent.createParser(geoJson);
             parser.nextToken();
             ShapeBuilder sb = ShapeBuilder.parse(parser);
-            QueryBuilder qb = boolQuery()
-                .must(geoShapeQuery("geometry", sb))
-                .must(queryStringQuery(query));
+            QueryBuilder qb;
+            if (query != null && query != "") {
+                qb = boolQuery()
+                    .must(geoShapeQuery("geometry", sb))
+                    .must(queryStringQuery(query));
+            } else {
+                qb = boolQuery()
+                    .must(geoShapeQuery("geometry", sb));
+            }
             instances = instanceSearchRepository.search(qb, pageable);
         } catch (Exception e) {
             log.debug("Could not find instance for the given geojson");

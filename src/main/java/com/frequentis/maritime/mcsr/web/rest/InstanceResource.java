@@ -26,6 +26,7 @@ import com.frequentis.maritime.mcsr.service.InstanceService;
 import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
+import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -74,10 +75,15 @@ public class InstanceResource {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("instance", "idexists", "A new instance cannot already have an ID")).body(null);
         }
         try {
+            String xml = instance.getInstanceAsXml().getContent().toString();
+            log.info("XML:" + xml);
+            XmlUtil.validateXml(xml, "ServiceInstanceSchema.xsd");
             instance = InstanceUtil.parseInstanceAttributesFromXML(instance);
         } catch (Exception e) {
-            log.debug("Error parsing xml: ", e);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            log.error("Error parsing xml: ", e);
+            return ResponseEntity.badRequest()
+                .headers(HeaderUtil.createFailureAlert("instance", e.getMessage(), e.toString()))
+                .body(instance);
         }
         if (instance.getDesigns() != null && instance.getDesigns().size() > 0) {
             Design design = instance.getDesigns().iterator().next();
@@ -95,8 +101,10 @@ public class InstanceResource {
         try {
             result = InstanceUtil.parseInstanceGeometryFromXML(result);
         } catch (Exception e) {
-            log.debug("Error parsing geometry: ", e);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            log.error("Error parsing geometry: ", e);
+            return ResponseEntity.badRequest()
+                .headers(HeaderUtil.createFailureAlert("instance", e.getMessage(), e.toString()))
+                .body(instance);
         }
         instanceService.saveGeometry(result);
         return ResponseEntity.created(new URI("/api/instances/" + result.getId()))
@@ -140,6 +148,18 @@ public class InstanceResource {
                 }
             }
         }
+        try {
+            String xml = instance.getInstanceAsXml().getContent().toString();
+            log.info("XML:" + xml);
+            XmlUtil.validateXml(xml, "ServiceInstanceSchema.xsd");
+            instance = InstanceUtil.parseInstanceAttributesFromXML(instance);
+        } catch (Exception e) {
+            log.error("Error parsing xml: ", e);
+            return ResponseEntity.badRequest()
+                .headers(HeaderUtil.createFailureAlert("instance", e.getMessage(), e.toString()))
+                .body(instance);
+        }
+
         Instance result = instanceService.save(instance);
         try {
             result = InstanceUtil.parseInstanceGeometryFromXML(result);

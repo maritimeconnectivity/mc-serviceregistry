@@ -75,6 +75,16 @@ public class TechnicalDesignResource {
         if (design.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("design", "idexists", "A new design cannot already have an ID")).body(null);
         }
+        try {
+            String xml = design.getDesignAsXml().getContent().toString();
+            log.info("XML:" + xml);
+            XmlUtil.validateXml(xml, "ServiceDesignSchema.xsd");
+        } catch (Exception e) {
+            log.error("Error parsing xml: ", e);
+            return ResponseEntity.badRequest()
+                .headers(HeaderUtil.createFailureAlert("design", e.getMessage(), e.toString()))
+                .body(design);
+        }
         design.setOrganizationId(organizationId);
         Design result = designService.save(design);
         return ResponseEntity.created(new URI("/api/technicalDesign/" + result.getId()))
@@ -110,6 +120,17 @@ public class TechnicalDesignResource {
         if (design.getOrganizationId() != null && design.getOrganizationId().length() > 0 && !organizationId.equals(design.getOrganizationId())) {
             log.warn("Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+design.getOrganizationId());
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        try {
+            String xml = design.getDesignAsXml().getContent().toString();
+            log.info("XML:" + xml);
+            XmlUtil.validateXml(xml, "ServiceDesignSchema.xsd");
+        } catch (Exception e) {
+            log.error("Error parsing xml: ", e);
+            return ResponseEntity.badRequest()
+                .headers(HeaderUtil.createFailureAlert("design", e.getMessage(), e.toString()))
+                .body(design);
         }
 
         Design result = designService.save(design);
