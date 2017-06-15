@@ -1,0 +1,10 @@
+{
+    "mcsrApp": {
+        "SpecificationTemplateType" : {
+            "null": "",
+            "SPECIFICATION": "SPECIFICATION",
+            "DESIGN": "DESIGN",
+            "INSTANCE": "INSTANCE"
+        }
+    }
+}

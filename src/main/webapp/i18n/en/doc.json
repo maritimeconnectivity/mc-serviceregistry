@@ -1,0 +1,28 @@
+{
+    "mcsrApp": {
+        "doc" : {
+            "home": {
+                "title": "Docs",
+                "createLabel": "Create a new Doc",
+                "createOrEditLabel": "Create or edit a Doc",
+                "search": "Search for Doc"
+            },
+            "created": "A new Doc is created with identifier {{ param }}",
+            "updated": "A Doc is updated with identifier {{ param }}",
+            "deleted": "A Doc is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Doc {{ id }}?"
+            },
+            "detail": {
+                "title": "Doc"
+            },
+            "name": "Name",
+            "comment": "Comment",
+            "mimetype": "Mimetype",
+            "filecontent": "Filecontent",
+            "specification": "Specification",
+            "design": "Design",
+            "instance": "Instance"
+        }
+    }
+}

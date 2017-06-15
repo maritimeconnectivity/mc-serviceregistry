@@ -1,0 +1,24 @@
+{
+    "mcsrApp": {
+        "xml" : {
+            "home": {
+                "title": "Xmls",
+                "createLabel": "Create a new Xml",
+                "createOrEditLabel": "Create or edit a Xml",
+                "search": "Search for Xml"
+            },
+            "created": "A new Xml is created with identifier {{ param }}",
+            "updated": "A Xml is updated with identifier {{ param }}",
+            "deleted": "A Xml is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Xml {{ id }}?"
+            },
+            "detail": {
+                "title": "Xml"
+            },
+            "name": "Name",
+            "comment": "Comment",
+            "content": "Content"
+        }
+    }
+}

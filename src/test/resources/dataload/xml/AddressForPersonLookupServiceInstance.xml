@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ MaritimeCloud Service Registry
+  ~ Copyright (c) 2016 Frequentis AG
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<ServiceInstanceSchema:serviceInstance xmlns:ServiceInstanceSchema="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceInstanceSchema.xsd" xmlns:ServiceSpecificationSchema="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceSpecificationSchema.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceInstanceSchema.xsd ServiceInstanceSchema.xsd ">
+	<id>urn:mrn:mcl:service:specification:example:13d293c8-bee5-4d63-aba3-c735983885a7</id>
+	<version>1.0.0</version>
+	<name>John Doe's Address Person Lookup Service Implementation</name>
+	<status>provisional</status>
+	<description>A simple service implementing the AddressPersonLookupServiceSpecification</description>
+	<keywords>john doe simple person address location lookup</keywords>
+	<URL>https://john.doe.example.com/mcl/addressLookupServiceImpl/</URL>
+
+	<requiresAuthorization>true</requiresAuthorization>
+
+	<offersServiceLevel>
+		<availability>0</availability>
+		<name>Development</name>
+		<description>This service implementation is under active development, 0% availability is guaranteed.</description>
+	</offersServiceLevel>
+	<coversAreas>
+		<coversArea>
+			<name>Bermuda Triangle</name>
+			<description>Loosely defined region in the western part of the North Atlantic Ocean.</description>
+			<geometryAsWKT>POLYGON(-80.190 25.774, -66.118 18.466, -64.757 32.321, -80.190 25.774</geometryAsWKT>
+		</coversArea>
+	</coversAreas>
+
+	<implementsServiceDesign>
+		<id>urn:mrn:mcl:service:design:example:32c11e45-1fa0-42db-bbff-cfe687382fee</id>
+		<version>1.0.0</version>
+	</implementsServiceDesign>
+	<producedBy>
+		<id>urn:mrn:mcl:user:example:johndoe</id>
+		<name>John Doe</name>
+		<description>John Doe is the authority for standards at example.com</description>
+		<contactInfo>johndoe@example.com</contactInfo>
+		<isCommercial>false</isCommercial>
+	</producedBy>
+	<providedBy>
+		<id>urn:mrn:mcl:user:example:johndoe</id>
+		<name>Jane Doe</name>
+		<description>Jane Doe is the authority for providing services at example.com</description>
+		<contactInfo>janedoe@example.com</contactInfo>
+		<isCommercial>false</isCommercial>
+	</providedBy>
+</ServiceInstanceSchema:serviceInstance>

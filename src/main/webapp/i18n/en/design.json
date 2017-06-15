@@ -1,0 +1,34 @@
+{
+    "mcsrApp": {
+        "design" : {
+            "home": {
+                "title": "Designs",
+                "createLabel": "Create a new Design",
+                "createOrEditLabel": "Create or edit a Design",
+                "search": "Search for Design"
+            },
+            "created": "A new Design is created with identifier {{ param }}",
+            "updated": "A Design is updated with identifier {{ param }}",
+            "deleted": "A Design is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Design {{ id }}?"
+            },
+            "detail": {
+                "title": "Design"
+            },
+            "name": "Name",
+            "version": "Version",
+            "comment": "Comment",
+            "designId": "Design Id",
+            "organisationId": "Organisation Id",
+            "status": "Status",
+            "organizationId": "Organization Id",
+            "designAsXml": "Design As Xml",
+            "designAsDoc": "Design As Doc",
+            "implementedSpecificationVersion": "Implemented Specification Version",
+            "specifications": "Specifications",
+            "docs": "Docs",
+            "instances": "Instances"
+        }
+    }
+}

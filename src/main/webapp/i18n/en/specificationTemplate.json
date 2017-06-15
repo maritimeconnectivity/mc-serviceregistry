@@ -1,0 +1,29 @@
+{
+    "mcsrApp": {
+        "specificationTemplate" : {
+            "home": {
+                "title": "Specification Templates",
+                "createLabel": "Create a new Specification Template",
+                "createOrEditLabel": "Create or edit a Specification Template",
+                "search": "Search for Specification Template"
+            },
+            "created": "A new Specification Template is created with identifier {{ param }}",
+            "updated": "A Specification Template is updated with identifier {{ param }}",
+            "deleted": "A Specification Template is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Specification Template {{ id }}?"
+            },
+            "detail": {
+                "title": "Specification Template"
+            },
+            "name": "Name",
+            "version": "Version",
+            "type": "Type",
+            "comment": "Comment",
+            "guidelineDoc": "Guideline Doc",
+            "templateDoc": "Template Doc",
+            "docs": "Docs",
+            "xsds": "Xsds"
+        }
+    }
+}

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ServiceDesignSchema="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceDesignSchema.xsd" xmlns:ServiceSpecificationSchema="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceSpecificationSchema.xsd" targetNamespace="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceDesignSchema.xsd" elementFormDefault="qualified" version="1.0.2" xml:lang="EN">
+	<import namespace="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceSpecificationSchema.xsd" schemaLocation="ServiceBaseTypesSchema.xsd"/>
+	<annotation>
+		<documentation>
+    		Authors:
+    		    EfficienSea2 WP 3 Partners 
+    			Thomas Lutz
+    			Christoph Rihacek
+    			Josef Jahn
+    			Hubert Künig
+  		</documentation>
+	</annotation>
+	<annotation>
+		<documentation>
+    		This formal description of a service technical design is intentionally kept
+    		simple and plain.
+    		For all described objects lots of more attributes and related objects could
+    		be added and standardized, but in order to get as much adoption as possible,
+    		the entry barrier should be low, and therefore quite some aspects have been left out.
+  		</documentation>
+	</annotation>
+	<element name="serviceDesign" type="ServiceDesignSchema:ServiceDesign">
+		<annotation>
+			<documentation>
+    			The root element of a service technical design.
+    			Please refer to the type serviceDesign for details.
+  			</documentation>
+		</annotation>
+	</element>
+	<complexType name="ServiceDesign">
+		<annotation>
+			<documentation>
+				A service technical design description.
+
+    			Elements of a serviceDesign are:
+
+                - name             The human readable name of the service design The name should be
+                                       at maximum a one line brief label. Newer versions of the same service
+                                       design should adopt the same name.
+
+                - id                   Globally unique identification of the service design Newer versions of
+                                       the same service design shall adopt the same id.
+
+                - version            Version of the service design. A service design is uniquely identified 
+										by its id and version. Any change in the service physical data model 
+										or in the service specification reference requires a new version of the 
+										service design.
+
+				- status			Status of the service design. One of the values 'provisional', 'released', 
+									'deprecated', 'deleted'.
+
+                - description      A human readable short description of the service design. The 
+										description shall contain an abstract of what a service implementation 
+										actually does..
+
+                - designsServiceSpecifications 
+										Refers to service specification(s) that is/are realised 
+										by this service design. As a minimum, one service specification shall 
+										be referenced. One service design may realise several service 
+										specifications (either different versions of one specification, or even 
+										different specifications)..
+
+                - offersTransport      Refers to transport technologies offered by the service design. At
+										least one reference shall be provided.
+
+                - designedBy		Mandatory reference to information about the author of the service design.
+
+                - servicePhysicalDataModel
+										Mandatory reference to the service physical data model description.
+            </documentation>
+		</annotation>
+		<all>
+			<element name="id" type="ServiceSpecificationSchema:ServiceIdentifier" minOccurs="1" maxOccurs="1"/>
+			<element name="version" type="ServiceSpecificationSchema:ServiceVersion" minOccurs="1" maxOccurs="1"/>
+			<element name="name" type="string" minOccurs="1" maxOccurs="1"/>
+			<element name="status" type="ServiceSpecificationSchema:ServiceStatus" minOccurs="1" maxOccurs="1"/>
+			<element name="description" type="string" minOccurs="1" maxOccurs="1"/>
+			<element name="offersTransport" minOccurs="1" maxOccurs="1">
+				<complexType>
+					<sequence>
+						<element name="offersTransport" type="ServiceDesignSchema:Transport" minOccurs="1" maxOccurs="unbounded"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="designsServiceSpecifications" minOccurs="1" maxOccurs="1">
+				<complexType>
+					<sequence>
+						<element name="designsServiceSpecifications" type="ServiceDesignSchema:ServiceSpecificationReference" minOccurs="1" maxOccurs="unbounded"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="designedBy" type="ServiceSpecificationSchema:VendorInfo" minOccurs="1" maxOccurs="1"/>
+			<element name="servicePhysicalDataModel" type="ServiceDesignSchema:ServicePhysicalDataModel" minOccurs="1" maxOccurs="1"/>
+		</all>
+	</complexType>
+	<complexType name="ServiceSpecificationReference">
+		<annotation>
+			<documentation>
+                A reference to the service specification that  is realised by  the service design
+                Has the id and the version of the respective service specification.
+
+                Elements of a ServiceSpecificationReference are:
+
+                - id      Identification of the service specification realised by the service design.
+
+                - version Version of the service specification realised by the service design.
+            </documentation>
+		</annotation>
+		<all>
+			<element name="id" type="string" minOccurs="1" maxOccurs="1"/>
+			<element name="version" type="string" minOccurs="1" maxOccurs="1"/>
+		</all>
+	</complexType>
+	<complexType name="Transport">
+		<annotation>
+			<documentation>
+                Definition of the transport protocol used by the service design.
+
+                Elements of a transport are:
+
+                - name        Human readable name.
+
+                - description Human readable description of the transport protocol used by the service design.
+
+                - protocol    A non-formal string representation of the transport (e.g. http/rest, http/soap,.. )
+                              that provides enough information to a service consumer to be able to connect.
+            </documentation>
+		</annotation>
+		<sequence>
+			<element name="name" type="string" minOccurs="1" maxOccurs="1"/>
+			<element name="description" type="string" minOccurs="1" maxOccurs="1"/>
+			<element name="protocol" type="string" minOccurs="1" maxOccurs="1"/>
+		</sequence>
+	</complexType>
+	<complexType name="ServicePhysicalDataModel">
+		<annotation>
+			<documentation>
+                The ServicePhysicalDataModel describes the data model for the service design. 
+                The ServicePhysicalDataModel describes in detail all the data structures being 
+                actually exchanged when service consumers interact with a service instance that 
+                implements this design.
+
+                - name        Human readable model name. The name shall be no longer than one line.
+
+                - description Human readable description of the model.
+
+                - model       The model can e.g. be a WSDL file, a JSON API, or the like. It is recommended to
+                              wrap the model in a CDATA section, and provide enough information in the name and
+                              description to make clear how to deal with the content in model.
+
+                - modelType   The modelType should contain e.g. an abbreviation that indicates what technology is
+                              used to describe the model. E.g. WSDL, JSON.
+            </documentation>
+		</annotation>
+		<all>
+			<element name="name" type="string" minOccurs="1" maxOccurs="1"/>
+			<element name="description" type="string" minOccurs="1" maxOccurs="1"/>
+			<element name="modelType" type="string" minOccurs="1" maxOccurs="1"/>
+			<element name="model" type="string" minOccurs="1" maxOccurs="1"/>
+		</all>
+	</complexType>
+</schema>

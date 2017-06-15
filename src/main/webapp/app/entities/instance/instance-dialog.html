@@ -1,0 +1,158 @@
+
+<form name="editForm" role="form" novalidate ng-submit="vm.save()" show-validation>
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                ng-click="vm.clear()">&times;</button>
+        <h4 class="modal-title" id="myInstanceLabel" translate="mcsrApp.instance.home.createOrEditLabel">Create or edit a Instance</h4>
+    </div>
+    <div class="modal-body">
+        <jhi-alert-error></jhi-alert-error>
+        <div class="form-group" ng-show="vm.instance.id">
+            <label for="id" translate="global.field.id">ID</label>
+            <input type="text" class="form-control" id="id" name="id"
+                    ng-model="vm.instance.id" readonly />
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="mcsrApp.instance.name" for="field_name">Name</label>
+            <input type="text" class="form-control" name="name" id="field_name"
+                    ng-model="vm.instance.name"
+                    required />
+            <div ng-show="editForm.name.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.name.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="mcsrApp.instance.version" for="field_version">Version</label>
+            <input type="text" class="form-control" name="version" id="field_version"
+                    ng-model="vm.instance.version"
+                    required />
+            <div ng-show="editForm.version.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.version.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="mcsrApp.instance.comment" for="field_comment">Comment</label>
+            <input type="text" class="form-control" name="comment" id="field_comment"
+                    ng-model="vm.instance.comment"
+                    required />
+            <div ng-show="editForm.comment.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.comment.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+        <div class="form-group" ngf-drop ngf-change="vm.setGeometry($file, vm.instance)">
+            <label class="control-label" translate="mcsrApp.instance.geometry" for="field_geometry">Geometry</label>
+            <div>
+                <div ng-if="vm.instance.geometry" class="help-block clearfix">
+                    <a class="pull-left" ng-click="vm.openFile(vm.instance.geometryContentType, vm.instance.geometry)" translate="entity.action.open">open</a><br>
+                    <span class="pull-left">{{vm.instance.geometryContentType}}, {{vm.byteSize(vm.instance.geometry)}}</span>
+                    <button ng-click="vm.instance.geometry=null;vm.instance.geometryContentType=null;"
+                            class="btn btn-default btn-xs pull-right">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </button>
+                </div>
+                <button type="file" ngf-select class="btn btn-default btn-block"
+                        ngf-change="vm.setGeometry($file, vm.instance)" translate="entity.action.addblob">
+                    Add blob
+                </button>
+            </div>
+            <input type="hidden" class="form-control" name="geometry" id="field_geometry"
+                    ng-model="vm.instance.geometry"
+                     />
+            <input type="hidden" class="form-control" name="geometryContentType" id="field_geometryContentType"
+                    ng-model="vm.instance.geometryContentType" />
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="mcsrApp.instance.instanceId" for="field_instanceId">Instance Id</label>
+            <input type="text" class="form-control" name="instanceId" id="field_instanceId"
+                    ng-model="vm.instance.instanceId"
+                    required />
+            <div ng-show="editForm.instanceId.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.instanceId.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="mcsrApp.instance.keywords" for="field_keywords">Keywords</label>
+            <input type="text" class="form-control" name="keywords" id="field_keywords"
+                    ng-model="vm.instance.keywords"
+                     />
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="mcsrApp.instance.status" for="field_status">Status</label>
+            <input type="text" class="form-control" name="status" id="field_status"
+                    ng-model="vm.instance.status"
+                     />
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="mcsrApp.instance.organizationId" for="field_organizationId">Organization Id</label>
+            <input type="text" class="form-control" name="organizationId" id="field_organizationId"
+                    ng-model="vm.instance.organizationId"
+                     />
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="mcsrApp.instance.unlocode" for="field_unlocode">Unlocode</label>
+            <input type="text" class="form-control" name="unlocode" id="field_unlocode"
+                    ng-model="vm.instance.unlocode"
+                     />
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="mcsrApp.instance.endpointUri" for="field_endpointUri">Endpoint Uri</label>
+            <input type="text" class="form-control" name="endpointUri" id="field_endpointUri"
+                    ng-model="vm.instance.endpointUri"
+                     />
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="mcsrApp.instance.endpointType" for="field_endpointType">Endpoint Type</label>
+            <input type="text" class="form-control" name="endpointType" id="field_endpointType"
+                    ng-model="vm.instance.endpointType"
+                     />
+        </div>
+
+        <div class="form-group">
+            <label translate="mcsrApp.instance.instanceAsXml" for="field_instanceAsXml">Instance As Xml</label>
+            <select class="form-control" id="field_instanceAsXml" name="instanceAsXml" ng-model="vm.instance.instanceAsXml" ng-options="xml as xml.id for xml in vm.instanceasxmls | orderBy:'id' track by xml.id">
+                <option value=""></option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label translate="mcsrApp.instance.instanceAsDoc" for="field_instanceAsDoc">Instance As Doc</label>
+            <select class="form-control" id="field_instanceAsDoc" name="instanceAsDoc" ng-model="vm.instance.instanceAsDoc" ng-options="doc as doc.name for doc in vm.instanceasdocs | orderBy:'id' track by doc.id">
+                <option value=""></option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label translate="mcsrApp.instance.implementedSpecificationVersion" for="field_implementedSpecificationVersion">Implemented Specification Version</label>
+            <select class="form-control" id="field_implementedSpecificationVersion" name="implementedSpecificationVersion" ng-model="vm.instance.implementedSpecificationVersion" ng-options="specificationTemplate as specificationTemplate.version for specificationTemplate in vm.specificationtemplates track by specificationTemplate.id">
+                <option value=""></option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label translate="mcsrApp.instance.designs" for="field_designs">Designs</label>
+            <select class="form-control" id="field_designs" multiple name="designs" ng-model="vm.instance.designs" ng-options="design as design.name for design in vm.designs track by design.id"></select>
+        </div>
+        <div class="form-group">
+            <label translate="mcsrApp.instance.docs" for="field_docs">Docs</label>
+            <select class="form-control" id="field_docs" multiple name="docs" ng-model="vm.instance.docs" ng-options="doc as doc.name for doc in vm.docs track by doc.id"></select>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.clear()">
+            <span class="glyphicon glyphicon-ban-circle"></span>&nbsp;<span translate="entity.action.cancel">Cancel</span>
+        </button>
+        <button type="submit" ng-disabled="editForm.$invalid || vm.isSaving" class="btn btn-primary">
+            <span class="glyphicon glyphicon-save"></span>&nbsp;<span translate="entity.action.save">Save</span>
+        </button>
+    </div>
+</form>

@@ -1,0 +1,34 @@
+
+<div>
+    <h2><span translate="mcsrApp.xml.detail.title">Xml</span> {{vm.xml.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span translate="mcsrApp.xml.name">Name</span></dt>
+        <dd>
+            <span>{{vm.xml.name}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.xml.comment">Comment</span></dt>
+        <dd>
+            <span>{{vm.xml.comment}}</span>
+        </dd>
+        <dt><span translate="mcsrApp.xml.content">Content</span></dt>
+        <dd>
+            <div ng-if="vm.xml.content">
+                <a ng-click="vm.openFile(vm.xml.contentContentType, vm.Base64.encode(vm.xml.content))" translate="entity.action.open">open</a>
+                {{vm.xml.contentContentType}}, {{vm.byteSize(vm.xml.content)}}
+            </div>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span translate="entity.action.back"> Back</span>
+    </button>
+
+    <button type="button" ui-sref="xml-detail.edit({id:vm.xml.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-xs hidden-sm" translate="entity.action.edit"> Edit</span>
+    </button>
+</div>
