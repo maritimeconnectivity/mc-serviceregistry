@@ -17,26 +17,31 @@
  */
 package com.frequentis.maritime.mcsr.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.annotations.ApiModel;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.elasticsearch.annotations.Document;
 
-import javax.persistence.*;
-import javax.validation.constraints.*;
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * A doc represents a human readable document that can be attached to various objects.This could be an office document containing guidelines linked,to a service specification, or a Getting Started PDF attached toan service instance.
  *
  */
-@ApiModel(description = ""
-    + "A doc represents a human readable document that can be attached to various objects.This could be an office document containing guidelines linked,to a service specification, or a Getting Started PDF attached toan service instance."
-    + "")
 @Entity
 @Table(name = "doc")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)

@@ -17,8 +17,37 @@
  */
 package com.frequentis.maritime.mcsr.web.rest;
 
-import com.frequentis.maritime.mcsr.config.Constants;
+import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.codahale.metrics.annotation.Timed;
+import com.frequentis.maritime.mcsr.config.Constants;
 import com.frequentis.maritime.mcsr.domain.Authority;
 import com.frequentis.maritime.mcsr.domain.User;
 import com.frequentis.maritime.mcsr.repository.AuthorityRepository;
@@ -30,28 +59,6 @@ import com.frequentis.maritime.mcsr.service.UserService;
 import com.frequentis.maritime.mcsr.web.rest.dto.ManagedUserDTO;
 import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
-
-import javax.inject.Inject;
-import java.net.URI;
-import java.net.URISyntaxException;
-import javax.servlet.http.HttpServletRequest;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * REST controller for managing users.
@@ -79,7 +86,6 @@ import static org.elasticsearch.index.query.QueryBuilders.*;
  */
 @RestController
 @RequestMapping("/api")
-@ApiIgnore
 public class UserResource {
 
     private final Logger log = LoggerFactory.getLogger(UserResource.class);

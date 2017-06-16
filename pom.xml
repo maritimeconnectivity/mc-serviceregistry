@@ -3,9 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
+        <artifactId>spring-boot-starter-parent</artifactId>
         <groupId>org.springframework.boot</groupId>
-    	<artifactId>spring-boot-starter-parent</artifactId>
-    	<version>2.0.0.M1</version>
+        <version>2.0.0.M1</version>
         <relativePath />
     </parent>
 
@@ -18,35 +18,9 @@
     <prerequisites>
         <maven>3.0.0</maven>
     </prerequisites>
-    
-    <repositories>
-	    <repository>
-	        <id>spring-milestones</id>
-	        <name>Spring Milestones</name>
-	        <url>https://repo.spring.io/libs-milestone</url>
-	        <snapshots>
-	            <enabled>false</enabled>
-	        </snapshots>
-	    </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-	        <id>spring-milestones</id>
-	        <name>Spring Milestones</name>
-	        <url>https://repo.spring.io/libs-milestone</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
 
     <properties>
         <assertj-core.version>3.3.0</assertj-core.version>
-        <springdata.elasticsearch.version>3.0.0.M3</springdata.elasticsearch.version>
-        <spring-data-releasetrain.version>Kay-M3</spring-data-releasetrain.version>
         <awaitility.version>1.7.0</awaitility.version>
         <commons-io.version>2.4</commons-io.version>
         <commons-lang.version>2.6</commons-lang.version>
@@ -64,6 +38,7 @@
         <liquibase.version>3.4.2</liquibase.version>
         <logstash-logback-encoder.version>4.6</logstash-logback-encoder.version>
         <mapstruct.version>1.0.0.Final</mapstruct.version>
+        <maven-artifact.version>3.3.9</maven-artifact.version>
         <maven-enforcer-plugin.version>1.4.1</maven-enforcer-plugin.version>
         <maven-resources-plugin.version>3.0.0</maven-resources-plugin.version>
         <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
@@ -90,21 +65,18 @@
         <sonar.surefire.reportsPath>${project.testresult.directory}/surefire-reports</sonar.surefire.reportsPath>
         <sonar.tests>${project.basedir}/src/test/</sonar.tests>
         <sortpom-maven-plugin.version>2.5.0</sortpom-maven-plugin.version>
+        <spring-data-releasetrain.version>Kay-M3</spring-data-releasetrain.version>
         <spring-security.version>4.1.0.RELEASE</spring-security.version>
-        <springfox.version>2.5.0</springfox.version>
-        <maven-artifact.version>3.3.9</maven-artifact.version>
+        <springdata.elasticsearch.version>3.0.0.M3</springdata.elasticsearch.version>
+        <springfox.version>2.7.0</springfox.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-artifact</artifactId>
-            <version>${maven-artifact.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-spring-security-adapter</artifactId>
-            <version>2.2.0.Final</version>
+            <groupId>com.carrotsearch.randomizedtesting</groupId>
+            <artifactId>randomizedtesting-runner</artifactId>
+            <version>2.1.11</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -140,10 +112,16 @@
             <scope>test</scope>
             <!-- parent POM declares this dependency in default (compile) scope -->
         </dependency>
-        <dependency>
+        <!-- dependency>
             <groupId>com.mattbertolini</groupId>
             <artifactId>liquibase-slf4j</artifactId>
             <version>${liquibase-slf4j.version}</version>
+        </dependency> -->
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>3.8</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.ryantenney.metrics</groupId>
@@ -163,6 +141,11 @@
                     <groupId>com.codahale.metrics</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.vividsolutions</groupId>
+            <artifactId>jts</artifactId>
+            <version>1.13</version>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
@@ -265,7 +248,7 @@
             <version>${gatling.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
+        <!-- <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
             <version>${springfox.version}</version>
@@ -275,7 +258,7 @@
                     <groupId>org.mapstruct</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
+        </dependency> -->
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
@@ -305,6 +288,19 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- for SOAP services -->
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-spring-boot-starter-jaxws</artifactId>
+            <version>3.1.11</version>
+        </dependency>
+        
+        <dependency>
+	        <groupId>org.springframework</groupId>
+	        <artifactId>spring-web</artifactId>
+	        <version>5.0.0.M3</version>
+	      </dependency>
         <!-- jhipster-needle-maven-add-dependency -->
 
         <dependency>
@@ -313,9 +309,28 @@
             <version>4.5</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact</artifactId>
+            <version>${maven-artifact.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <version>${assertj-core.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.docx4j</groupId>
+            <artifactId>docx4j</artifactId>
+            <version>3.3.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- for generating sample data -->
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.25-incubating</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -338,6 +353,11 @@
             <artifactId>hibernate-validator</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-spring-security-adapter</artifactId>
+            <version>2.2.0.Final</version>
+        </dependency>
+        <!--  dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
             <exclusions>
@@ -346,11 +366,16 @@
                     <groupId>org.eclipse.jetty</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-jdk8</artifactId>
             <version>${mapstruct.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>5.0.0.M3</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -428,81 +453,56 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-spring-service-connector</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-elasticsearch</artifactId>
+            <version>${springdata.elasticsearch.version}</version>
+        </dependency>
         <!-- security -->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-data</artifactId>
         </dependency>
-        
+
         <!-- after to M3 migration -->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-messaging</artifactId>
             <version>${spring-security.version}</version>
         </dependency>
-        <dependency>
-		    <groupId>org.springframework.data</groupId>
-    		<artifactId>spring-data-elasticsearch</artifactId>
-		    <version>${springdata.elasticsearch.version}</version>
-        </dependency>
-        <dependency>
-        	<groupId>org.springframework</groupId>
-        	<artifactId>spring-context</artifactId>
-        	<version>5.0.0.RC2</version>
-    	</dependency>
-    	<dependency>
-		    <groupId>org.thymeleaf</groupId>
-		    <artifactId>thymeleaf-spring4</artifactId>
-		    <version>3.0.6.RELEASE</version>
-		</dependency>
-    	
-		
-      
-		<!-- for SOAP services -->
-		<dependency>
-		    <groupId>org.apache.cxf</groupId>
-		    <artifactId>cxf-spring-boot-starter-jaxws</artifactId>
-		    <version>3.1.11</version>
-		</dependency>
-
-        <!-- for generating sample data -->
-        <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
-            <version>2.3.25-incubating</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
-            <version>3.8</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.vividsolutions</groupId>
-            <artifactId>jts</artifactId>
-            <version>1.13</version>
-        </dependency>
+        
+        
         <dependency>
             <groupId>org.wololo</groupId>
             <artifactId>jts2geojson</artifactId>
             <version>0.8.0</version>
         </dependency>
-        <dependency>
-            <groupId>com.carrotsearch.randomizedtesting</groupId>
-            <artifactId>randomizedtesting-runner</artifactId>
-            <version>2.1.11</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.docx4j</groupId>
-            <artifactId>docx4j</artifactId>
-            <version>3.3.0</version>
-            <scope>test</scope>
-        </dependency>
 
-	        
     </dependencies>
+
+    <repositories>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/libs-milestone</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/libs-milestone</url>
+        </pluginRepository>
+    </pluginRepositories>
     <build>
         <defaultGoal>spring-boot:run</defaultGoal>
         <testResources>
@@ -780,7 +780,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
+            <!-- <plugin>
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-maven-plugin</artifactId>
                 <version>${liquibase.version}</version>
@@ -814,6 +814,7 @@
                     <logging>debug</logging>
                 </configuration>
             </plugin>
+             -->
             <plugin>
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>
@@ -828,13 +829,13 @@
                     <!--
                     Enable the line below to have remote debugging of your application on port 5005 -->
                     <jvmArguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</jvmArguments>
-                    
+
                     <mainClass>com.frequentis.maritime.mcsr.McsrApp</mainClass>
                     <archive>
-			            <manifest>
-			                <addClasspath>true</addClasspath>
-			            </manifest>
-			        </archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                    </archive>
                 </configuration>
             </plugin>
             <!-- jhipster-needle-maven-add-plugin -->

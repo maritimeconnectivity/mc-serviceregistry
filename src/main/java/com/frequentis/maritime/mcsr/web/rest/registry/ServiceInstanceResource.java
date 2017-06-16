@@ -17,6 +17,34 @@
  */
 package com.frequentis.maritime.mcsr.web.rest.registry;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import javax.inject.Inject;
+import javax.validation.Valid;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.WebRequest;
+
 import com.codahale.metrics.annotation.Timed;
 import com.frequentis.maritime.mcsr.domain.Design;
 import com.frequentis.maritime.mcsr.domain.Instance;
@@ -27,31 +55,9 @@ import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
-
-import javax.inject.Inject;
-import javax.validation.Valid;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
-@Api
 public class ServiceInstanceResource {
 
     private final Logger log = LoggerFactory.getLogger(ServiceInstanceResource.class);
@@ -200,8 +206,7 @@ public class ServiceInstanceResource {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    @ApiOperation(value = "getInstance", notes = "Returns the service instance with the specified id and version. Use version 'latest' to get the newest one.")
-    public ResponseEntity<Instance> getInstance(@PathVariable String id, @PathVariable String version, @RequestParam(defaultValue = "false") String includeDoc) {
+        public ResponseEntity<Instance> getInstance(@PathVariable String id, @PathVariable String version, @RequestParam(defaultValue = "false") String includeDoc) {
         log.debug("REST request to get Instance via domain id {} and version {}", id, version);
         Instance instance = null;
         if (version.equalsIgnoreCase("latest")) {
@@ -335,8 +340,7 @@ public class ServiceInstanceResource {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    @ApiOperation(value = "searchInstancesByUnlocode", notes = "Returns all service instances matching the specified UnLoCode.")
-    public ResponseEntity<List<Instance>> searchInstancesByUnlocode(@RequestParam String query, @RequestParam(defaultValue = "false") String includeDoc, Pageable pageable)
+        public ResponseEntity<List<Instance>> searchInstancesByUnlocode(@RequestParam String query, @RequestParam(defaultValue = "false") String includeDoc, Pageable pageable)
         throws Exception, URISyntaxException {
         log.debug("REST request to search for a page of Instances for unlocode {}", query);
         Page<Instance> page = instanceService.searchUnlocode(query, pageable);
@@ -362,8 +366,7 @@ public class ServiceInstanceResource {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    @ApiOperation(value = "searchInstancesByLocation", notes = "Returns all service instances matching the specified Lat/Lon coordinates.")
-    public ResponseEntity<?> searchInstancesByLocation(@RequestParam String latitude, @RequestParam(defaultValue = "false") String includeDoc, @RequestParam String longitude, @RequestParam(defaultValue = "", required=false) String query, Pageable pageable)
+        public ResponseEntity<?> searchInstancesByLocation(@RequestParam String latitude, @RequestParam(defaultValue = "false") String includeDoc, @RequestParam String longitude, @RequestParam(defaultValue = "", required=false) String query, Pageable pageable)
         throws Exception, URISyntaxException {
         log.debug("REST request to get Instance by lat {} long {}", latitude, longitude);
         Page<Instance> page = instanceService.findByLocation(Double.parseDouble(latitude), Double.parseDouble(longitude), query, pageable);
@@ -390,8 +393,7 @@ public class ServiceInstanceResource {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    @ApiOperation(value = "searchInstancesByGeometryGeojson", notes = "Returns all service instances matching the specified GeoJson shape.")
-    public ResponseEntity<?> searchInstancesByGeometryGeojson(@RequestParam String geometry, @RequestParam(defaultValue = "false") String includeDoc, @RequestParam(defaultValue = "", required=false) String query, Pageable pageable)
+        public ResponseEntity<?> searchInstancesByGeometryGeojson(@RequestParam String geometry, @RequestParam(defaultValue = "false") String includeDoc, @RequestParam(defaultValue = "", required=false) String query, Pageable pageable)
         throws Exception, URISyntaxException {
         log.debug("REST request to get Instance by geojson ", geometry);
         Page<Instance> page = instanceService.findByGeoshape(geometry, query, pageable);
@@ -417,8 +419,7 @@ public class ServiceInstanceResource {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    @ApiOperation(value = "searchInstancesByGeometryWKT", notes = "Returns all service instances matching the specified WKT shape.")
-    public ResponseEntity<?> searchInstancesByGeometryWKT(@RequestParam String geometry, @RequestParam(defaultValue = "", required=false) String query, @RequestParam(defaultValue = "false") String includeDoc, Pageable pageable)
+        public ResponseEntity<?> searchInstancesByGeometryWKT(@RequestParam String geometry, @RequestParam(defaultValue = "", required=false) String query, @RequestParam(defaultValue = "false") String includeDoc, Pageable pageable)
         throws Exception, URISyntaxException {
         log.debug("REST request to get Instance by wkt ", geometry);
         String geoJson = null;

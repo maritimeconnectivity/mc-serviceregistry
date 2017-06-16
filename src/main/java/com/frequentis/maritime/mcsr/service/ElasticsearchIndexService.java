@@ -18,14 +18,12 @@
 
 package com.frequentis.maritime.mcsr.service;
 
+import java.lang.reflect.Method;
+import java.util.List;
+
+import javax.inject.Inject;
+
 import org.elasticsearch.indices.IndexAlreadyExistsException;
-import com.codahale.metrics.annotation.Timed;
-import com.frequentis.maritime.mcsr.domain.*;
-import com.frequentis.maritime.mcsr.repository.*;
-import com.frequentis.maritime.mcsr.repository.search.*;
-import com.frequentis.maritime.mcsr.web.rest.registry.ServiceInstanceResource;
-import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
-import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
@@ -35,9 +33,37 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import java.lang.reflect.Method;
-import java.util.List;
+import com.codahale.metrics.annotation.Timed;
+import com.frequentis.maritime.mcsr.domain.Design;
+import com.frequentis.maritime.mcsr.domain.Doc;
+import com.frequentis.maritime.mcsr.domain.Instance;
+import com.frequentis.maritime.mcsr.domain.Specification;
+import com.frequentis.maritime.mcsr.domain.SpecificationTemplate;
+import com.frequentis.maritime.mcsr.domain.SpecificationTemplateSet;
+import com.frequentis.maritime.mcsr.domain.User;
+import com.frequentis.maritime.mcsr.domain.Xml;
+import com.frequentis.maritime.mcsr.domain.Xsd;
+import com.frequentis.maritime.mcsr.repository.DesignRepository;
+import com.frequentis.maritime.mcsr.repository.DocRepository;
+import com.frequentis.maritime.mcsr.repository.InstanceRepository;
+import com.frequentis.maritime.mcsr.repository.SpecificationRepository;
+import com.frequentis.maritime.mcsr.repository.SpecificationTemplateRepository;
+import com.frequentis.maritime.mcsr.repository.SpecificationTemplateSetRepository;
+import com.frequentis.maritime.mcsr.repository.UserRepository;
+import com.frequentis.maritime.mcsr.repository.XmlRepository;
+import com.frequentis.maritime.mcsr.repository.XsdRepository;
+import com.frequentis.maritime.mcsr.repository.search.DesignSearchRepository;
+import com.frequentis.maritime.mcsr.repository.search.DocSearchRepository;
+import com.frequentis.maritime.mcsr.repository.search.InstanceSearchRepository;
+import com.frequentis.maritime.mcsr.repository.search.SpecificationSearchRepository;
+import com.frequentis.maritime.mcsr.repository.search.SpecificationTemplateSearchRepository;
+import com.frequentis.maritime.mcsr.repository.search.SpecificationTemplateSetSearchRepository;
+import com.frequentis.maritime.mcsr.repository.search.UserSearchRepository;
+import com.frequentis.maritime.mcsr.repository.search.XmlSearchRepository;
+import com.frequentis.maritime.mcsr.repository.search.XsdSearchRepository;
+import com.frequentis.maritime.mcsr.web.rest.registry.ServiceInstanceResource;
+import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
+import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 
 @Service
 public class ElasticsearchIndexService {

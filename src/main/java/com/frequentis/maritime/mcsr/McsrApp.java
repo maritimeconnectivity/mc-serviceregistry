@@ -41,9 +41,8 @@ import java.util.Collection;
 
 
 @SpringBootApplication
-//@ComponentScan
-//@EnableAutoConfiguration(exclude = { MetricFilterAutoConfiguration.class, MetricRepositoryAutoConfiguration.class })
-//@EnableConfigurationProperties({ JHipsterProperties.class, LiquibaseProperties.class })
+@EnableAutoConfiguration(exclude = { MetricFilterAutoConfiguration.class, MetricRepositoryAutoConfiguration.class })
+@EnableConfigurationProperties({ JHipsterProperties.class, LiquibaseProperties.class })
 public class McsrApp {
 
     private static final Logger log = LoggerFactory.getLogger(McsrApp.class);
@@ -91,5 +90,6 @@ public class McsrApp {
             InetAddress.getLocalHost().getHostAddress(),
             env.getProperty("server.port"));
     }
+    
 
 }
