@@ -39,10 +39,11 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collection;
 
-@ComponentScan
+
 @SpringBootApplication
-@EnableAutoConfiguration(exclude = { MetricFilterAutoConfiguration.class, MetricRepositoryAutoConfiguration.class })
-@EnableConfigurationProperties({ JHipsterProperties.class, LiquibaseProperties.class })
+//@ComponentScan
+//@EnableAutoConfiguration(exclude = { MetricFilterAutoConfiguration.class, MetricRepositoryAutoConfiguration.class })
+//@EnableConfigurationProperties({ JHipsterProperties.class, LiquibaseProperties.class })
 public class McsrApp {
 
     private static final Logger log = LoggerFactory.getLogger(McsrApp.class);
@@ -89,7 +90,6 @@ public class McsrApp {
             env.getProperty("server.port"),
             InetAddress.getLocalHost().getHostAddress(),
             env.getProperty("server.port"));
-
     }
 
 }
