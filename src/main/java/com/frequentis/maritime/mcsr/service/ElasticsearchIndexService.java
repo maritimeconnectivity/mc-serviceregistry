@@ -134,9 +134,9 @@ public class ElasticsearchIndexService {
         if (jpaRepository.count() > 0) {
             try {
                 Method m = jpaRepository.getClass().getMethod("findAllWithEagerRelationships");
-                elasticsearchRepository.save((List<T>) m.invoke(jpaRepository));
+                elasticsearchRepository.saveAll((List<T>) m.invoke(jpaRepository));
             } catch (Exception e) {
-                elasticsearchRepository.save(jpaRepository.findAll());
+                elasticsearchRepository.saveAll(jpaRepository.findAll());
             }
         }
         log.info("Elasticsearch: Indexed all rows for " + entityClass.getSimpleName());

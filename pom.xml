@@ -18,10 +18,22 @@
     <prerequisites>
         <maven>3.0.0</maven>
     </prerequisites>
+    
+    <repositories>
+	    <repository>
+	        <id>spring-milestones</id>
+	        <name>Spring Milestones</name>
+	        <url>https://repo.spring.io/libs-milestone</url>
+	        <snapshots>
+	            <enabled>false</enabled>
+	        </snapshots>
+	    </repository>
+    </repositories>
 
     <properties>
         <assertj-core.version>3.3.0</assertj-core.version>
-        <springdata.version>2.1.4.RELEASE</springdata.version>
+        <springdata.elasticsearch.version>3.0.0.M3</springdata.elasticsearch.version>
+        <spring-data-releasetrain.version>Kay-M3</spring-data-releasetrain.version>
         <awaitility.version>1.7.0</awaitility.version>
         <commons-io.version>2.4</commons-io.version>
         <commons-lang.version>2.6</commons-lang.version>
@@ -416,9 +428,10 @@
         <dependency>
 		    <groupId>org.springframework.data</groupId>
     		<artifactId>spring-data-elasticsearch</artifactId>
-		    <version>${springdata.version}</version>
-		</dependency>
+		    <version>${springdata.elasticsearch.version}</version>
+        </dependency>
 		
+      
 		<!-- for SOAP services -->
 		<dependency>
 		    <groupId>org.apache.cxf</groupId>

@@ -17,22 +17,20 @@
  */
 package com.frequentis.maritime.mcsr.service;
 
-import com.frequentis.maritime.mcsr.domain.SpecificationTemplate;
-import com.frequentis.maritime.mcsr.repository.SpecificationTemplateRepository;
-import com.frequentis.maritime.mcsr.repository.search.SpecificationTemplateSearchRepository;
+import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
+
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static org.elasticsearch.index.query.QueryBuilders.*;
+import com.frequentis.maritime.mcsr.domain.SpecificationTemplate;
+import com.frequentis.maritime.mcsr.repository.SpecificationTemplateRepository;
+import com.frequentis.maritime.mcsr.repository.search.SpecificationTemplateSearchRepository;
 
 /**
  * Service Implementation for managing SpecificationTemplate.
@@ -41,73 +39,78 @@ import static org.elasticsearch.index.query.QueryBuilders.*;
 @Transactional
 public class SpecificationTemplateService {
 
-    private final Logger log = LoggerFactory.getLogger(SpecificationTemplateService.class);
+	private final Logger log = LoggerFactory.getLogger(SpecificationTemplateService.class);
 
-    @Inject
-    private SpecificationTemplateRepository specificationTemplateRepository;
+	@Inject
+	private SpecificationTemplateRepository specificationTemplateRepository;
 
-    @Inject
-    private SpecificationTemplateSearchRepository specificationTemplateSearchRepository;
+	@Inject
+	private SpecificationTemplateSearchRepository specificationTemplateSearchRepository;
 
-    /**
-     * Save a specificationTemplate.
-     *
-     * @param specificationTemplate the entity to save
-     * @return the persisted entity
-     */
-    public SpecificationTemplate save(SpecificationTemplate specificationTemplate) {
-        log.debug("Request to save SpecificationTemplate : {}", specificationTemplate);
-        SpecificationTemplate result = specificationTemplateRepository.save(specificationTemplate);
-        specificationTemplateSearchRepository.save(result);
-        return result;
-    }
+	/**
+	 * Save a specificationTemplate.
+	 *
+	 * @param specificationTemplate
+	 *            the entity to save
+	 * @return the persisted entity
+	 */
+	public SpecificationTemplate save(SpecificationTemplate specificationTemplate) {
+		log.debug("Request to save SpecificationTemplate : {}", specificationTemplate);
+		SpecificationTemplate result = specificationTemplateRepository.save(specificationTemplate);
+		specificationTemplateSearchRepository.save(result);
+		return result;
+	}
 
-    /**
-     *  Get all the specificationTemplates.
-     *
-     *  @param pageable the pagination information
-     *  @return the list of entities
-     */
-    @Transactional(readOnly = true)
-    public Page<SpecificationTemplate> findAll(Pageable pageable) {
-        log.debug("Request to get all SpecificationTemplates");
-        Page<SpecificationTemplate> result = specificationTemplateRepository.findAll(pageable);
-        return result;
-    }
+	/**
+	 * Get all the specificationTemplates.
+	 *
+	 * @param pageable
+	 *            the pagination information
+	 * @return the list of entities
+	 */
+	@Transactional(readOnly = true)
+	public Page<SpecificationTemplate> findAll(Pageable pageable) {
+		log.debug("Request to get all SpecificationTemplates");
+		Page<SpecificationTemplate> result = specificationTemplateRepository.findAll(pageable);
+		return result;
+	}
 
-    /**
-     *  Get one specificationTemplate by id.
-     *
-     *  @param id the id of the entity
-     *  @return the entity
-     */
-    @Transactional(readOnly = true)
-    public SpecificationTemplate findOne(Long id) {
-        log.debug("Request to get SpecificationTemplate : {}", id);
-        SpecificationTemplate specificationTemplate = specificationTemplateRepository.findOneWithEagerRelationships(id);
-        return specificationTemplate;
-    }
+	/**
+	 * Get one specificationTemplate by id.
+	 *
+	 * @param id
+	 *            the id of the entity
+	 * @return the entity
+	 */
+	@Transactional(readOnly = true)
+	public SpecificationTemplate findOne(Long id) {
+		log.debug("Request to get SpecificationTemplate : {}", id);
+		SpecificationTemplate specificationTemplate = specificationTemplateRepository.findOneWithEagerRelationships(id);
+		return specificationTemplate;
+	}
 
-    /**
-     *  Delete the  specificationTemplate by id.
-     *
-     *  @param id the id of the entity
-     */
-    public void delete(Long id) {
-        log.debug("Request to delete SpecificationTemplate : {}", id);
-        specificationTemplateRepository.delete(id);
-        specificationTemplateSearchRepository.delete(id);
-    }
+	/**
+	 * Delete the specificationTemplate by id.
+	 *
+	 * @param id
+	 *            the id of the entity
+	 */
+	public void delete(Long id) {
+		log.debug("Request to delete SpecificationTemplate : {}", id);
+		// specificationTemplateRepository.delete(id);
+		// specificationTemplateSearchRepository.delete(id);
+	}
 
-    /**
-     * Search for the specificationTemplate corresponding to the query.
-     *
-     *  @param query the query of the search
-     *  @return the list of entities
-     */
-    @Transactional(readOnly = true)
-    public Page<SpecificationTemplate> search(String query, Pageable pageable) {
-        log.debug("Request to search for a page of SpecificationTemplates for query {}", query);
-        return specificationTemplateSearchRepository.search(queryStringQuery(query), pageable);
-    }
+	/**
+	 * Search for the specificationTemplate corresponding to the query.
+	 *
+	 * @param query
+	 *            the query of the search
+	 * @return the list of entities
+	 */
+	@Transactional(readOnly = true)
+	public Page<SpecificationTemplate> search(String query, Pageable pageable) {
+		log.debug("Request to search for a page of SpecificationTemplates for query {}", query);
+		return specificationTemplateSearchRepository.search(queryStringQuery(query), pageable);
+	}
 }

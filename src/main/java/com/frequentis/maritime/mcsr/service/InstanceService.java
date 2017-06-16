@@ -129,8 +129,8 @@ public class InstanceService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Instance : {}", id);
-        instanceRepository.delete(id);
-        instanceSearchRepository.delete(id);
+        instanceRepository.deleteById(id);
+        instanceSearchRepository.deleteById(id);
     }
 
     /**

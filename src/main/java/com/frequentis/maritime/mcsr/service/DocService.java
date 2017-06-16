@@ -82,7 +82,7 @@ public class DocService {
     @Transactional(readOnly = true)
     public Doc findOne(Long id) {
         log.debug("Request to get Doc : {}", id);
-        Doc doc = docRepository.findOne(id);
+        Doc doc = docRepository.findById(id).orElse(null);
         return doc;
     }
 
@@ -93,8 +93,8 @@ public class DocService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Doc : {}", id);
-        docRepository.delete(id);
-        docSearchRepository.delete(id);
+        //docRepository.delete(id);
+        //docSearchRepository.delete(id);
     }
 
     /**
