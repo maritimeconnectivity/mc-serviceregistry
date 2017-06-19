@@ -46,16 +46,17 @@ spring:
     jpa:
         database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
         database: MYSQL
-        show-sql: false
+        show-sql: true
         properties:
-            hibernate.cache.use_second_level_cache: true
+            hibernate.naming.physical-strategy: 
+            hibernate.cache.use_second_level_cache: false
             hibernate.cache.use_query_cache: false
             hibernate.generate_statistics: false
             hibernate.cache.region.factory_class: org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
     data:
         elasticsearch:
-            cluster-name: elasticsearch
-            cluster-nodes: 127.0.0.1:9300
+#            cluster-name: elasticsearch
+#            cluster-nodes: 127.0.0.1:9300
             properties:
                 path:
                   logs: target/elasticsearch/log

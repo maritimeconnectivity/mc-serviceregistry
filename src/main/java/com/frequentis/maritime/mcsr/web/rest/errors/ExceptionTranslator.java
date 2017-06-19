@@ -85,7 +85,7 @@ public class ExceptionTranslator {
         return new ErrorDTO(ErrorConstants.ERR_METHOD_NOT_SUPPORTED, exception.getMessage());
     }
 
-    @ExceptionHandler(Exception.class)
+    //@ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDTO> processRuntimeException(Exception ex) throws Exception {
         BodyBuilder builder;
         ErrorDTO errorDTO;

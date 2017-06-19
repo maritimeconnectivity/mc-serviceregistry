@@ -75,15 +75,15 @@ public class Design implements Serializable {
 
     @NotNull
     @Column(name = "design_id", nullable = false)
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @Field(type = FieldType.text, index = true)
     private String designId;
 
     @Column(name = "status")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @Field(type = FieldType.text, index = true)
     private String status;
 
     @Column(name = "organization_id")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @Field(type = FieldType.text, index = true)
     private String organizationId;
 
     @OneToOne

@@ -1,83 +1,58 @@
-# ===================================================================
-# Spring Boot configuration.
-#
-# This configuration will be overriden by the Spring profile you use,
-# for example application-dev.yml if you use the "dev" profile.
-# ===================================================================
-
-# ===================================================================
-# Standard Spring Boot properties.
-# Full reference is available at:
-# http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
-# ===================================================================
-
 management:
-    context-path: /management
-    health:
-        mail:
-            enabled: false # When using the MailService, configure an SMTP server and set this to true
-
+  context-path: /management
+  health:
+    mail:
+      enabled: false
 spring:
-    application:
-        name: mcsr
-    profiles:
-        # The commented value for `active` can be replaced with valid spring profiles to load.
-        # Otherwise, it will be filled in by maven when building the WAR file
-        # Either way, it can be overridden by `--spring.profiles.active` value passed in the commandline or `-Dspring.profiles.active` set in `JAVA_OPTS`
-        active: #spring.profiles.active#
-    jackson:
-        serialization.write_dates_as_timestamps: false
-    jpa:
-        open-in-view: false
-        hibernate:
-            ddl-auto: none
-            naming-strategy: org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy
-    messages:
-        basename: i18n/messages
-    mvc:
-        favicon:
-            enabled: false
-    thymeleaf:
-        mode: XHTML
-
+  application:
+    name: mcsr
+  profiles:
+    active: null
+  jackson:
+    serialization.write_dates_as_timestamps: false
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+      naming-strategy: org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy
+  messages:
+    basename: i18n/messages
+  mvc:
+    favicon:
+      enabled: false
+  thymeleaf:
+    mode: XHTML
 security:
-    basic:
-        enabled: false
-        
+  basic:
+    enabled: false
 cxf:
   path: /services
   jaxws:
     component-scan: true
     classes-scan-packages: org.apache.cxf.jaxrs.swagger,org.apache.cxf.metrics,com.frequentis.maritime.mcsr.soap
-
-# ===================================================================
-# JHipster specific properties
-# ===================================================================
-
 jhipster:
-    async:
-        corePoolSize: 2
-        maxPoolSize: 50
-        queueCapacity: 10000
-    cors: #By default CORS are not enabled. Uncomment to enable.
-        allowed-origins: "*"
-        allowed-methods: GET, PUT, POST, DELETE, OPTIONS
-        allowed-headers: "*"
-        exposed-headers:
-        allow-credentials: true
-        max-age: 1800
-    mail:
-        from: mcsr@localhost
-    swagger:
-        title: Maritime Cloud Service Registry API
-        description: Maritime Cloud Service Registry, developed under the Horizon 2020 Project EfficienSea2, cofunded by the European Union.
-        version: 1.0
-        termsOfServiceUrl:
-        contactName: Frequentis AG
-        contactUrl: http://www.frequentis.com
-        contactEmail: josef.jahn@frequentis.com
-        license: AGPLv3
-        licenseUrl: https:/www.gnu.org/licenses/agpl-3.0.en.html
-    ribbon:
-        # comma seperated list of profiles to show a ribbon on the GUI
-        displayOnActiveProfiles: dev
+  async:
+    corePoolSize: 2
+    maxPoolSize: 50
+    queueCapacity: 10000
+  cors:
+    allowed-origins: '*'
+    allowed-methods: GET, PUT, POST, DELETE, OPTIONS
+    allowed-headers: '*'
+    exposed-headers: null
+    allow-credentials: true
+    max-age: 1800
+  mail:
+    from: mcsr@localhost
+  swagger:
+    title: Maritime Cloud Service Registry API
+    description: Maritime Cloud Service Registry, developed under the Horizon 2020 Project EfficienSea2, cofunded by the European Union.
+    version: 1.0
+    termsOfServiceUrl: null
+    contactName: Frequentis AG
+    contactUrl: http://www.frequentis.com
+    contactEmail: josef.jahn@frequentis.com
+    license: AGPLv3
+    licenseUrl: https:/www.gnu.org/licenses/agpl-3.0.en.html
+  ribbon:
+    displayOnActiveProfiles: dev

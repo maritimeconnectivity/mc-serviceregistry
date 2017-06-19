@@ -76,15 +76,15 @@ public class Specification implements Serializable {
 
     @NotNull
     @Column(name = "specification_id", nullable = false)
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @Field(type = FieldType.text, index = true)
     private String specificationId;
 
     @Column(name = "status")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @Field(type = FieldType.text, index = true)
     private String status;
 
     @Column(name = "organization_id")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @Field(type = FieldType.text, index = true)
     private String organizationId;
 
     @OneToOne

@@ -87,50 +87,50 @@ public class Instance implements Serializable {
 
     @NotNull
     @Column(name = "instance_id", nullable = false)
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @Field(type = FieldType.text, index = true)
     private String instanceId;
 
     @Column(name = "keywords")
     private String keywords;
 
     @Column(name = "status")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @Field(type = FieldType.text, index = true)
     private String status;
 
     @Column(name = "organization_id")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @Field(type = FieldType.text, index = true)
     private String organizationId;
 
     @Column(name = "unlocode")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @Field(type = FieldType.text, index = true)
     private String unlocode;
 
     @Column(name = "endpoint_uri")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @Field(type = FieldType.text, index = true)
     private String endpointUri;
 
     @Column(name = "endpoint_type")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @Field(type = FieldType.text, index = true)
     private String endpointType;
 
     @Column(name = "mmsi")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @Field(type = FieldType.text, index = true)
     private String mmsi;
 
     @Column(name = "imo")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @Field(type = FieldType.text, index = true)
     private String imo;
 
     @Column(name = "service_type")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @Field(type = FieldType.text, index = true)
     private String serviceType;
 
     @Column(name = "design_id")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @Field(type = FieldType.text, index = true)
     private String designId;
 
     @Column(name = "specification_id")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @Field(type = FieldType.text, index = true)
     private String specificationId;
 
     @OneToOne

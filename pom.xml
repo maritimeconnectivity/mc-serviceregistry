@@ -20,6 +20,7 @@
     </prerequisites>
 
     <properties>
+    	<elasticsearch.version>5.4.0</elasticsearch.version>
         <assertj-core.version>3.3.0</assertj-core.version>
         <awaitility.version>1.7.0</awaitility.version>
         <commons-io.version>2.4</commons-io.version>
@@ -67,7 +68,7 @@
         <sortpom-maven-plugin.version>2.5.0</sortpom-maven-plugin.version>
         <spring-data-releasetrain.version>Kay-M3</spring-data-releasetrain.version>
         <spring-security.version>4.1.0.RELEASE</spring-security.version>
-        <springdata.elasticsearch.version>3.0.0.M3</springdata.elasticsearch.version>
+        <springdata.elasticsearch.version>3.0.0.BUILD-SNAPSHOT</springdata.elasticsearch.version>
         <springfox.version>2.7.0</springfox.version>
     </properties>
 
@@ -290,12 +291,28 @@
         </dependency>
 
         <!-- for SOAP services -->
-        <dependency>
+        <!--dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-spring-boot-starter-jaxws</artifactId>
             <version>3.1.11</version>
-        </dependency>
-        
+        </dependency>-->
+        <dependency>
+		    <groupId>org.apache.cxf</groupId>
+		    <artifactId>cxf-rt-frontend-jaxws</artifactId>
+		    <version>3.1.11</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.elasticsearch.client</groupId>
+		    <artifactId>transport</artifactId>
+		    <version>5.4.1</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.logging.log4j</groupId>
+		    <artifactId>log4j-api</artifactId>
+		    <version>${log4j2.version}</version>
+		</dependency>
+				
+
         <dependency>
 	        <groupId>org.springframework</groupId>
 	        <artifactId>spring-web</artifactId>
@@ -357,7 +374,7 @@
             <artifactId>keycloak-spring-security-adapter</artifactId>
             <version>2.2.0.Final</version>
         </dependency>
-        <!--  dependency>
+        <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
             <exclusions>
@@ -366,16 +383,11 @@
                     <groupId>org.eclipse.jetty</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>-->
+        </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-jdk8</artifactId>
             <version>${mapstruct.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>5.0.0.M3</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -489,6 +501,14 @@
             <name>Spring Milestones</name>
             <url>https://repo.spring.io/libs-milestone</url>
         </repository>
+        <repository>
+	        <id>spring-snapshots</id>
+	        <name>Spring Snapshots</name>
+	        <url>https://repo.spring.io/libs-snapshot</url>
+	        <snapshots>
+	            <enabled>true</enabled>
+	        </snapshots>
+	    </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>
