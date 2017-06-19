@@ -312,12 +312,6 @@
 		    <version>${log4j2.version}</version>
 		</dependency>
 				
-
-        <dependency>
-	        <groupId>org.springframework</groupId>
-	        <artifactId>spring-web</artifactId>
-	        <version>5.0.0.M3</version>
-	      </dependency>
         <!-- jhipster-needle-maven-add-dependency -->
 
         <dependency>
