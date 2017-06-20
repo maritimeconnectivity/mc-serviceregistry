@@ -8,6 +8,7 @@ import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 
 import com.frequentis.maritime.mcsr.repository.PersistentTokenRepository;
+import com.frequentis.maritime.mcsr.repository.UserRepository;
 import com.frequentis.maritime.mcsr.security.CustomPersistentRememberMeServices;
  
  
@@ -35,10 +36,13 @@ public class WebServiceConfig {
 //    public RememberMeServices rememberMeService(
 //    		JHipsterProperties jHipsterProperties, 
 //    		org.springframework.security.core.userdetails.UserDetailsService userDetailsService,
-//    		PersistentTokenRepository persistentTokenRepository) {
+//    		PersistentTokenRepository persistentTokenRepository,
+//    		UserRepository userRepository) {
 //    	log.info("Creating rememberMeService");
-//    	CustomPersistentRememberMeServices rms = new CustomPersistentRememberMeServices(jHipsterProperties, userDetailsService);
-//    	rms.setPersistentTokenRepository(persistentTokenRepository);
+//    	CustomPersistentRememberMeServices rms = new CustomPersistentRememberMeServices(jHipsterProperties, 
+//    			userDetailsService, 
+//    			persistentTokenRepository,
+//    			userRepository);
 //    	return rms;
 //    }
 	

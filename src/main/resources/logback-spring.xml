@@ -5,7 +5,7 @@
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>logFile-a.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>90</maxHistory>
         </rollingPolicy>
         <encoder>
@@ -19,7 +19,10 @@
         <appender-ref ref="FILE"/>
     </appender>
 
-    <logger name="com.frequentis.maritime.mcsr" level="#logback.loglevel#"/>
+    <!--logger name="com.frequentis.maritime.mcsr" level="#logback.loglevel#"/-->
+    <logger name="com.frequentis.maritime.mcsr" level="DEBUG"/>
+    <logger name="com.frequentis.maritime.mcsr.security.CustomPersistentRememberMeServices" level="DEBUG"/>
+    <logger name="CustomPersistentRememberMeServices" level="DEBUG"/>
 
     <logger name="javax.activation" level="WARN"/>
     <logger name="javax.mail" level="WARN"/>
