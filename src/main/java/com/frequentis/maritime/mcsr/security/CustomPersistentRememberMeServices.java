@@ -17,27 +17,33 @@
  */
 package com.frequentis.maritime.mcsr.security;
 
-import com.frequentis.maritime.mcsr.domain.PersistentToken;
-import com.frequentis.maritime.mcsr.repository.PersistentTokenRepository;
-import com.frequentis.maritime.mcsr.repository.UserRepository;
-import com.frequentis.maritime.mcsr.config.JHipsterProperties;
+import java.security.SecureRandom;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Base64;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.codec.Base64;
-import org.springframework.security.web.authentication.rememberme.*;
+import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
+import org.springframework.security.web.authentication.rememberme.CookieTheftException;
+import org.springframework.security.web.authentication.rememberme.InvalidCookieException;
+import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.security.SecureRandom;
-import java.time.LocalDate;
-import java.util.Arrays;
+import com.frequentis.maritime.mcsr.config.JHipsterProperties;
+import com.frequentis.maritime.mcsr.domain.PersistentToken;
+import com.frequentis.maritime.mcsr.repository.PersistentTokenRepository;
+import com.frequentis.maritime.mcsr.repository.UserRepository;
 
 /**
  * Custom implementation of Spring Security's RememberMeServices.
@@ -62,9 +68,9 @@ import java.util.Arrays;
  * The main algorithm comes from Spring Security's PersistentTokenBasedRememberMeServices, but this class
  * couldn't be cleanly extended.
  */
-@Service
+//@Service
 public class CustomPersistentRememberMeServices extends
-    AbstractRememberMeServices {
+    AbstractRememberMeServices implements RememberMeServices {
 
     private final Logger log = LoggerFactory.getLogger(CustomPersistentRememberMeServices.class);
 
@@ -79,19 +85,22 @@ public class CustomPersistentRememberMeServices extends
 
     private SecureRandom random;
 
-    @Inject
+
     private PersistentTokenRepository persistentTokenRepository;
 
-    @Inject
+
     private UserRepository userRepository;
 
-    @Inject
+
     public CustomPersistentRememberMeServices(JHipsterProperties jHipsterProperties, org.springframework.security.core.userdetails
         .UserDetailsService userDetailsService) {
 
         super(jHipsterProperties.getSecurity().getRememberMe().getKey(), userDetailsService);
+        log.debug("AbstractRememberMeServices logger is {} and log is {}", logger, log);
         random = new SecureRandom();
     }
+    
+    
 
     @Override
     protected UserDetails processAutoLoginCookie(String[] cookieTokens, HttpServletRequest request,
@@ -201,13 +210,13 @@ public class CustomPersistentRememberMeServices extends
     private String generateSeriesData() {
         byte[] newSeries = new byte[DEFAULT_SERIES_LENGTH];
         random.nextBytes(newSeries);
-        return new String(Base64.encode(newSeries));
+        return Base64.getEncoder().encodeToString(newSeries);
     }
 
     private String generateTokenData() {
         byte[] newToken = new byte[DEFAULT_TOKEN_LENGTH];
         random.nextBytes(newToken);
-        return new String(Base64.encode(newToken));
+        return Base64.getEncoder().encodeToString(newToken);
     }
 
     private void addCookie(PersistentToken token, HttpServletRequest request, HttpServletResponse response) {
@@ -215,4 +224,12 @@ public class CustomPersistentRememberMeServices extends
             new String[]{token.getSeries(), token.getTokenValue()},
             TOKEN_VALIDITY_SECONDS, request, response);
     }
+
+
+
+	public void setPersistentTokenRepository(PersistentTokenRepository persistentTokenRepository) {
+		this.persistentTokenRepository = persistentTokenRepository;
+	}
+    
+    
 }

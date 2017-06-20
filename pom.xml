@@ -29,7 +29,8 @@
         <frontend-maven-plugin.version>1.0</frontend-maven-plugin.version>
         <gatling-maven-plugin.version>2.1.7</gatling-maven-plugin.version>
         <gatling.version>2.1.7</gatling.version>
-        <hibernate.version>4.3.11.Final</hibernate.version>
+        <!--hibernate.version>4.3.11.Final</hibernate.version-->
+        <hibernate.version>5.0.0.Final</hibernate.version>
         <hikaricp.version>2.4.6</hikaricp.version>
         <jacoco-maven-plugin.version>0.7.6.201602180812</jacoco-maven-plugin.version>
         <java.version>1.8</java.version>
@@ -67,9 +68,10 @@
         <sonar.tests>${project.basedir}/src/test/</sonar.tests>
         <sortpom-maven-plugin.version>2.5.0</sortpom-maven-plugin.version>
         <spring-data-releasetrain.version>Kay-M3</spring-data-releasetrain.version>
-        <spring-security.version>4.1.0.RELEASE</spring-security.version>
+        <!--spring-security.version>4.1.0.RELEASE</spring-security.version -->
         <springdata.elasticsearch.version>3.0.0.BUILD-SNAPSHOT</springdata.elasticsearch.version>
         <springfox.version>2.7.0</springfox.version>
+        <cglib.version>3.2.5</cglib.version>
     </properties>
 
     <dependencies>
@@ -289,6 +291,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+		        
 
         <!-- for SOAP services -->
         <!--dependency>
@@ -306,11 +309,7 @@
 		    <artifactId>transport</artifactId>
 		    <version>5.4.1</version>
 		</dependency>
-		<dependency>
-		    <groupId>org.apache.logging.log4j</groupId>
-		    <artifactId>log4j-api</artifactId>
-		    <version>${log4j2.version}</version>
-		</dependency>
+
 				
         <!-- jhipster-needle-maven-add-dependency -->
 
@@ -366,7 +365,7 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-spring-security-adapter</artifactId>
-            <version>2.2.0.Final</version>
+            <version>3.1.0.Final</version>
         </dependency>
         <dependency>
             <groupId>org.liquibase</groupId>

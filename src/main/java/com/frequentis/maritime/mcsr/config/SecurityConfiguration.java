@@ -17,12 +17,20 @@
  */
 package com.frequentis.maritime.mcsr.config;
 
+import com.frequentis.maritime.mcsr.repository.PersistentTokenRepository;
 import com.frequentis.maritime.mcsr.security.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.keycloak.adapters.springsecurity.KeycloakSecurityComponents;
 import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
 import org.keycloak.adapters.springsecurity.filter.KeycloakAuthenticationProcessingFilter;
 import org.keycloak.adapters.springsecurity.filter.KeycloakPreAuthActionsFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -38,6 +46,7 @@ import org.springframework.security.data.repository.query.SecurityEvaluationCont
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.preauth.x509.X509AuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
 import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
@@ -45,8 +54,10 @@ import javax.inject.Inject;
 
 @Configuration
 @EnableWebSecurity
+@ComponentScan(basePackageClasses = KeycloakSecurityComponents.class)
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter {
+	private final Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
 
     @Inject
     private JHipsterProperties jHipsterProperties;
@@ -65,7 +76,7 @@ public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter 
 
     @Inject
     private UserDetailsService userDetailsService;
-
+    
     @Inject
     private RememberMeServices rememberMeServices;
 
@@ -85,6 +96,7 @@ public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter 
 
     @Override
     public void configure(WebSecurity web) throws Exception {
+    	log.debug("Configuring WebSecurity");
         web.ignoring()
             .antMatchers(HttpMethod.OPTIONS, "/**")
             .antMatchers("/app/**/*.{js,html}")
@@ -96,6 +108,7 @@ public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter 
             .antMatchers("/h2-console/**");
     }
 
+    @Bean
     @Override
     protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
         return new NullAuthenticatedSessionStrategy();
@@ -119,6 +132,9 @@ public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter 
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+    	super.configure(http);
+    	log.debug("Configuring HttpSecurity");
+    	log.debug("RememberMe service {}", rememberMeServices);
         http
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .sessionAuthenticationStrategy(sessionAuthenticationStrategy())

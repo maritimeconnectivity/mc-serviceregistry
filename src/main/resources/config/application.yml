@@ -15,6 +15,8 @@ spring:
     hibernate:
       ddl-auto: none
       naming-strategy: org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy
+      # This is required for newer Hibernate or you can use genrator = native (https://hibernate.atlassian.net/browse/HHH-11014)
+      use-new-id-generator-mappings: false
   messages:
     basename: i18n/messages
   mvc:
