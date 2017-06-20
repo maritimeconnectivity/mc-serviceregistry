@@ -37,6 +37,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import springfox.documentation.annotations.ApiIgnore;
+
 import com.frequentis.maritime.mcsr.service.AuditEventService;
 import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
 
@@ -45,6 +47,7 @@ import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
  */
 @RestController
 @RequestMapping(value = "/management/jhipster/audits", produces = MediaType.APPLICATION_JSON_VALUE)
+@ApiIgnore
 public class AuditResource {
 
     private AuditEventService auditEventService;

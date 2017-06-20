@@ -54,8 +54,12 @@ import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 @RestController
 @RequestMapping("/api")
+@Api
 public class TechnicalDesignResource {
     private final Logger log = LoggerFactory.getLogger(DesignResource.class);
 
@@ -163,7 +167,8 @@ public class TechnicalDesignResource {
     @RequestMapping(value = "/technicalDesign/{id}/{version}/",
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
-        @Timed
+    @ApiOperation(value = "getDesign", notes = "Returns the technical design with the specified id and version. Use version 'latest' to get the newest one.")
+    @Timed
     public ResponseEntity<Design> getDesign(@PathVariable String id, @PathVariable String version) {
         log.debug("REST request to get Design {} of version {}", id, version);
         Design design = null;

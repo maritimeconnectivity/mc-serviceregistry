@@ -48,11 +48,14 @@ import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 
+import springfox.documentation.annotations.ApiIgnore;
+
 /**
  * REST controller for managing Design.
  */
 @RestController
 @RequestMapping("/api")
+@ApiIgnore
 public class DesignResource {
 
     private final Logger log = LoggerFactory.getLogger(DesignResource.class);

@@ -37,11 +37,14 @@ import com.frequentis.maritime.mcsr.security.AuthoritiesConstants;
 import com.frequentis.maritime.mcsr.security.SecurityUtils;
 import com.frequentis.maritime.mcsr.service.ElasticsearchIndexService;
 
+import io.swagger.annotations.Api;
+
 /**
  * REST controller for managing Elasticsearch index.
  */
 @RestController
 @RequestMapping("/api")
+@Api
 public class ElasticsearchIndexResource {
 
     private final Logger log = LoggerFactory.getLogger(ElasticsearchIndexResource.class);

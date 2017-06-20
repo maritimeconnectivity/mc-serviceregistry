@@ -53,11 +53,14 @@ import com.frequentis.maritime.mcsr.web.rest.dto.ManagedUserDTO;
 import com.frequentis.maritime.mcsr.web.rest.dto.UserDTO;
 import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
 
+import springfox.documentation.annotations.ApiIgnore;
+
 /**
  * REST controller for managing the current user's account.
  */
 @RestController
 @RequestMapping("/api")
+@ApiIgnore
 public class AccountResource {
 
     private final Logger log = LoggerFactory.getLogger(AccountResource.class);

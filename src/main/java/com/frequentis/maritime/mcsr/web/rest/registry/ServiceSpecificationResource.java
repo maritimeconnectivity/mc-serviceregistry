@@ -54,8 +54,12 @@ import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 @RestController
 @RequestMapping("/api")
+@Api
 public class ServiceSpecificationResource {
 
     private final Logger log = LoggerFactory.getLogger(SpecificationResource.class);
@@ -165,7 +169,8 @@ public class ServiceSpecificationResource {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-        public ResponseEntity<Specification> getSpecification(@PathVariable String id, @PathVariable String version) {
+    @ApiOperation(value = "getSpecification", notes = "Returns the service specification with the specified id and version. Use version 'latest' to get the newest one.")
+    public ResponseEntity<Specification> getSpecification(@PathVariable String id, @PathVariable String version) {
         log.debug("REST request to get Specification {} of version {}", id, version);
         Specification specification = null;
         if (version.equalsIgnoreCase("latest")) {

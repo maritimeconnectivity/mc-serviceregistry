@@ -31,8 +31,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.frequentis.maritime.mcsr.config.JHipsterProperties;
 
+import springfox.documentation.annotations.ApiIgnore;
+
 @RestController
 @RequestMapping("/api")
+@ApiIgnore
 public class ProfileInfoResource {
 
     @Inject

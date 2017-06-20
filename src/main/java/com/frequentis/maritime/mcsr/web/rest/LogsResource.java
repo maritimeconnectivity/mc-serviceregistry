@@ -34,12 +34,14 @@ import com.frequentis.maritime.mcsr.web.rest.dto.LoggerDTO;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * Controller for view and managing Log Level at runtime.
  */
 @RestController
 @RequestMapping("/management/jhipster")
+@ApiIgnore
 public class LogsResource {
 
     @RequestMapping(value = "/logs",

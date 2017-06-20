@@ -51,11 +51,14 @@ import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 
+import springfox.documentation.annotations.ApiIgnore;
+
 /**
  * REST controller for managing Instance.
  */
 @RestController
 @RequestMapping("/api")
+@ApiIgnore
 public class InstanceResource {
 
     private final Logger log = LoggerFactory.getLogger(InstanceResource.class);

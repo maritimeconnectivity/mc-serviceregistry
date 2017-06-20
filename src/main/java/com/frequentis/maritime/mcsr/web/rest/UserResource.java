@@ -60,6 +60,8 @@ import com.frequentis.maritime.mcsr.web.rest.dto.ManagedUserDTO;
 import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
 
+import springfox.documentation.annotations.ApiIgnore;
+
 /**
  * REST controller for managing users.
  *
@@ -86,6 +88,7 @@ import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
  */
 @RestController
 @RequestMapping("/api")
+@ApiIgnore
 public class UserResource {
 
     private final Logger log = LoggerFactory.getLogger(UserResource.class);

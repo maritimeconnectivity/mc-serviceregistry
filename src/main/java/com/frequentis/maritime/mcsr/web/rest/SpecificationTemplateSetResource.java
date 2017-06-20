@@ -46,11 +46,14 @@ import com.frequentis.maritime.mcsr.service.SpecificationTemplateSetService;
 import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
 
+import springfox.documentation.annotations.ApiIgnore;
+
 /**
  * REST controller for managing SpecificationTemplateSet.
  */
 @RestController
 @RequestMapping("/api")
+@ApiIgnore
 public class SpecificationTemplateSetResource {
 
     private final Logger log = LoggerFactory.getLogger(SpecificationTemplateSetResource.class);
