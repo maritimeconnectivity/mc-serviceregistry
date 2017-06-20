@@ -18,10 +18,12 @@
 package com.frequentis.maritime.mcsr.config;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,14 +53,17 @@ public class ElasticSearchConfiguration {
         return new ElasticsearchTemplate(client, new CustomEntityMapper(jackson2ObjectMapperBuilder.createXmlMapper(false).build()));
     }
     
-    @Bean
-	public Client createTransportClient() throws Exception {
-    	Settings settings = Settings.builder()
-    	        .put("cluster.name", "myClusterName").build();
-    	
-    	TransportClient client = new PreBuiltTransportClient(settings);
-		return client;
-	}
+//    @Bean
+//	public Client createTransportClient() throws Exception {
+//    	log.info("Creating transportClient for Elasticsearch");
+//    	Settings settings = Settings.builder()
+//    	        .put("cluster.name", "myClusterName").build();
+//    	
+//    	TransportClient client = new PreBuiltTransportClient(settings);
+//    	client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("127.0.0.1"), 9300));
+//    	log.info("transportClient: {}", client);
+//		return client;
+//	}
 
     public class CustomEntityMapper implements EntityMapper {
 

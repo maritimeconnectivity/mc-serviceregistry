@@ -304,11 +304,6 @@
 		    <artifactId>cxf-rt-frontend-jaxws</artifactId>
 		    <version>3.1.11</version>
 		</dependency>
-		<dependency>
-		    <groupId>org.elasticsearch.client</groupId>
-		    <artifactId>transport</artifactId>
-		    <version>5.4.1</version>
-		</dependency>
 
 				
         <!-- jhipster-needle-maven-add-dependency -->

@@ -54,8 +54,8 @@ spring:
             hibernate.cache.region.factory_class: org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
     data:
         elasticsearch:
-#            cluster-name: elasticsearch
-#            cluster-nodes: 127.0.0.1:9300
+            cluster-name: elasticsearch
+            cluster-nodes: 127.0.0.1:9300
             properties:
                 path:
                   logs: target/elasticsearch/log
