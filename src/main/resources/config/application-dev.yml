@@ -44,8 +44,8 @@ spring:
 #            hibernate.generate_statistics: true
 #            hibernate.cache.region.factory_class: org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
     jpa:
-        database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
-        database: MYSQL
+        database-platform: com.frequentis.maritime.mcsr.domain.util.FixedH2Dialect
+        database: H2
         show-sql: true
         properties:
             hibernate.cache.use_second_level_cache: false

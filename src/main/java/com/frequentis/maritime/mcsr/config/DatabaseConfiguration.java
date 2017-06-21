@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
@@ -67,7 +68,7 @@ public class DatabaseConfiguration {
     @ConditionalOnExpression("#{!environment.acceptsProfiles('" + Constants.SPRING_PROFILE_CLOUD + "') && !environment.acceptsProfiles('" + Constants.SPRING_PROFILE_HEROKU + "')}")
     @ConfigurationProperties(prefix = "spring.datasource.hikari")
     public DataSource dataSource(DataSourceProperties dataSourceProperties) {
-        log.debug("Configuring Datasource");
+        log.debug("Configuring Datasource {}", dataSourceProperties.getUrl());
         if (dataSourceProperties.getUrl() == null) {
             log.error("Your database connection pool configuration is incorrect! The application" +
                     " cannot start. Please check your Spring profile, current profiles are: {}",

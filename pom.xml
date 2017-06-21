@@ -30,7 +30,7 @@
         <gatling-maven-plugin.version>2.1.7</gatling-maven-plugin.version>
         <gatling.version>2.1.7</gatling.version>
         <!--hibernate.version>4.3.11.Final</hibernate.version-->
-        <hibernate.version>5.0.0.Final</hibernate.version>
+        <hibernate.version>5.2.9.Final</hibernate.version>
         <hikaricp.version>2.4.6</hikaricp.version>
         <jacoco-maven-plugin.version>0.7.6.201602180812</jacoco-maven-plugin.version>
         <java.version>1.8</java.version>
@@ -86,13 +86,19 @@
 		    <artifactId>log4j-over-slf4j</artifactId>
 		    <version>1.7.21</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>jcl-over-slf4j</artifactId>
+		    <version>1.7.25</version>
+		</dependency>
 		
-        <dependency>
+		
+        <!-- dependency>
             <groupId>com.carrotsearch.randomizedtesting</groupId>
             <artifactId>randomizedtesting-runner</artifactId>
             <version>2.1.11</version>
             <scope>test</scope>
-        </dependency>
+        </dependency -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-hibernate4</artifactId>
@@ -353,7 +359,13 @@
             </exclusions>
         </dependency>
 
-        <!-- for generating sample data -->
+	    <!-- for generating sample data -->
+	    <dependency>
+		    <groupId>org.hsqldb</groupId>
+		    <artifactId>hsqldb</artifactId>
+		    <version>2.3.2</version>
+		    <scope>test</scope>
+		</dependency>
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
@@ -371,6 +383,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-envers</artifactId>

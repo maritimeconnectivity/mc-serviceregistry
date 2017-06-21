@@ -17,57 +17,86 @@
  */
 package com.frequentis.maritime.mcsr.domain.util;
 
-import com.frequentis.maritime.mcsr.domain.util.JSR310DateConverters.*;
-
-import java.time.*;
 import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.frequentis.maritime.mcsr.domain.util.JSR310DateConverters.DateToZonedDateTimeConverter;
+import com.frequentis.maritime.mcsr.domain.util.JSR310DateConverters.ZonedDateTimeToDateConverter;
+
+
 public final class JSR310PersistenceConverters {
+	
 
     private JSR310PersistenceConverters() {}
 
-    @Converter(autoApply = true)
-    public static class LocalDateConverter implements AttributeConverter<LocalDate, java.sql.Date> {
-
-        @Override
-        public java.sql.Date convertToDatabaseColumn(LocalDate date) {
-            return date == null ? null : java.sql.Date.valueOf(date);
-        }
-
-        @Override
-        public LocalDate convertToEntityAttribute(java.sql.Date date) {
-            return date == null ? null : date.toLocalDate();
-        }
-    }
-
+//    //@Converter(autoApply = true)
+//    public static class LocalDateConverter implements AttributeConverter<LocalDate, java.sql.Date> {
+//
+//        @Override
+//        public java.sql.Date convertToDatabaseColumn(LocalDate date) {
+//            return date == null ? null : java.sql.Date.valueOf(date);
+//        }
+//
+//        @Override
+//        public LocalDate convertToEntityAttribute(java.sql.Date date) {
+//            return date == null ? null : date.toLocalDate();
+//        }
+//    }
+//
     @Converter(autoApply = true)
     public static class ZonedDateTimeConverter implements AttributeConverter<ZonedDateTime, Date> {
+    	private final Logger log = LoggerFactory.getLogger(ZonedDateTimeConverter.class);
 
         @Override
         public Date convertToDatabaseColumn(ZonedDateTime zonedDateTime) {
+        	log.debug("Convert from {}");
             return ZonedDateTimeToDateConverter.INSTANCE.convert(zonedDateTime);
         }
 
         @Override
         public ZonedDateTime convertToEntityAttribute(Date date) {
+        	log.debug("Convert from {}");
             return DateToZonedDateTimeConverter.INSTANCE.convert(date);
         }
     }
-
-    @Converter(autoApply = true)
-    public static class LocalDateTimeConverter implements AttributeConverter<LocalDateTime, Date> {
-
-        @Override
-        public Date convertToDatabaseColumn(LocalDateTime localDateTime) {
-            return LocalDateTimeToDateConverter.INSTANCE.convert(localDateTime);
-        }
-
-        @Override
-        public LocalDateTime convertToEntityAttribute(Date date) {
-            return DateToLocalDateTimeConverter.INSTANCE.convert(date);
-        }
-    }
+//
+//    //@Converter(autoApply = true)
+//    public static class LocalDateTimeConverter implements AttributeConverter<LocalDateTime, Date> {
+//
+//        @Override
+//        public Date convertToDatabaseColumn(LocalDateTime localDateTime) {
+//            return LocalDateTimeToDateConverter.INSTANCE.convert(localDateTime);
+//        }
+//
+//        @Override
+//        public LocalDateTime convertToEntityAttribute(Date date) {
+//            return DateToLocalDateTimeConverter.INSTANCE.convert(date);
+//        }
+//    }
+//    
+//    @Converter(autoApply = true)
+//    public static class ZonedDateTimeConverter implements AttributeConverter<java.time.ZonedDateTime, java.sql.Timestamp> {
+//
+//        @Override
+//        public java.sql.Timestamp convertToDatabaseColumn(ZonedDateTime entityValue) {
+//           return Timestamp.from(entityValue.toInstant());
+//        }
+//
+//        @Override
+//        public ZonedDateTime convertToEntityAttribute(java.sql.Timestamp databaseValue) {
+//            LocalDateTime localDateTime = databaseValue.toLocalDateTime();
+//            return localDateTime.atZone(ZoneId.systemDefault());
+//        }
+//
+//    }
+    
+    
 }

@@ -18,6 +18,7 @@
 package com.frequentis.maritime.mcsr.domain;
 
 import java.io.Serializable;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 import javax.persistence.Column;
@@ -29,7 +30,9 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.Auditable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -40,7 +43,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @MappedSuperclass
 @Audited
 @EntityListeners(AuditingEntityListener.class)
-public abstract class AbstractAuditingEntity implements Serializable {
+public abstract class AbstractAuditingEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -52,7 +55,7 @@ public abstract class AbstractAuditingEntity implements Serializable {
     @CreatedDate
     @Column(name = "created_date", nullable = false)
     @JsonIgnore
-    private ZonedDateTime createdDate = ZonedDateTime.now();
+    private LocalDateTime createdDate = LocalDateTime.now();
 
     @LastModifiedBy
     @Column(name = "last_modified_by", length = 50)
@@ -62,7 +65,7 @@ public abstract class AbstractAuditingEntity implements Serializable {
     @LastModifiedDate
     @Column(name = "last_modified_date")
     @JsonIgnore
-    private ZonedDateTime lastModifiedDate = ZonedDateTime.now();
+    private LocalDateTime lastModifiedDate = LocalDateTime.now();
 
     public String getCreatedBy() {
         return createdBy;
@@ -73,11 +76,14 @@ public abstract class AbstractAuditingEntity implements Serializable {
     }
 
     public ZonedDateTime getCreatedDate() {
-        return createdDate;
+    	if(createdDate == null) {
+    		return null;
+    	}
+    	return createdDate.atZone(ZoneId.systemDefault());
     }
 
     public void setCreatedDate(ZonedDateTime createdDate) {
-        this.createdDate = createdDate;
+        this.createdDate = createdDate.toLocalDateTime();
     }
 
     public String getLastModifiedBy() {
@@ -89,10 +95,13 @@ public abstract class AbstractAuditingEntity implements Serializable {
     }
 
     public ZonedDateTime getLastModifiedDate() {
-        return lastModifiedDate;
+    	if(lastModifiedDate == null) {
+    		return null;
+    	}
+    	return lastModifiedDate.atZone(ZoneId.systemDefault());
     }
 
     public void setLastModifiedDate(ZonedDateTime lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
+        this.lastModifiedDate = lastModifiedDate.toLocalDateTime();
     }
 }
