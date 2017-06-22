@@ -30,13 +30,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.frequentis.maritime.mcsr.domain.PersistentToken;
 import com.frequentis.maritime.mcsr.domain.User;
 import com.frequentis.maritime.mcsr.repository.PersistentTokenRepository;
 import com.frequentis.maritime.mcsr.repository.UserRepository;
+import com.frequentis.maritime.mcsr.service.util.RandomUtil;
 
 /**
  * Test class for the UserResource REST controller.
@@ -46,6 +49,7 @@ import com.frequentis.maritime.mcsr.repository.UserRepository;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "integration")
+@Transactional
 public class UserServiceIntTest {
 
     @Inject
@@ -82,8 +86,79 @@ public class UserServiceIntTest {
         assertThat(maybeUser.get().getResetKey()).isNotNull();
     }
     
+    @Test
+    @WithMockUser("test-user")
+    public void assertThatOnlyActivatedUserCanRequestPasswordReset() {
+        User user = userService.createUserInformation("johndoe", "johndoe", "John", "Doe", "john.doe@localhost", "en-US");
+        Optional<User> maybeUser = userService.requestPasswordReset("john.doe@localhost");
+        assertThat(maybeUser.isPresent()).isFalse();
+        userRepository.delete(user);
+    }
     
-    
+    @Test
+    @WithMockUser("test-user")
+    public void assertThatResetKeyMustNotBeOlderThan24Hours() {
+        User user = userService.createUserInformation("johndoe", "johndoe", "John", "Doe", "john.doe@localhost", "en-US");
+
+        ZonedDateTime daysAgo = ZonedDateTime.now().minusHours(25);
+        String resetKey = RandomUtil.generateResetKey();
+        user.setActivated(true);
+        user.setResetDate(daysAgo);
+        user.setResetKey(resetKey);
+
+        userRepository.save(user);
+
+        Optional<User> maybeUser = userService.completePasswordReset("johndoe2", user.getResetKey());
+
+        assertThat(maybeUser.isPresent()).isFalse();
+
+        userRepository.delete(user);
+    }
+
+    @Test
+    @WithMockUser("test-user")
+    public void assertThatResetKeyMustBeValid() {
+        User user = userService.createUserInformation("johndoe", "johndoe", "John", "Doe", "john.doe@localhost", "en-US");
+
+        ZonedDateTime daysAgo = ZonedDateTime.now().minusHours(25);
+        user.setActivated(true);
+        user.setResetDate(daysAgo);
+        user.setResetKey("1234");
+        userRepository.save(user);
+        Optional<User> maybeUser = userService.completePasswordReset("johndoe2", user.getResetKey());
+        assertThat(maybeUser.isPresent()).isFalse();
+        userRepository.delete(user);
+    }
+
+    @Test
+    @WithMockUser("test-user")
+    public void assertThatUserCanResetPassword() {
+        User user = userService.createUserInformation("johndoe", "johndoe", "John", "Doe", "john.doe@localhost", "en-US");
+        String oldPassword = user.getPassword();
+        ZonedDateTime daysAgo = ZonedDateTime.now().minusHours(2);
+        String resetKey = RandomUtil.generateResetKey();
+        user.setActivated(true);
+        user.setResetDate(daysAgo);
+        user.setResetKey(resetKey);
+        userRepository.save(user);
+        Optional<User> maybeUser = userService.completePasswordReset("johndoe2", user.getResetKey());
+        assertThat(maybeUser.isPresent()).isTrue();
+        assertThat(maybeUser.get().getResetDate()).isNull();
+        assertThat(maybeUser.get().getResetKey()).isNull();
+        assertThat(maybeUser.get().getPassword()).isNotEqualTo(oldPassword);
+
+        userRepository.delete(user);
+    }
+
+    @Test
+    @WithMockUser("test-user")
+    public void testFindNotActivatedUsersByCreationDateBefore() {
+        userService.removeNotActivatedUsers();
+        ZonedDateTime now = ZonedDateTime.now();
+        List<User> users = userRepository.findAllByActivatedIsFalseAndCreatedDateBefore(now.minusDays(3));
+        assertThat(users).isEmpty();
+    }
+
     private void generateUserToken(User user, String tokenSeries, LocalDate localDate) {
         PersistentToken token = new PersistentToken();
         token.setSeries(tokenSeries);

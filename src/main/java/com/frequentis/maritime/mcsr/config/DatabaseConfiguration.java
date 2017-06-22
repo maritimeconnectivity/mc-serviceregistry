@@ -45,13 +45,13 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import liquibase.integration.spring.SpringLiquibase;
 
 import com.codahale.metrics.MetricRegistry;
-import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
+import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import com.frequentis.maritime.mcsr.config.liquibase.AsyncSpringLiquibase;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
 @EnableJpaRepositories("com.frequentis.maritime.mcsr.repository")
-@EnableJpaAuditing(auditorAwareRef = "springSecurityAuditorAware")
+@EnableJpaAuditing(auditorAwareRef = "springSecurityAuditorAware", dateTimeProviderRef = "customDateTimeProvider")
 @EnableTransactionManagement
 @EnableElasticsearchRepositories("com.frequentis.maritime.mcsr.repository.search")
 public class DatabaseConfiguration {
@@ -125,7 +125,7 @@ public class DatabaseConfiguration {
     }
 
     @Bean
-    public Hibernate4Module hibernate4Module() {
-        return new Hibernate4Module();
+    public Hibernate5Module hibernate4Module() {
+        return new Hibernate5Module();
     }
 }

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <!--
+        Added the constraints for entity Instance.
+    -->
+    <changeSet id="20160731214548-2" author="jhipster">
+        
+        <addForeignKeyConstraint baseColumnNames="instance_as_xml_id"
+                                 baseTableName="instance"
+                                 constraintName="fk_instance_instanceasxml_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="xml"/>
+
+        <addForeignKeyConstraint baseColumnNames="instance_as_doc_id"
+                                 baseTableName="instance"
+                                 constraintName="fk_instance_instanceasdoc_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="doc"/>
+
+        <addForeignKeyConstraint baseColumnNames="implemented_specification_version_id"
+                                 baseTableName="instance"
+                                 constraintName="fk_instance_implementedspecificationversion_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="specification_template"/>
+
+        <addForeignKeyConstraint baseColumnNames="instances_id"
+                                 baseTableName="instance_designs"
+                                 constraintName="fk_instance_designs_instances_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="instance"/>
+        <addForeignKeyConstraint baseColumnNames="designs_id"
+                                 baseTableName="instance_designs"
+                                 constraintName="fk_instance_designs_designs_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="design"/>
+        
+        <addForeignKeyConstraint baseColumnNames="instances_id"
+                                 baseTableName="instance_docs"
+                                 constraintName="fk_instance_docs_instances_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="instance"/>
+        <addForeignKeyConstraint baseColumnNames="docs_id"
+                                 baseTableName="instance_docs"
+                                 constraintName="fk_instance_docs_docs_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="doc"/>
+        
+    </changeSet>
+</databaseChangeLog>

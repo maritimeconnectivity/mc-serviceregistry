@@ -14,8 +14,8 @@
 spring:
     datasource:
 #        url: jdbc:h2:file:./target/h2db/db/mcsr;DB_CLOSE_DELAY=-1
-        url: jdbc:mysql://localhost:3306/maritimeregistry-test?useUnicode=true&characterEncoding=utf8&useSSL=false
-#        url: jdbc:h2:mem:AZ;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+#        url: jdbc:mysql://localhost:3306/maritimeregistry-test?useUnicode=true&characterEncoding=utf8&useSSL=false
+        url: jdbc:h2:mem:AZ;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
 #        url: jdbc:h2:file:./mcsr.h2;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
         name:
         username: root
@@ -40,7 +40,7 @@ spring:
     data:
         elasticsearch:
             cluster-name: elasticsearch-test
-            cluster-nodes: 127.0.0.1:9300
+            cluster-nodes: localhost:9300
             properties:
                 path:
                   logs: target/elasticsearch/log

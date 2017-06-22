@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <!--
+        Added the constraints for entity Specification.
+    -->
+    <changeSet id="20160731214546-2" author="jhipster">
+        
+        <addForeignKeyConstraint baseColumnNames="spec_as_xml_id"
+                                 baseTableName="specification"
+                                 constraintName="fk_specification_specasxml_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="xml"/>
+
+        <addForeignKeyConstraint baseColumnNames="spec_as_doc_id"
+                                 baseTableName="specification"
+                                 constraintName="fk_specification_specasdoc_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="doc"/>
+
+        <addForeignKeyConstraint baseColumnNames="implemented_specification_version_id"
+                                 baseTableName="specification"
+                                 constraintName="fk_specification_implementedspecificationversion_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="specification_template"/>
+
+        <addForeignKeyConstraint baseColumnNames="specifications_id"
+                                 baseTableName="specification_docs"
+                                 constraintName="fk_specification_docs_specifications_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="specification"/>
+        <addForeignKeyConstraint baseColumnNames="docs_id"
+                                 baseTableName="specification_docs"
+                                 constraintName="fk_specification_docs_docs_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="doc"/>
+        
+    </changeSet>
+</databaseChangeLog>

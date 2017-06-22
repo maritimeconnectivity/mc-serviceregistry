@@ -25,6 +25,7 @@ import javax.persistence.Column;
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
 
+import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -39,6 +40,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 /**
  * Base abstract class for entities which will hold definitions for created, last modified by and created,
  * last modified by date.
+ * 
  */
 @MappedSuperclass
 @Audited
@@ -55,7 +57,7 @@ public abstract class AbstractAuditingEntity {
     @CreatedDate
     @Column(name = "created_date", nullable = false)
     @JsonIgnore
-    private LocalDateTime createdDate = LocalDateTime.now();
+    private ZonedDateTime createdDate = ZonedDateTime.now();
 
     @LastModifiedBy
     @Column(name = "last_modified_by", length = 50)
@@ -65,7 +67,7 @@ public abstract class AbstractAuditingEntity {
     @LastModifiedDate
     @Column(name = "last_modified_date")
     @JsonIgnore
-    private LocalDateTime lastModifiedDate = LocalDateTime.now();
+    private ZonedDateTime lastModifiedDate = ZonedDateTime.now();
 
     public String getCreatedBy() {
         return createdBy;
@@ -79,11 +81,11 @@ public abstract class AbstractAuditingEntity {
     	if(createdDate == null) {
     		return null;
     	}
-    	return createdDate.atZone(ZoneId.systemDefault());
+    	return createdDate;
     }
 
     public void setCreatedDate(ZonedDateTime createdDate) {
-        this.createdDate = createdDate.toLocalDateTime();
+        this.createdDate = createdDate;
     }
 
     public String getLastModifiedBy() {
@@ -98,10 +100,10 @@ public abstract class AbstractAuditingEntity {
     	if(lastModifiedDate == null) {
     		return null;
     	}
-    	return lastModifiedDate.atZone(ZoneId.systemDefault());
+    	return lastModifiedDate;
     }
 
     public void setLastModifiedDate(ZonedDateTime lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate.toLocalDateTime();
+        this.lastModifiedDate = lastModifiedDate;
     }
 }
