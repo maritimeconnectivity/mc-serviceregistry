@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.elasticsearch.ResourceAlreadyExistsException;
 //import org.elasticsearch.indices.IndexAlreadyExistsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,8 +154,7 @@ public class ElasticsearchIndexService {
         elasticsearchTemplate.deleteIndex(entityClass);
         try {
             elasticsearchTemplate.createIndex(entityClass);
-        //} catch (IndexAlreadyExistsException e) {
-        } catch (Exception e) {
+        } catch (ResourceAlreadyExistsException  e) {
             // Do nothing. Index was already concurrently recreated by some other service.
         }
         elasticsearchTemplate.putMapping(entityClass);
@@ -179,8 +179,7 @@ public class ElasticsearchIndexService {
         //elasticsearchTemplate.deleteIndex(entityClass);
         try {
             elasticsearchTemplate.createIndex(Instance.class);
-        } catch (Exception e) {
-        //} catch (IndexAlreadyExistsException e) {
+        } catch (ResourceAlreadyExistsException  e) {
             // Do nothing. Index was already concurrently recreated by some other service.
         }
         elasticsearchTemplate.putMapping(Instance.class);
