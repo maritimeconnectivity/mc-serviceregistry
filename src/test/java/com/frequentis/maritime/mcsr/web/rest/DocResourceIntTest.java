@@ -209,7 +209,7 @@ public class DocResourceIntTest {
         // Get all the docs
         restDocMockMvc.perform(get("/api/docs?sort=id,desc"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(doc.getId().intValue())))
                 .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
                 .andExpect(jsonPath("$.[*].comment").value(hasItem(DEFAULT_COMMENT.toString())))
@@ -227,7 +227,7 @@ public class DocResourceIntTest {
         // Get the doc
         restDocMockMvc.perform(get("/api/docs/{id}", doc.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(jsonPath("$.id").value(doc.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
             .andExpect(jsonPath("$.comment").value(DEFAULT_COMMENT.toString()))
@@ -312,7 +312,7 @@ public class DocResourceIntTest {
         // Search the doc
         restDocMockMvc.perform(get("/api/_search/docs?query=id:" + doc.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(jsonPath("$.[*].id").value(hasItem(doc.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
             .andExpect(jsonPath("$.[*].comment").value(hasItem(DEFAULT_COMMENT.toString())))

@@ -151,7 +151,7 @@ public class AuditResourceIntTest {
         // Query audits but expect no results
         restAuditMockMvc.perform(get("/management/jhipster/audits?fromDate=" + fromDate + "&toDate=" + toDate))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(header().string("X-Total-Count", "0"));
     }
 
