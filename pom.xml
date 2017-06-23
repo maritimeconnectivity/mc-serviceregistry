@@ -322,6 +322,16 @@
 		    <artifactId>cxf-rt-frontend-jaxws</artifactId>
 		    <version>3.1.11</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.apache.cxf</groupId>
+		    <artifactId>cxf-rt-transports-http</artifactId>
+		    <version>3.1.11</version>
+		</dependency>
+		<dependency>
+		    <groupId>javax.servlet</groupId>
+		    <artifactId>javax.servlet-api</artifactId>
+		    <version>3.1.0</version>
+		</dependency>
 
 				
         <!-- jhipster-needle-maven-add-dependency -->
