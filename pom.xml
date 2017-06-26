@@ -145,6 +145,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+		    <groupId>com.spatial4j</groupId>
+		    <artifactId>spatial4j</artifactId>
+		    <version>0.5</version>
+		</dependency>
+        <dependency>
             <groupId>com.ryantenney.metrics</groupId>
             <artifactId>metrics-spring</artifactId>
             <version>${metrics-spring.version}</version>

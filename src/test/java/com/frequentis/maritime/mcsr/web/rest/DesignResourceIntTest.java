@@ -30,6 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -45,6 +47,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -55,7 +59,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 
+import com.frequentis.maritime.mcsr.dataload.DataLoader;
+import com.frequentis.maritime.mcsr.dataload.TestDataLoader;
 import com.frequentis.maritime.mcsr.domain.Design;
 import com.frequentis.maritime.mcsr.domain.Xml;
 import com.frequentis.maritime.mcsr.repository.DesignRepository;
@@ -104,15 +111,22 @@ public class DesignResourceIntTest {
     
     @Inject
     private ApplicationContext context;
+    
+    @Inject
+    private XmlResource xmlResource;
+    
+    @Inject
+    Environment environment;
+    
+    @Inject
+    TestDataLoader testDataLoader;
 
     private MockMvc restDesignMockMvc;
 
     private Design design;
-    
-    private String addressForPersonLookupServiceDesignRestXml;
 
     @PostConstruct
-    public void setup() throws IOException {
+    public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
         DesignResource designResource = new DesignResource();
         ReflectionTestUtils.setField(designResource, "designService", designService);
@@ -120,13 +134,12 @@ public class DesignResourceIntTest {
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
         
-        // Read XML data
-        Path xmlFilePath = context.getResource("classpath:dataload/xml/AddressForPersonLookupServiceDesignREST.xml").getFile().toPath();
-        addressForPersonLookupServiceDesignRestXml = new String(Files.readAllBytes(xmlFilePath));
+        
+        testDataLoader.run();
     }
 
     @Before
-    public void initTest() {
+    public void initTest() throws URISyntaxException {
         designSearchRepository.deleteAll();
         design = new Design();
         design.setName(DEFAULT_NAME);
@@ -135,13 +148,6 @@ public class DesignResourceIntTest {
         design.setDesignId(DEFAULT_DESIGN_ID);
         design.setStatus(DEFAULT_STATUS);
         design.setOrganizationId(DEFAULT_ORGANIZATION_ID);
-        
-        Xml xml = new Xml();
-        xml.setComment("Some comment");
-        xml.setContent(addressForPersonLookupServiceDesignRestXml);
-        xml.setContentContentType("application/xml");
-        xml.setName("Some name");
-        design.setDesignAsXml(xml);
     }
 
     @Test
