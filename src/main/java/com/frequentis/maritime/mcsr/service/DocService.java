@@ -93,8 +93,8 @@ public class DocService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Doc : {}", id);
-        //docRepository.delete(id);
-        //docSearchRepository.delete(id);
+        docRepository.deleteById(id);
+        docSearchRepository.deleteById(id);
     }
 
     /**

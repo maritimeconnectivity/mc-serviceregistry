@@ -295,7 +295,10 @@ public class DocResourceIntTest {
                 .andExpect(status().isOk());
 
         // Validate ElasticSearch is empty
-        boolean docExistsInEs = docSearchRepository.existsById(doc.getId());
+        // FIXME HOTFIX! There is SD-ES bug DATAES-363
+        //boolean docExistsInEs = docSearchRepository.existsById(doc.getId());
+        boolean docExistsInEs = docSearchRepository.findById(doc.getId()).isPresent();
+        
         assertThat(docExistsInEs).isFalse();
 
         // Validate the database is empty

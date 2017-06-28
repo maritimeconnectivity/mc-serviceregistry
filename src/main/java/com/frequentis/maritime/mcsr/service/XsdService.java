@@ -95,9 +95,9 @@ public class XsdService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Xsd : {}", id);
-        //Xsd xsd = xsdRepository.getOne(id);
-        //xsdRepository.delete(xsd);
-        //xsdSearchRepository.delete(xsd);
+        Xsd xsd = xsdRepository.getOne(id);
+        xsdRepository.delete(xsd);
+        xsdSearchRepository.delete(xsd);
     }
 
     /**

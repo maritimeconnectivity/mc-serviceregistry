@@ -115,15 +115,17 @@ public class DesignResource {
         if (design.getId() == null) {
             return createDesign(design);
         }
-        try {
-            String xml = design.getDesignAsXml().getContent().toString();
-            log.info("XML:" + xml);
-            XmlUtil.validateXml(xml, "ServiceDesignSchema.xsd");
-        } catch (Exception e) {
-            log.error("Error parsing xml: ", e);
-            return ResponseEntity.badRequest()
-                .headers(HeaderUtil.createFailureAlert("design", e.getMessage(), e.toString()))
-                .body(design);
+        if(design.getDesignAsXml() != null) {
+	        try {
+	            String xml = design.getDesignAsXml().getContent().toString();
+	            log.info("XML:" + xml);
+	            XmlUtil.validateXml(xml, "ServiceDesignSchema.xsd");
+	        } catch (Exception e) {
+	            log.error("Error parsing xml: ", e);
+	            return ResponseEntity.badRequest()
+	                .headers(HeaderUtil.createFailureAlert("design", e.getMessage(), e.toString()))
+	                .body(design);
+	        }
         }
 
         Design result = designService.save(design);

@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.data.domain.Page;

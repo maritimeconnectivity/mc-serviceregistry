@@ -117,9 +117,6 @@ public class DesignResourceIntTest {
     
     @Inject
     Environment environment;
-    
-    @Inject
-    TestDataLoader testDataLoader;
 
     private MockMvc restDesignMockMvc;
 
@@ -135,7 +132,6 @@ public class DesignResourceIntTest {
             .setMessageConverters(jacksonMessageConverter).build();
         
         
-        testDataLoader.run();
     }
 
     @Before
@@ -349,7 +345,9 @@ public class DesignResourceIntTest {
                 .andExpect(status().isOk());
 
         // Validate ElasticSearch is empty
-        boolean designExistsInEs = designSearchRepository.existsById(design.getId());
+        // FIXME HOTFIX! There is SD-ES bug DATAES-363
+        //boolean designExistsInEs = designSearchRepository.existsById(design.getId());
+        boolean designExistsInEs = designSearchRepository.findById(design.getId()).isPresent();
         assertThat(designExistsInEs).isFalse();
 
         // Validate the database is empty
@@ -366,7 +364,7 @@ public class DesignResourceIntTest {
         // Search the design
         restDesignMockMvc.perform(get("/api/_search/designs?query=id:" + design.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(jsonPath("$.[*].id").value(hasItem(design.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
             .andExpect(jsonPath("$.[*].version").value(hasItem(DEFAULT_VERSION.toString())))

@@ -28,6 +28,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -39,7 +42,7 @@ import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -52,9 +55,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.frequentis.maritime.mcsr.domain.Specification;
+import com.frequentis.maritime.mcsr.domain.Xml;
 import com.frequentis.maritime.mcsr.repository.SpecificationRepository;
 import com.frequentis.maritime.mcsr.repository.search.SpecificationSearchRepository;
 import com.frequentis.maritime.mcsr.service.SpecificationService;
+import com.frequentis.maritime.mcsr.service.XmlService;
 
 
 /**
@@ -82,6 +87,9 @@ public class SpecificationResourceIntTest {
     private static final String UPDATED_STATUS = "BBBBB";
     private static final String DEFAULT_ORGANIZATION_ID = "AAAAA";
     private static final String UPDATED_ORGANIZATION_ID = "BBBBB";
+	private static final String DEFAULT_XML_COMMENT = "LLLL";
+	private static final String DEFAULT_XML_CONTENTYPE = "application/xml";
+	private static final String DEFAULT_XML_NAME = "SpecTestXML";
 
     @Inject
     private SpecificationRepository specificationRepository;
@@ -97,19 +105,40 @@ public class SpecificationResourceIntTest {
 
     @Inject
     private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
+    
+    @Inject
+    private ApplicationContext appContext;
+    
+    @Inject
+    private XmlService xmlService;
 
     private MockMvc restSpecificationMockMvc;
 
     private Specification specification;
+    
+    private Xml specificationXML;
 
     @PostConstruct
-    public void setup() {
+    public void setup() throws IOException {
         MockitoAnnotations.initMocks(this);
         SpecificationResource specificationResource = new SpecificationResource();
         ReflectionTestUtils.setField(specificationResource, "specificationService", specificationService);
         this.restSpecificationMockMvc = MockMvcBuilders.standaloneSetup(specificationResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
+        
+        Path xmlPath = appContext.getResource("classpath:dataload/xml/AddressForPersonLookupServiceSpecification.xml").getFile().toPath();
+        String specificationXML = new String(Files.readAllBytes(xmlPath));
+        
+        // XML for test
+        Xml xml = new Xml();
+        xml.setComment(DEFAULT_XML_COMMENT);
+        xml.setName(DEFAULT_XML_NAME);
+        xml.setContentContentType(DEFAULT_XML_CONTENTYPE);
+        xml.setContent(specificationXML);
+        xmlService.save(xml);
+        this.specificationXML = xml;
+        
     }
 
     @Before
@@ -123,16 +152,19 @@ public class SpecificationResourceIntTest {
         specification.setSpecificationId(DEFAULT_SPECIFICATION_ID);
         specification.setStatus(DEFAULT_STATUS);
         specification.setOrganizationId(DEFAULT_ORGANIZATION_ID);
+        
+
     }
 
-    // TODO Can't work. Missing XML.
-    //@Test
+    @Test
     @Transactional
     public void createSpecification() throws Exception {
         int databaseSizeBeforeCreate = specificationRepository.findAll().size();
+        
+        // XML is required in resource
+        specification.setSpecAsXml(specificationXML);
 
         // Create the Specification
-
         restSpecificationMockMvc.perform(post("/api/specifications")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
                 .content(TestUtil.convertObjectToJsonBytes(specification)))
@@ -275,10 +307,11 @@ public class SpecificationResourceIntTest {
                 .andExpect(status().isNotFound());
     }
 
-    // TODO Can't work. Missing required attribute.
-    //@Test
+    @Test
     @Transactional
     public void updateSpecification() throws Exception {
+        // XML is required in resource
+        specification.setSpecAsXml(specificationXML);
         // Initialize the database
         specificationService.save(specification);
 
@@ -294,6 +327,7 @@ public class SpecificationResourceIntTest {
         updatedSpecification.setSpecificationId(UPDATED_SPECIFICATION_ID);
         updatedSpecification.setStatus(UPDATED_STATUS);
         updatedSpecification.setOrganizationId(UPDATED_ORGANIZATION_ID);
+        updatedSpecification.setSpecAsXml(specificationXML);
 
         restSpecificationMockMvc.perform(put("/api/specifications")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -318,7 +352,7 @@ public class SpecificationResourceIntTest {
     }
 
     @Test
-    @Transactional
+    @javax.transaction.Transactional
     public void deleteSpecification() throws Exception {
         // Initialize the database
         specificationService.save(specification);
@@ -331,7 +365,11 @@ public class SpecificationResourceIntTest {
                 .andExpect(status().isOk());
 
         // Validate ElasticSearch is empty
-        boolean specificationExistsInEs = specificationSearchRepository.existsById(specification.getId());
+        specificationSearchRepository.refresh();
+        
+        // FIXME HOTFIX! There is SD-ES bug DATAES-363
+        //boolean specificationExistsInEs = specificationSearchRepository.existsById(specification.getId());
+        boolean specificationExistsInEs = specificationSearchRepository.findById(specification.getId()).isPresent();
         assertThat(specificationExistsInEs).isFalse();
 
         // Validate the database is empty
