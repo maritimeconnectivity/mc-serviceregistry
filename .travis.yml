@@ -1,9 +1,12 @@
 language: java
 
-node_js: "4.3"
+node_js: "4.4.7"
 
-before_script:
+install: 
+  - npm install
   - npm install -g gulp-cli
+
+script: "npm test"
 
 script:
   - ./mvnw spring-boot:run && bootPid=$!
