@@ -10,4 +10,8 @@ install:
   - npm install -g gulp-cli
   - mvn -N io.takari:maven:wrapper
 
-script: "./mvnw spring-boot:run & ; bootPid=$! sleep 30s ;  gulp itest ;  kill $bootPid"
+script: 
+  - ./mvnw spring-boot:run &
+  - sleep 30s
+  - gulp itest
+  - killall mvnw
