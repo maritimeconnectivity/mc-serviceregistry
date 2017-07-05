@@ -16,7 +16,7 @@ install:
   - mvn -N io.takari:maven:wrapper
 
 script: 
-  - ./mvnw test
+  - ./mvnw compile
   - ./mvnw spring-boot:run &
   - sleep 30s
   - gulp itest
