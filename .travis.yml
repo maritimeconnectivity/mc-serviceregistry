@@ -2,7 +2,10 @@ language: java
 
 node_js: "4.4.7"
 
-install: 
+install:
+  - nvm install v4.4.7
+  - node -v
+  - npm -v
   - npm install
   - npm install -g gulp-cli
   - mvn -N io.takari:maven:wrapper
