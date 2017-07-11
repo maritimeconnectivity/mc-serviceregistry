@@ -36,18 +36,21 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldIndex;
-import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.frequentis.maritime.mcsr.domain.util.JsonNodeConverter;
+import com.frequentis.maritime.mcsr.domain.util.JsonNodeGeoShapeConverter;
+
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.core.geo.GeoShape;
 
 /**
  * Holds a description of an service instance.An instance can be compatible to one or morespecification templates.It has at least a technical representation of thedescriptiion in form of an XML and a filled out templateas e.g. word document.
@@ -80,7 +83,7 @@ public class Instance implements Serializable {
 
     @Column(name = "geometry", columnDefinition = "LONGTEXT")
     @Convert(converter = JsonNodeConverter.class)
-    private JsonNode geometry;
+    private GeoShape<?> geometry;
 
     @Column(name = "geometry_content_type")
     private String geometryContentType;
@@ -191,12 +194,21 @@ public class Instance implements Serializable {
         this.comment = comment;
     }
 
-    public JsonNode getGeometry() {
+    @Transient
+    public GeoShape<?> getGeometryAsGeoShape() {
         return geometry;
     }
 
-    public void setGeometry(JsonNode geometry) {
+    public JsonNode getGeometry() {
+    	return JsonNodeGeoShapeConverter.convertFromGeoShape(getGeometryAsGeoShape());
+    }
+
+    public void setGeometryAsGeoShape(GeoShape<?> geometry) {
         this.geometry = geometry;
+    }
+
+    public void setGeometry(JsonNode geometry) {
+    	setGeometryAsGeoShape(JsonNodeGeoShapeConverter.convertToGeoShape(geometry));
     }
 
     public String getGeometryContentType() {

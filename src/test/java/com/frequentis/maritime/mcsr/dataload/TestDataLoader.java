@@ -25,10 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.frequentis.maritime.mcsr.domain.Design;
@@ -48,6 +44,10 @@ import com.frequentis.maritime.mcsr.web.rest.SpecificationTemplateResource;
 import com.frequentis.maritime.mcsr.web.rest.SpecificationTemplateSetResource;
 import com.frequentis.maritime.mcsr.web.rest.XmlResource;
 import com.frequentis.maritime.mcsr.web.rest.XsdResource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Component;
 
 
 /**
@@ -76,7 +76,7 @@ public class TestDataLoader {
     @Autowired
     private InstanceResource restInstance;
 
-    
+
     public void run() throws Exception {
         loadBaseData();
         //generateInstances(5);
@@ -199,7 +199,7 @@ public class TestDataLoader {
         List<Doc> docs = restDoc.searchDocs(docSearchString, PageRequest.of(0, 1)).getBody();
         instance.setInstanceAsDoc(docs.get(0));
 
-        
+
         List<SpecificationTemplate> tempaltes = restSpecTemplate.searchSpecificationTemplates(implementedServiceTemplateSearchString, PageRequest.of(0, 1)).getBody();
         instance.setImplementedSpecificationVersion(tempaltes.get(0));
 
@@ -245,7 +245,7 @@ public class TestDataLoader {
         spec.setVersion(version);
         spec.setComment(comment);
 
-        
+
         List<Xml> xmls = restXml.searchXmls(xmlSearchString, PageRequest.of(0, 1)).getBody();
         spec.setSpecAsXml(xmls.get(0));
 

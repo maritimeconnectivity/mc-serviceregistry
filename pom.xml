@@ -69,7 +69,8 @@
         <sortpom-maven-plugin.version>2.5.0</sortpom-maven-plugin.version>
         <spring-data-releasetrain.version>Kay-M3</spring-data-releasetrain.version>
         <!--spring-security.version>4.1.0.RELEASE</spring-security.version -->
-        <springdata.elasticsearch.version>3.0.0.BUILD-SNAPSHOT</springdata.elasticsearch.version>
+        <!-- our version of DATAES -->
+        <springdata.elasticsearch.version>3.0.0.SWIM-SNAPSHOT</springdata.elasticsearch.version>
         <springfox.version>2.7.0</springfox.version>
         <cglib.version>3.2.5</cglib.version>
     </properties>
@@ -410,7 +411,7 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-spring-security-adapter</artifactId>
-            <version>3.1.0.Final</version>
+            <version>3.0.0.Final</version>
         </dependency>
         <dependency>
             <groupId>org.liquibase</groupId>

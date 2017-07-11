@@ -18,30 +18,38 @@
 
 package com.frequentis.maritime.mcsr.service;
 
+import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.geoShapeQuery;
+import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
+
+//import static org.elasticsearch.common.geo.builders.ShapeBuilder.newPoint;
+
+import javax.inject.Inject;
+
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.elasticsearch.common.geo.builders.ShapeBuilder;
+import org.elasticsearch.common.xcontent.NamedXContentRegistry;
+import org.elasticsearch.common.xcontent.XContentParser;
+import org.elasticsearch.common.xcontent.json.JsonXContent;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.frequentis.maritime.mcsr.domain.Instance;
 import com.frequentis.maritime.mcsr.repository.InstanceRepository;
 import com.frequentis.maritime.mcsr.repository.search.InstanceSearchRepository;
 import com.vividsolutions.jts.geom.Geometry;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.elasticsearch.common.geo.builders.ShapeBuilder;
-import org.elasticsearch.common.xcontent.XContentParser;
-import org.elasticsearch.common.xcontent.json.JsonXContent;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.geo.GeoShape;
+import org.springframework.data.elasticsearch.core.geo.GeoShapeModule;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.inject.Inject;
-
-//import static org.elasticsearch.common.geo.builders.ShapeBuilder.newPoint;
-import static org.elasticsearch.index.query.QueryBuilders.*;
-
 /**
  * Service Implementation for managing Instance.
  */
@@ -56,6 +64,8 @@ public class InstanceService {
 
     @Inject
     private InstanceSearchRepository instanceSearchRepository;
+    @Inject
+    private ElasticsearchOperations elasticsearchOperations;
 
     private String wholeWorldGeoJson = "{\n" +
         "  \"type\": \"Polygon\",\n" +
@@ -286,16 +296,23 @@ public class InstanceService {
     public Page<Instance> findByGeoshape(String geoJson, String query, Pageable pageable) throws Exception {
         log.debug("Request to get Instance by query {} and geojson {}", query, geoJson);
         Page<Instance> instances = null;
-        //XContentParser parser = JsonXContent.jsonXContent.createParser(geoJson);
-        //parser.nextToken();
-        //ShapeBuilder sb = ShapeBuilder.parse(parser);
-//        if (query == null || query.trim().length() == 0) {
-//            query = "*";
-//        }
-//        QueryBuilder qb = boolQuery()
-//            .must(geoShapeQuery("geometry", sb))
-//            .must(queryStringQuery(query));
-//        instances = instanceSearchRepository.search(qb, pageable);
+
+        ObjectMapper om = new ObjectMapper();
+        om.registerModule(new GeoShapeModule());
+
+        GeoShape shape = om.readValue(geoJson, GeoShape.class);
+
+        XContentParser parser = JsonXContent.jsonXContent.createParser(NamedXContentRegistry.EMPTY, geoJson);
+        parser.nextToken();
+        ShapeBuilder sb = ShapeBuilder.parse(parser);
+        if (query == null || query.trim().length() == 0) {
+            query = "*";
+        }
+        QueryBuilder qb = boolQuery()
+            .must(geoShapeQuery("geometry", sb))
+            .must(queryStringQuery(query));
+        instances = instanceSearchRepository.search(qb, pageable);
+
         return instances;
     }
 

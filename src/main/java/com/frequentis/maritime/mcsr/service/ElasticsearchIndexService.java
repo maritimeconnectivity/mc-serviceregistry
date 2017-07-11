@@ -27,12 +27,6 @@ import org.elasticsearch.ResourceAlreadyExistsException;
 //import org.elasticsearch.indices.IndexAlreadyExistsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.codahale.metrics.annotation.Timed;
 import com.frequentis.maritime.mcsr.domain.Design;
@@ -65,6 +59,13 @@ import com.frequentis.maritime.mcsr.repository.search.XsdSearchRepository;
 import com.frequentis.maritime.mcsr.web.rest.registry.ServiceInstanceResource;
 import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
+
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ElasticsearchIndexService {
@@ -177,6 +178,8 @@ public class ElasticsearchIndexService {
         //Don't delete the instance index because this index needs to be manually created
         //because spring-data can't handle geometry index creation
         //elasticsearchTemplate.deleteIndex(entityClass);
+    	// Delete in Custom Spring Data Elasticsearch
+    	elasticsearchTemplate.deleteIndex(Instance.class);
         try {
             elasticsearchTemplate.createIndex(Instance.class);
         } catch (ResourceAlreadyExistsException  e) {
