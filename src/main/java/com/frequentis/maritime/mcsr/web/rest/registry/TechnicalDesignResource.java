@@ -36,12 +36,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -64,7 +67,7 @@ public class TechnicalDesignResource {
         method = RequestMethod.POST,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Design> createDesign(@Valid @RequestBody Design design, @RequestHeader("Authorization") String bearerToken) throws URISyntaxException {
+    public ResponseEntity<Design> createDesign(@Valid @RequestBody Design design, @RequestHeader("Authorization") String bearerToken) throws Exception, URISyntaxException {
         log.debug("REST request to save Design : {}", design);
         String organizationId = "";
         try {
@@ -75,16 +78,9 @@ public class TechnicalDesignResource {
         if (design.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("design", "idexists", "A new design cannot already have an ID")).body(null);
         }
-        try {
-            String xml = design.getDesignAsXml().getContent().toString();
-            log.info("XML:" + xml);
-            XmlUtil.validateXml(xml, "ServiceDesignSchema.xsd");
-        } catch (Exception e) {
-            log.error("Error parsing xml: ", e);
-            return ResponseEntity.badRequest()
-                .headers(HeaderUtil.createFailureAlert("design", e.getMessage(), e.toString()))
-                .body(design);
-        }
+        String xml = design.getDesignAsXml().getContent().toString();
+        log.info("XML:" + xml);
+        XmlUtil.validateXml(xml, "ServiceDesignSchema.xsd");
         design.setOrganizationId(organizationId);
         Design result = designService.save(design);
         return ResponseEntity.created(new URI("/api/technicalDesign/" + result.getId()))
@@ -105,7 +101,7 @@ public class TechnicalDesignResource {
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Design> updateDesign(@Valid @RequestBody Design design, @RequestHeader("Authorization") String bearerToken) throws URISyntaxException {
+    public ResponseEntity<Design> updateDesign(@Valid @RequestBody Design design, @RequestHeader("Authorization") String bearerToken) throws Exception, URISyntaxException {
         log.debug("REST request to update Design : {}", design);
         if (design.getId() == null) {
             return createDesign(design, bearerToken);
@@ -122,16 +118,9 @@ public class TechnicalDesignResource {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        try {
-            String xml = design.getDesignAsXml().getContent().toString();
-            log.info("XML:" + xml);
-            XmlUtil.validateXml(xml, "ServiceDesignSchema.xsd");
-        } catch (Exception e) {
-            log.error("Error parsing xml: ", e);
-            return ResponseEntity.badRequest()
-                .headers(HeaderUtil.createFailureAlert("design", e.getMessage(), e.toString()))
-                .body(design);
-        }
+        String xml = design.getDesignAsXml().getContent().toString();
+        log.info("XML:" + xml);
+        XmlUtil.validateXml(xml, "ServiceDesignSchema.xsd");
 
         Design result = designService.save(design);
         return ResponseEntity.ok()
@@ -282,7 +271,7 @@ public class TechnicalDesignResource {
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Void> updateDesignStatus(@PathVariable String id, @PathVariable String version, @RequestParam String status, @RequestHeader("Authorization") String bearerToken) {
+    public ResponseEntity<Void> updateDesignStatus(@PathVariable String id, @PathVariable String version, @RequestParam String status, @RequestHeader("Authorization") String bearerToken) throws Exception {
         log.debug("REST request to update status of Design {} of version {}", id, version);
         Design design = designService.findByDomainId(id, version);
 
@@ -297,21 +286,26 @@ public class TechnicalDesignResource {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        try {
-            Xml designXml = design.getDesignAsXml();
-            String xml = designXml.getContent().toString();
-            //Update the status value inside the xml definition
-            String resultXml = XmlUtil.updateXmlNode(status, xml, "/ServiceDesignSchema:serviceDesign/status");
-            designXml.setContent(resultXml);
-            design.setDesignAsXml(designXml);
-        }
-        catch (Exception e) {
-            log.debug("Error updating specification xml: ", e);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        Xml designXml = design.getDesignAsXml();
+        String xml = designXml.getContent().toString();
+        //Update the status value inside the xml definition
+        String resultXml = XmlUtil.updateXmlNode(status, xml, "/ServiceDesignSchema:serviceDesign/status");
+        designXml.setContent(resultXml);
+        design.setDesignAsXml(designXml);
 
         designService.updateStatus(design.getId(), status);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("design", id.toString())).build();
+    }
+
+    @ExceptionHandler({Exception.class, URISyntaxException.class})
+    public ResponseEntity<?> handleException(Exception e, WebRequest webRequest) {
+        Map<String, String> errorMap = new HashMap<String, String>();
+        errorMap.put("status", "error");
+        errorMap.put("timestamp", ""+System.currentTimeMillis());
+        errorMap.put("error", "Bad Request");
+        errorMap.put("message", e.getMessage());
+        errorMap.put("status", "400");
+        return ResponseEntity.badRequest().body(errorMap);
     }
 
 }

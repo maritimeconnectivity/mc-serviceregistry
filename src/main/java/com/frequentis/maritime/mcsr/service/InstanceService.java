@@ -38,12 +38,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.io.IOException;
 
 import static org.elasticsearch.common.geo.builders.ShapeBuilder.newPoint;
-import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.geoShapeQuery;
-import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
+import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * Service Implementation for managing Instance.
@@ -81,18 +78,14 @@ public class InstanceService {
         return result;
     }
 
-    public Instance saveGeometry(Instance instance) {
+    public Instance saveGeometry(Instance instance) throws Exception{
         //Save instance to DB
         JsonNode geometry = instance.getGeometry();
         if (instance.getGeometry() == null || instance.getGeometry().asText() == null || instance.getGeometry().asText() == "null") {
             log.debug("Setting whole-earth coverage");
             ObjectMapper mapper = new ObjectMapper();
             JsonNode wholeEarth = null;
-            try {
-                wholeEarth = mapper.readTree(wholeWorldGeoJson);
-            } catch (IOException e) {
-                log.error("Exception setting whole-earth coverage: ", e);
-            }
+            wholeEarth = mapper.readTree(wholeWorldGeoJson);
             geometry = wholeEarth;
         }
         //Save to ES
@@ -268,26 +261,18 @@ public class InstanceService {
      *  @return the entity
      */
     @Transactional(readOnly = true)
-    public Page<Instance> findByLocation(double latitude, double longitude, String query, Pageable pageable) {
+    public Page<Instance> findByLocation(double latitude, double longitude, String query, Pageable pageable) throws Exception {
         log.debug("Request to get Instance by lat {} long {} and query {}", latitude, longitude, query);
         Page<Instance> instances = null;
-        try {
-            Geometry g;
-            ShapeBuilder sb = newPoint(longitude, latitude);
-            QueryBuilder qb;
-            if (query != null && query != "") {
-                qb = boolQuery()
-                    .must(geoShapeQuery("geometry", sb))
-                    .must(queryStringQuery(query));
-            } else {
-                qb = boolQuery()
-                    .must(geoShapeQuery("geometry", sb));
-            }
-            instances = instanceSearchRepository.search(qb, pageable);
-        } catch (Exception e) {
-            log.debug("Could not find instance for lat {} long {}", latitude, longitude);
-            e.printStackTrace();
+        Geometry g;
+        ShapeBuilder sb = newPoint(longitude, latitude);
+        if (query == null || query.trim().length() == 0) {
+            query = "*";
         }
+        QueryBuilder qb = boolQuery()
+            .must(geoShapeQuery("geometry", sb))
+            .must(queryStringQuery(query));
+        instances = instanceSearchRepository.search(qb, pageable);
         return instances;
     }
 
@@ -298,27 +283,19 @@ public class InstanceService {
      *  @return the entity
      */
     @Transactional(readOnly = true)
-    public Page<Instance> findByGeoshape(String geoJson, String query, Pageable pageable) {
+    public Page<Instance> findByGeoshape(String geoJson, String query, Pageable pageable) throws Exception {
         log.debug("Request to get Instance by query {} and geojson {}", query, geoJson);
         Page<Instance> instances = null;
-        try {
-            XContentParser parser = JsonXContent.jsonXContent.createParser(geoJson);
-            parser.nextToken();
-            ShapeBuilder sb = ShapeBuilder.parse(parser);
-            QueryBuilder qb;
-            if (query != null && query != "") {
-                qb = boolQuery()
-                    .must(geoShapeQuery("geometry", sb))
-                    .must(queryStringQuery(query));
-            } else {
-                qb = boolQuery()
-                    .must(geoShapeQuery("geometry", sb));
-            }
-            instances = instanceSearchRepository.search(qb, pageable);
-        } catch (Exception e) {
-            log.debug("Could not find instance for the given geojson");
-            e.printStackTrace();
+        XContentParser parser = JsonXContent.jsonXContent.createParser(geoJson);
+        parser.nextToken();
+        ShapeBuilder sb = ShapeBuilder.parse(parser);
+        if (query == null || query.trim().length() == 0) {
+            query = "*";
         }
+        QueryBuilder qb = boolQuery()
+            .must(geoShapeQuery("geometry", sb))
+            .must(queryStringQuery(query));
+        instances = instanceSearchRepository.search(qb, pageable);
         return instances;
     }
 

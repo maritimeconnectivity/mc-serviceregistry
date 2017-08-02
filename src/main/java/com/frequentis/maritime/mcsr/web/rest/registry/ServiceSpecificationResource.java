@@ -36,12 +36,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -65,7 +68,7 @@ public class ServiceSpecificationResource {
         method = RequestMethod.POST,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Specification> createSpecification(@Valid @RequestBody Specification specification, @RequestHeader("Authorization") String bearerToken) throws URISyntaxException {
+    public ResponseEntity<Specification> createSpecification(@Valid @RequestBody Specification specification, @RequestHeader("Authorization") String bearerToken) throws Exception, URISyntaxException {
         log.debug("REST request to save Specification : {}", specification);
         String organizationId = "";
         try {
@@ -76,16 +79,9 @@ public class ServiceSpecificationResource {
         if (specification.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("specification", "idexists", "A new specification cannot already have an ID")).body(null);
         }
-        try {
-            String xml = specification.getSpecAsXml().getContent().toString();
-            log.info("XML:" + xml);
-            XmlUtil.validateXml(xml, "ServiceSpecificationSchema.xsd");
-        } catch (Exception e) {
-            log.error("Error parsing xml: ", e);
-            return ResponseEntity.badRequest()
-                .headers(HeaderUtil.createFailureAlert("specification", e.getMessage(), e.toString()))
-                .body(specification);
-        }
+        String xml = specification.getSpecAsXml().getContent().toString();
+        log.info("XML:" + xml);
+        XmlUtil.validateXml(xml, "ServiceSpecificationSchema.xsd");
 
         specification.setOrganizationId(organizationId);
         Specification result = specificationService.save(specification);
@@ -107,7 +103,7 @@ public class ServiceSpecificationResource {
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Specification> updateSpecification(@Valid @RequestBody Specification specification, @RequestHeader("Authorization") String bearerToken) throws URISyntaxException {
+    public ResponseEntity<Specification> updateSpecification(@Valid @RequestBody Specification specification, @RequestHeader("Authorization") String bearerToken) throws Exception, URISyntaxException {
         log.debug("REST request to update Specification : {}", specification);
         if (specification.getId() == null) {
             return createSpecification(specification, bearerToken);
@@ -123,16 +119,9 @@ public class ServiceSpecificationResource {
             log.warn("Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+specification.getOrganizationId());
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        try {
-            String xml = specification.getSpecAsXml().getContent().toString();
-            log.info("XML:" + xml);
-            XmlUtil.validateXml(xml, "ServiceSpecificationSchema.xsd");
-        } catch (Exception e) {
-            log.error("Error parsing xml: ", e);
-            return ResponseEntity.badRequest()
-                .headers(HeaderUtil.createFailureAlert("specification", e.getMessage(), e.toString()))
-                .body(specification);
-        }
+        String xml = specification.getSpecAsXml().getContent().toString();
+        log.info("XML:" + xml);
+        XmlUtil.validateXml(xml, "ServiceSpecificationSchema.xsd");
 
         Specification result = specificationService.save(specification);
         return ResponseEntity.ok()
@@ -266,7 +255,7 @@ public class ServiceSpecificationResource {
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<Void> updateSpecificationStatus(@PathVariable String id, @PathVariable String version, @RequestParam String status, @RequestHeader("Authorization") String bearerToken)
-        throws URISyntaxException {
+        throws Exception, URISyntaxException {
         log.debug("REST request to update status of Specification {} of version {}", id, version);
         Specification specification = specificationService.findByDomainId(id, version);
 
@@ -281,23 +270,27 @@ public class ServiceSpecificationResource {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        try {
-            Xml specificationXml = specification.getSpecAsXml();
-            String xml = specificationXml.getContent().toString();
-            //Update the status value inside the xml definition
-            String resultXml = XmlUtil.updateXmlNode(status, xml, "/ServiceSpecificationSchema:serviceSpecification/status");
-            specificationXml.setContent(resultXml);
-            specification.setSpecAsXml(specificationXml);
-        }
-        catch (Exception e) {
-            log.debug("Error updating specification xml: ", e);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        Xml specificationXml = specification.getSpecAsXml();
+        String xml = specificationXml.getContent().toString();
+        //Update the status value inside the xml definition
+        String resultXml = XmlUtil.updateXmlNode(status, xml, "/ServiceSpecificationSchema:serviceSpecification/status");
+        specificationXml.setContent(resultXml);
+        specification.setSpecAsXml(specificationXml);
 
         specificationService.updateStatus(specification.getId(), status);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityStatusUpdateAlert("specification", id.toString())).build();
     }
 
+    @ExceptionHandler({Exception.class, URISyntaxException.class})
+    public ResponseEntity<?> handleException(Exception e, WebRequest webRequest) {
+        Map<String, String> errorMap = new HashMap<String, String>();
+        errorMap.put("status", "error");
+        errorMap.put("timestamp", ""+System.currentTimeMillis());
+        errorMap.put("error", "Bad Request");
+        errorMap.put("message", e.getMessage());
+        errorMap.put("status", "400");
+        return ResponseEntity.badRequest().body(errorMap);
+    }
 
 
 

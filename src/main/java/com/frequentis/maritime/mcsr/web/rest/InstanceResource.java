@@ -69,7 +69,7 @@ public class InstanceResource {
         method = RequestMethod.POST,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Instance> createInstance(@Valid @RequestBody Instance instance) throws URISyntaxException {
+    public ResponseEntity<Instance> createInstance(@Valid @RequestBody Instance instance) throws Exception, URISyntaxException {
         log.debug("REST request to save Instance : {}", instance);
         if (instance.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("instance", "idexists", "A new instance cannot already have an ID")).body(null);
@@ -125,7 +125,7 @@ public class InstanceResource {
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Instance> updateInstance(@Valid @RequestBody Instance instance) throws URISyntaxException {
+    public ResponseEntity<Instance> updateInstance(@Valid @RequestBody Instance instance) throws Exception, URISyntaxException {
         log.debug("REST request to update Instance : {}", instance);
         if (instance.getId() == null) {
             return createInstance(instance);

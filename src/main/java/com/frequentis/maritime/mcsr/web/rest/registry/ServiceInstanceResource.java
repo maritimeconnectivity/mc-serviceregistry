@@ -38,12 +38,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -67,7 +70,7 @@ public class ServiceInstanceResource {
         method = RequestMethod.POST,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Instance> createInstance(@Valid @RequestBody Instance instance, @RequestHeader(value = "Authorization", required=false) String bearerToken) throws URISyntaxException {
+    public ResponseEntity<?> createInstance(@Valid @RequestBody Instance instance, @RequestHeader(value = "Authorization", required=false) String bearerToken) throws Exception, URISyntaxException {
         log.debug("REST request to save Instance : {}", instance);
         String organizationId = "";
         try {
@@ -79,18 +82,11 @@ public class ServiceInstanceResource {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("instance", "idexists", "A new instance cannot already have an ID")).body(null);
         }
 
-        try {
-            String xml = instance.getInstanceAsXml().getContent().toString();
-            log.info("XML:" + xml);
-            XmlUtil.validateXml(xml, "ServiceInstanceSchema.xsd");
-            instance = InstanceUtil.parseInstanceAttributesFromXML(instance);
-            instance.setOrganizationId(organizationId);
-        } catch (Exception e) {
-            log.error("Error parsing xml: ", e);
-            return ResponseEntity.badRequest()
-                .headers(HeaderUtil.createFailureAlert("instance", e.getMessage(), e.toString()))
-                .body(instance);
-        }
+        String xml = instance.getInstanceAsXml().getContent().toString();
+        log.info("XML:" + xml);
+        XmlUtil.validateXml(xml, "ServiceInstanceSchema.xsd");
+        instance = InstanceUtil.parseInstanceAttributesFromXML(instance);
+        instance.setOrganizationId(organizationId);
 
         if (instance.getDesigns() != null && instance.getDesigns().size() > 0) {
             Design design = instance.getDesigns().iterator().next();
@@ -105,14 +101,7 @@ public class ServiceInstanceResource {
             }
         }
         Instance result = instanceService.save(instance);
-        try {
-            result = InstanceUtil.parseInstanceGeometryFromXML(result);
-        } catch (Exception e) {
-            log.error("Error parsing geometry: ", e);
-            return ResponseEntity.badRequest()
-                .headers(HeaderUtil.createFailureAlert("instance", e.getMessage(), e.toString()))
-                .body(instance);
-        }
+        result = InstanceUtil.parseInstanceGeometryFromXML(result);
         instanceService.saveGeometry(result);
         return ResponseEntity.created(new URI("/api/serviceInstance/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("instance", result.getId().toString()))
@@ -132,15 +121,13 @@ public class ServiceInstanceResource {
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Instance> updateInstance(@Valid @RequestBody Instance instance, @RequestHeader(value = "Authorization", required=false) String bearerToken) throws URISyntaxException {
+    public ResponseEntity<?> updateInstance(@Valid @RequestBody Instance instance, @RequestHeader(value = "Authorization", required=false) String bearerToken) throws Exception, URISyntaxException {
         log.debug("REST request to update Instance : {}", instance);
 
-        try {
-            instance = InstanceUtil.parseInstanceAttributesFromXML(instance);
-        } catch (Exception e) {
-            log.error("Error parsing xml: ", e);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        String xml = instance.getInstanceAsXml().getContent().toString();
+        log.info("XML:" + xml);
+        XmlUtil.validateXml(xml, "ServiceInstanceSchema.xsd");
+        instance = InstanceUtil.parseInstanceAttributesFromXML(instance);
 
         if (instance.getId() == null) {
             return createInstance(instance, bearerToken);
@@ -168,25 +155,9 @@ public class ServiceInstanceResource {
                 }
             }
         }
-        try {
-            String xml = instance.getInstanceAsXml().getContent().toString();
-            log.info("XML:" + xml);
-            XmlUtil.validateXml(xml, "ServiceInstanceSchema.xsd");
-            instance = InstanceUtil.parseInstanceAttributesFromXML(instance);
-        } catch (Exception e) {
-            log.error("Error parsing xml: ", e);
-            return ResponseEntity.badRequest()
-                .headers(HeaderUtil.createFailureAlert("instance", e.getMessage(), e.toString()))
-                .body(instance);
-        }
 
         Instance result = instanceService.save(instance);
-        try {
-            result = InstanceUtil.parseInstanceGeometryFromXML(result);
-        } catch (Exception e) {
-            log.debug("Error parsing geometry: ", e);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        result = InstanceUtil.parseInstanceGeometryFromXML(result);
         instanceService.saveGeometry(result);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert("instance", instance.getId().toString()))
@@ -205,7 +176,7 @@ public class ServiceInstanceResource {
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<List<Instance>> getAllInstances(@RequestParam(defaultValue = "false") String includeDoc, Pageable pageable)
-        throws URISyntaxException {
+        throws Exception, URISyntaxException {
         log.debug("REST request to get a page of Instances");
         Page<Instance> page = instanceService.findAll(pageable);
         if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
@@ -260,7 +231,7 @@ public class ServiceInstanceResource {
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<List<Instance>> getAllInstancesById(@PathVariable String id, @RequestParam(defaultValue = "false") String includeDoc, Pageable pageable)
-        throws URISyntaxException {
+        throws Exception, URISyntaxException {
         log.debug("REST request to get a page of Instances by id {}", id);
         Page<Instance> page = instanceService.findAllByDomainId(id, pageable);
         if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
@@ -315,7 +286,7 @@ public class ServiceInstanceResource {
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<List<Instance>> searchInstances(@RequestParam String query, @RequestParam(defaultValue = "false") String includeDoc, Pageable pageable)
-        throws URISyntaxException {
+        throws Exception, URISyntaxException {
         log.debug("REST request to search for a page of Instances for query {}", query);
         Page<Instance> page = instanceService.search(query, pageable);
         if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
@@ -340,7 +311,7 @@ public class ServiceInstanceResource {
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<List<Instance>> searchInstancesByKeywords(@RequestParam String query, @RequestParam(defaultValue = "false") String includeDoc, Pageable pageable)
-        throws URISyntaxException {
+        throws Exception, URISyntaxException {
         log.debug("REST request to search for a page of Instances for keywords {}", query);
         Page<Instance> page = instanceService.searchKeywords(query, pageable);
         if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
@@ -366,7 +337,7 @@ public class ServiceInstanceResource {
     @Timed
     @ApiOperation(value = "searchInstancesByUnlocode", notes = "Returns all service instances matching the specified UnLoCode.")
     public ResponseEntity<List<Instance>> searchInstancesByUnlocode(@RequestParam String query, @RequestParam(defaultValue = "false") String includeDoc, Pageable pageable)
-        throws URISyntaxException {
+        throws Exception, URISyntaxException {
         log.debug("REST request to search for a page of Instances for unlocode {}", query);
         Page<Instance> page = instanceService.searchUnlocode(query, pageable);
         if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
@@ -392,8 +363,8 @@ public class ServiceInstanceResource {
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @ApiOperation(value = "searchInstancesByLocation", notes = "Returns all service instances matching the specified Lat/Lon coordinates.")
-    public ResponseEntity<List<Instance>> searchInstancesByLocation(@RequestParam String latitude, @RequestParam(defaultValue = "false") String includeDoc, @RequestParam String longitude, @RequestParam(defaultValue = "", required=false) String query, Pageable pageable)
-        throws URISyntaxException {
+    public ResponseEntity<?> searchInstancesByLocation(@RequestParam String latitude, @RequestParam(defaultValue = "false") String includeDoc, @RequestParam String longitude, @RequestParam(defaultValue = "", required=false) String query, Pageable pageable)
+        throws Exception, URISyntaxException {
         log.debug("REST request to get Instance by lat {} long {}", latitude, longitude);
         Page<Instance> page = instanceService.findByLocation(Double.parseDouble(latitude), Double.parseDouble(longitude), query, pageable);
         if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
@@ -420,8 +391,8 @@ public class ServiceInstanceResource {
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @ApiOperation(value = "searchInstancesByGeometryGeojson", notes = "Returns all service instances matching the specified GeoJson shape.")
-    public ResponseEntity<List<Instance>> searchInstancesByGeometryGeojson(@RequestParam String geometry, @RequestParam(defaultValue = "false") String includeDoc, @RequestParam(defaultValue = "", required=false) String query, Pageable pageable)
-        throws URISyntaxException {
+    public ResponseEntity<?> searchInstancesByGeometryGeojson(@RequestParam String geometry, @RequestParam(defaultValue = "false") String includeDoc, @RequestParam(defaultValue = "", required=false) String query, Pageable pageable)
+        throws Exception, URISyntaxException {
         log.debug("REST request to get Instance by geojson ", geometry);
         Page<Instance> page = instanceService.findByGeoshape(geometry, query, pageable);
         if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
@@ -447,17 +418,12 @@ public class ServiceInstanceResource {
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @ApiOperation(value = "searchInstancesByGeometryWKT", notes = "Returns all service instances matching the specified WKT shape.")
-    public ResponseEntity<List<Instance>> searchInstancesByGeometryWKT(@RequestParam String geometry, @RequestParam(defaultValue = "", required=false) String query, @RequestParam(defaultValue = "false") String includeDoc, Pageable pageable)
-        throws URISyntaxException {
+    public ResponseEntity<?> searchInstancesByGeometryWKT(@RequestParam String geometry, @RequestParam(defaultValue = "", required=false) String query, @RequestParam(defaultValue = "false") String includeDoc, Pageable pageable)
+        throws Exception, URISyntaxException {
         log.debug("REST request to get Instance by wkt ", geometry);
         String geoJson = null;
-        try {
-            geoJson = InstanceUtil.convertWKTtoGeoJson(geometry).toString();
-            log.debug("Converted Geojson: " + geoJson);
-        } catch (Exception e) {
-            log.error("Error parsing wkt: ", e);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        geoJson = InstanceUtil.convertWKTtoGeoJson(geometry).toString();
+        log.debug("Converted Geojson: " + geoJson);
         Page<Instance> page = instanceService.findByGeoshape(geoJson, query, pageable);
         if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
             for(Instance instance:page.getContent()) {
@@ -481,36 +447,42 @@ public class ServiceInstanceResource {
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Void> updateInstanceStatus(@PathVariable String id, @PathVariable String version, @RequestParam String status, @RequestHeader(value = "Authorization", required=false) String bearerToken) {
+    public ResponseEntity<Void> updateInstanceStatus(@PathVariable String id, @PathVariable String version, @RequestParam String status, @RequestHeader(value = "Authorization", required=false) String bearerToken) throws Exception {
         log.debug("REST request to update status of Instance {} version {}", id, version);
+        Instance instance = instanceService.findByDomainId(id, version);
+
+        String organizationId = "";
         try {
-            Instance instance = instanceService.findByDomainId(id, version);
-
-            String organizationId = "";
-            try {
-                organizationId = HeaderUtil.extractOrganizationIdFromToken(bearerToken);
-            } catch (Exception e) {
-                log.warn("No organizationId could be parsed from the bearer token");
-            }
-            if (instance.getOrganizationId() != null && instance.getOrganizationId().length() > 0 && !organizationId.equals(instance.getOrganizationId())) {
-                log.warn("Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+instance.getOrganizationId());
-                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-            }
-
-            Xml instanceXml = instance.getInstanceAsXml();
-            String xml = instanceXml.getContent().toString();
-            //Update the status value inside the xml definition
-            String resultXml = XmlUtil.updateXmlNode(status, xml, "/ServiceInstanceSchema:serviceInstance/status");
-            instanceXml.setContent(resultXml);
-            instance.setInstanceAsXml(instanceXml);
-            instanceService.updateStatus(instance.getId(), status);
+            organizationId = HeaderUtil.extractOrganizationIdFromToken(bearerToken);
+        } catch (Exception e) {
+            log.warn("No organizationId could be parsed from the bearer token");
         }
-        catch (Exception e) {
-            log.debug("Error updating instance xml: ", e);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (instance.getOrganizationId() != null && instance.getOrganizationId().length() > 0 && !organizationId.equals(instance.getOrganizationId())) {
+            log.warn("Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+instance.getOrganizationId());
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
+
+        Xml instanceXml = instance.getInstanceAsXml();
+        String xml = instanceXml.getContent().toString();
+        //Update the status value inside the xml definition
+        String resultXml = XmlUtil.updateXmlNode(status, xml, "/ServiceInstanceSchema:serviceInstance/status");
+        instanceXml.setContent(resultXml);
+        instance.setInstanceAsXml(instanceXml);
+        instanceService.updateStatus(instance.getId(), status);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityStatusUpdateAlert("instance", id.toString())).build();
     }
+
+    @ExceptionHandler({Exception.class, URISyntaxException.class})
+    public ResponseEntity<?> handleException(Exception e, WebRequest webRequest) {
+        Map<String, String> errorMap = new HashMap<String, String>();
+        errorMap.put("status", "error");
+        errorMap.put("timestamp", ""+System.currentTimeMillis());
+        errorMap.put("error", "Bad Request");
+        errorMap.put("message", e.getMessage());
+        errorMap.put("status", "400");
+        return ResponseEntity.badRequest().body(errorMap);
+    }
+
 
 
 }

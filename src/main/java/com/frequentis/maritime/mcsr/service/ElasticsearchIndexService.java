@@ -19,12 +19,12 @@
 package com.frequentis.maritime.mcsr.service;
 
 import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.frequentis.maritime.mcsr.domain.*;
 import com.frequentis.maritime.mcsr.repository.*;
 import com.frequentis.maritime.mcsr.repository.search.*;
 import com.frequentis.maritime.mcsr.web.rest.registry.ServiceInstanceResource;
 import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
+import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 import org.elasticsearch.indices.IndexAlreadyExistsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -166,6 +165,8 @@ public class ElasticsearchIndexService {
             }
             for (Instance i : instanceList) {
                 try {
+                    String xml = i.getInstanceAsXml().getContent().toString();
+                    XmlUtil.validateXml(xml, "ServiceInstanceSchema.xsd");
                     i = InstanceUtil.parseInstanceAttributesFromXML(i);
                     Instance result = instanceRepository.save(i);
                     result = InstanceUtil.parseInstanceGeometryFromXML(result);
