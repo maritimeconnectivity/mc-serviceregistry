@@ -508,6 +508,9 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-elasticsearch</artifactId>
             <version>${springdata.elasticsearch.version}</version>
+            <scope>system</scope>
+            <!-- frequentis custom version of spring-data-elasticsearh with geo-shape support -->
+            <systemPath>${basedir}/lib/spring-data-elasticsearch-3.0.0.BUILD-SNAPSHOT.jar</systemPath>
             <exclusions>
             	<exclusion>
             		<groupId>org.apache.logging.log4j</groupId>
