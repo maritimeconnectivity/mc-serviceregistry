@@ -94,8 +94,8 @@ public class SpecificationService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Specification : {}", id);
-        specificationRepository.delete(id);
-        specificationSearchRepository.delete(id);
+        specificationRepository.deleteById(id);
+        specificationSearchRepository.deleteById(id);
     }
 
     /**

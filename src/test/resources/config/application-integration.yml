@@ -1,0 +1,52 @@
+# ===================================================================
+# Spring Boot configuration for the "dev" profile.
+#
+# This configuration overrides the application.yml file.
+# ===================================================================
+
+# ===================================================================
+# Standard Spring Boot properties.
+# Full reference is available at:
+# http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+# ===================================================================
+
+
+spring:
+    cache:
+        type: NON
+    datasource:
+#        url: jdbc:h2:file:./target/h2db/db/mcsr;DB_CLOSE_DELAY=-1
+#        url: jdbc:mysql://localhost:3306/maritimeregistry-test?useUnicode=true&characterEncoding=utf8&useSSL=false
+        url: jdbc:h2:mem:AZ;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+#        url: jdbc:h2:file:./mcsr.h2;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+        name:
+        username: root
+        password: root
+        hikari:
+            data-source-properties:
+                cachePrepStmts: false
+                prepStmtCacheSize: 0
+                prepStmtCacheSqlLimit: 0
+                useServerPrepStmts: false
+    jpa:
+        database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+        database: MYSQL
+#        database-platform: org.hibernate.dialect.H2Dialect
+#        database: H2
+        show-sql: true
+        properties:
+            hibernate.cache.use_second_level_cache: false
+            hibernate.cache.use_query_cache: false
+            hibernate.generate_statistics: false
+            hibernate.cache.region.factory_class: org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
+    data:
+        elasticsearch:
+            cluster-name: elasticsearch-test
+            cluster-nodes: localhost:9300
+            properties:
+                path:
+                  logs: target/elasticsearch/log
+                  data: target/elasticsearch/data
+
+server:
+    port: 8080

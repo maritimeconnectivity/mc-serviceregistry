@@ -17,8 +17,8 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<ServiceSpecificationSchema:serviceSpecification
-	xmlns:ServiceSpecificationSchema="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceSpecificationSchema.xsd"
+<serviceSpecification
+	xmlns="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceSpecificationSchema.xsd"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceSpecificationSchema.xsd ServiceSpecificationSchema.xsd "
 	xmlns:xs="http://www.w3.org/2001/XMLSchema" >
@@ -160,4 +160,4 @@
 		</serviceInterface>
 	</serviceInterfaces>
 
-</ServiceSpecificationSchema:serviceSpecification>
+</serviceSpecification>

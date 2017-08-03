@@ -17,37 +17,43 @@
  */
 package com.frequentis.maritime.mcsr.web.rest;
 
-import com.frequentis.maritime.mcsr.McsrApp;
-import com.frequentis.maritime.mcsr.domain.Xsd;
-import com.frequentis.maritime.mcsr.repository.XsdRepository;
-import com.frequentis.maritime.mcsr.service.XsdService;
-import com.frequentis.maritime.mcsr.repository.search.XsdSearchRepository;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.hamcrest.Matchers.hasItem;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Base64Utils;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.frequentis.maritime.mcsr.domain.Xsd;
+import com.frequentis.maritime.mcsr.repository.XsdRepository;
+import com.frequentis.maritime.mcsr.repository.search.XsdSearchRepository;
+import com.frequentis.maritime.mcsr.service.XsdService;
 
 
 /**
@@ -55,10 +61,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * @see XsdResource
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = McsrApp.class)
-@WebAppConfiguration
-@IntegrationTest
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles = "integration")
+@WithMockUser("test-user")
 public class XsdResourceIntTest {
 
     private static final String DEFAULT_NAME = "AAAAA";
@@ -132,7 +138,7 @@ public class XsdResourceIntTest {
         assertThat(testXsd.getContentContentType()).isEqualTo(DEFAULT_CONTENT_CONTENT_TYPE);
 
         // Validate the Xsd in ElasticSearch
-        Xsd xsdEs = xsdSearchRepository.findOne(testXsd.getId());
+        Xsd xsdEs = xsdSearchRepository.findById(testXsd.getId()).orElse(null);
         assertThat(xsdEs).isEqualToComparingFieldByField(testXsd);
     }
 
@@ -181,7 +187,7 @@ public class XsdResourceIntTest {
         // Get all the xsds
         restXsdMockMvc.perform(get("/api/xsds?sort=id,desc"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(xsd.getId().intValue())))
                 .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
                 .andExpect(jsonPath("$.[*].comment").value(hasItem(DEFAULT_COMMENT.toString())))
@@ -198,7 +204,7 @@ public class XsdResourceIntTest {
         // Get the xsd
         restXsdMockMvc.perform(get("/api/xsds/{id}", xsd.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(jsonPath("$.id").value(xsd.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
             .andExpect(jsonPath("$.comment").value(DEFAULT_COMMENT.toString()))
@@ -245,7 +251,7 @@ public class XsdResourceIntTest {
         assertThat(testXsd.getContentContentType()).isEqualTo(UPDATED_CONTENT_CONTENT_TYPE);
 
         // Validate the Xsd in ElasticSearch
-        Xsd xsdEs = xsdSearchRepository.findOne(testXsd.getId());
+        Xsd xsdEs = xsdSearchRepository.findById(testXsd.getId()).orElse(null);
         assertThat(xsdEs).isEqualToComparingFieldByField(testXsd);
     }
 
@@ -263,7 +269,9 @@ public class XsdResourceIntTest {
                 .andExpect(status().isOk());
 
         // Validate ElasticSearch is empty
-        boolean xsdExistsInEs = xsdSearchRepository.exists(xsd.getId());
+        // FIXME HOTFIX! There is SD-ES bug DATAES-363
+        //boolean xsdExistsInEs = xsdSearchRepository.existsById(xsd.getId());
+        boolean xsdExistsInEs = xsdSearchRepository.findById(xsd.getId()).isPresent();
         assertThat(xsdExistsInEs).isFalse();
 
         // Validate the database is empty
@@ -280,7 +288,7 @@ public class XsdResourceIntTest {
         // Search the xsd
         restXsdMockMvc.perform(get("/api/_search/xsds?query=id:" + xsd.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(jsonPath("$.[*].id").value(hasItem(xsd.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
             .andExpect(jsonPath("$.[*].comment").value(hasItem(DEFAULT_COMMENT.toString())))

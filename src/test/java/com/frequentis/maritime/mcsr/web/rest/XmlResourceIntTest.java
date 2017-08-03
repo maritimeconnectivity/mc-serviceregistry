@@ -17,37 +17,42 @@
  */
 package com.frequentis.maritime.mcsr.web.rest;
 
-import com.frequentis.maritime.mcsr.McsrApp;
-import com.frequentis.maritime.mcsr.domain.Xml;
-import com.frequentis.maritime.mcsr.repository.XmlRepository;
-import com.frequentis.maritime.mcsr.service.XmlService;
-import com.frequentis.maritime.mcsr.repository.search.XmlSearchRepository;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.hamcrest.Matchers.hasItem;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Base64Utils;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.frequentis.maritime.mcsr.domain.Xml;
+import com.frequentis.maritime.mcsr.repository.XmlRepository;
+import com.frequentis.maritime.mcsr.repository.search.XmlSearchRepository;
+import com.frequentis.maritime.mcsr.service.XmlService;
 
 
 /**
@@ -55,10 +60,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * @see XmlResource
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = McsrApp.class)
-@WebAppConfiguration
-@IntegrationTest
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles = "integration")
+@WithMockUser("test-user")
 public class XmlResourceIntTest {
 
     private static final String DEFAULT_NAME = "AAAAA";
@@ -132,7 +137,7 @@ public class XmlResourceIntTest {
         assertThat(testXml.getContentContentType()).isEqualTo(DEFAULT_CONTENT_CONTENT_TYPE);
 
         // Validate the Xml in ElasticSearch
-        Xml xmlEs = xmlSearchRepository.findOne(testXml.getId());
+        Xml xmlEs = xmlSearchRepository.findById(testXml.getId()).orElse(null);
         assertThat(xmlEs).isEqualToComparingFieldByField(testXml);
     }
 
@@ -181,7 +186,7 @@ public class XmlResourceIntTest {
         // Get all the xmls
         restXmlMockMvc.perform(get("/api/xmls?sort=id,desc"))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(jsonPath("$.[*].id").value(hasItem(xml.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
             .andExpect(jsonPath("$.[*].comment").value(hasItem(DEFAULT_COMMENT.toString())))
@@ -198,7 +203,7 @@ public class XmlResourceIntTest {
         // Get the xml
         restXmlMockMvc.perform(get("/api/xmls/{id}", xml.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(jsonPath("$.id").value(xml.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
             .andExpect(jsonPath("$.comment").value(DEFAULT_COMMENT.toString()))
@@ -245,7 +250,7 @@ public class XmlResourceIntTest {
         assertThat(testXml.getContentContentType()).isEqualTo(UPDATED_CONTENT_CONTENT_TYPE);
 
         // Validate the Xml in ElasticSearch
-        Xml xmlEs = xmlSearchRepository.findOne(testXml.getId());
+        Xml xmlEs = xmlSearchRepository.findById(testXml.getId()).orElse(null);
         assertThat(xmlEs).isEqualToComparingFieldByField(testXml);
     }
 
@@ -263,7 +268,9 @@ public class XmlResourceIntTest {
                 .andExpect(status().isOk());
 
         // Validate ElasticSearch is empty
-        boolean xmlExistsInEs = xmlSearchRepository.exists(xml.getId());
+        // FIXME HOTFIX! There is SD-ES bug DATAES-363
+        //boolean xmlExistsInEs = xmlSearchRepository.existsById(xml.getId());
+        boolean xmlExistsInEs = xmlSearchRepository.findById(xml.getId()).isPresent();
         assertThat(xmlExistsInEs).isFalse();
 
         // Validate the database is empty
@@ -280,7 +287,7 @@ public class XmlResourceIntTest {
         // Search the xml
         restXmlMockMvc.perform(get("/api/_search/xmls?query=id:" + xml.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(jsonPath("$.[*].id").value(hasItem(xml.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
             .andExpect(jsonPath("$.[*].comment").value(hasItem(DEFAULT_COMMENT.toString())))

@@ -17,16 +17,16 @@
  */
 package com.frequentis.maritime.mcsr.web.rest.registry;
 
-import com.codahale.metrics.annotation.Timed;
-import com.frequentis.maritime.mcsr.domain.Specification;
-import com.frequentis.maritime.mcsr.domain.Xml;
-import com.frequentis.maritime.mcsr.service.SpecificationService;
-import com.frequentis.maritime.mcsr.web.rest.SpecificationResource;
-import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
-import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
-import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import javax.inject.Inject;
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -35,17 +35,27 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import com.codahale.metrics.annotation.Timed;
+import com.frequentis.maritime.mcsr.domain.Specification;
+import com.frequentis.maritime.mcsr.domain.Xml;
+import com.frequentis.maritime.mcsr.service.SpecificationService;
+import com.frequentis.maritime.mcsr.web.rest.SpecificationResource;
+import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
+import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
+import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping("/api")

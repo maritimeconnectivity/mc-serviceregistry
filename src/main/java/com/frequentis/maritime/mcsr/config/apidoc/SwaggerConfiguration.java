@@ -75,7 +75,8 @@ public class SwaggerConfiguration {
             jHipsterProperties.getSwagger().getTermsOfServiceUrl(),
             contact,
             jHipsterProperties.getSwagger().getLicense(),
-            jHipsterProperties.getSwagger().getLicenseUrl());
+            jHipsterProperties.getSwagger().getLicenseUrl(),
+            null);
 
         Docket docket = new Docket(DocumentationType.SWAGGER_2)
             .apiInfo(apiInfo)

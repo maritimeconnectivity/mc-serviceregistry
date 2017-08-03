@@ -17,7 +17,9 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<ServiceDesignSchema:serviceDesign xmlns:ServiceDesignSchema="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceDesignSchema.xsd" xmlns:ServiceSpecificationSchema="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceSpecificationSchema.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceDesignSchema.xsd ServiceDesignSchema.xsd ">
+<serviceDesign xmlns="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceDesignSchema.xsd" xmlns:sd="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceDesignSchema.xsd" xmlns:ServiceSpecificationSchema="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceSpecificationSchema.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceDesignSchema.xsd ServiceDesignSchema.xsd
+					http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceSpecificationSchema.xsd ServiceBaseTypesSchema.xsd">
   <id>urn:mrn:mcl:service:design:example:32c11e45-1fa0-42db-bbff-cfe687382fee</id>
   <version>1.0.0</version>
   <name>Address for Person Lookup Service Specification - REST</name>
@@ -37,11 +39,11 @@
     </designsServiceSpecifications>
   </designsServiceSpecifications>
   <designedBy>
-    <id>urn:mrn:mcl:user:example:johndoe</id>
-	<name>John Doe</name>
-	<description>John Doe is the authority for standards in example.com</description>
-	<contactInfo>johndoe@example.com</contactInfo>
-	<isCommercial>false</isCommercial>
+    <ServiceSpecificationSchema:id>urn:mrn:mcl:user:example:johndoe</ServiceSpecificationSchema:id>
+	<ServiceSpecificationSchema:name>John Doe</ServiceSpecificationSchema:name>
+	<ServiceSpecificationSchema:description>John Doe is the authority for standards in example.com</ServiceSpecificationSchema:description>
+	<ServiceSpecificationSchema:contactInfo>johndoe@example.com</ServiceSpecificationSchema:contactInfo>
+	<ServiceSpecificationSchema:isCommercial>false</ServiceSpecificationSchema:isCommercial>
   </designedBy>
   <servicePhysicalDataModel>
     <name>REST Model</name>
@@ -77,4 +79,4 @@
 }
     </model>
   </servicePhysicalDataModel>
-</ServiceDesignSchema:serviceDesign>
+</serviceDesign>

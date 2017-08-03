@@ -1,0 +1,683 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+   <changeSet author="vagrant (generated)" id="1470310459206-1">
+      <createTable tableName="design">
+         <column autoIncrement="true" name="id" type="BIGINT">
+            <constraints primaryKey="true" primaryKeyName="designPK"/>
+         </column>
+         <column name="comment" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="design_id" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="name" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="organisation_id" type="VARCHAR(255)"/>
+         <column name="status" type="VARCHAR(255)"/>
+         <column name="version" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="design_as_doc_id" type="BIGINT"/>
+         <column name="design_as_xml_id" type="BIGINT"/>
+         <column name="implemented_specification_version_id" type="BIGINT"/>
+      </createTable>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-2">
+      <createTable tableName="design_docs">
+         <column name="designs_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+         <column name="docs_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+      </createTable>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-3">
+      <createTable tableName="design_specifications">
+         <column name="designs_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+         <column name="specifications_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+      </createTable>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-4">
+      <createTable tableName="doc">
+         <column autoIncrement="true" name="id" type="BIGINT">
+            <constraints primaryKey="true" primaryKeyName="docPK"/>
+         </column>
+         <column name="comment" type="VARCHAR(255)"/>
+         <column name="filecontent" type="BLOB">
+            <constraints nullable="false"/>
+         </column>
+         <column name="filecontent_content_type" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="mimetype" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="name" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+      </createTable>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-5">
+      <createTable tableName="instance">
+         <column autoIncrement="true" name="id" type="BIGINT">
+            <constraints primaryKey="true" primaryKeyName="instancePK"/>
+         </column>
+         <column name="comment" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="geometry" type="BLOB"/>
+         <column name="geometry_content_type" type="VARCHAR(255)"/>
+         <column name="instance_id" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="keywords" type="VARCHAR(255)"/>
+         <column name="name" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="status" type="VARCHAR(255)"/>
+         <column name="version" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="implemented_specification_version_id" type="BIGINT"/>
+         <column name="instance_as_doc_id" type="BIGINT"/>
+         <column name="instance_as_xml_id" type="BIGINT"/>
+      </createTable>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-6">
+      <createTable tableName="instance_designs">
+         <column name="instances_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+         <column name="designs_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+      </createTable>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-7">
+      <createTable tableName="instance_docs">
+         <column name="instances_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+         <column name="docs_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+      </createTable>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-8">
+      <createTable tableName="jhi_authority">
+         <column name="name" type="VARCHAR(50)">
+            <constraints nullable="false"/>
+         </column>
+      </createTable>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-9">
+      <createTable tableName="jhi_persistent_audit_event">
+         <column autoIncrement="true" name="event_id" type="BIGINT">
+            <constraints primaryKey="true" primaryKeyName="jhi_persistent_audit_eventPK"/>
+         </column>
+         <column name="event_date" type="timestamp"/>
+         <column name="event_type" type="VARCHAR(255)"/>
+         <column name="principal" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+      </createTable>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-10">
+      <createTable tableName="jhi_persistent_audit_evt_data">
+         <column name="event_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+         <column name="value" type="VARCHAR(255)"/>
+         <column name="name" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+      </createTable>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-11">
+      <createTable tableName="jhi_persistent_token">
+         <column name="series" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="ip_address" type="VARCHAR(39)"/>
+         <column name="token_date" type="date"/>
+         <column name="token_value" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="user_agent" type="VARCHAR(255)"/>
+         <column name="user_id" type="BIGINT"/>
+      </createTable>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-12">
+      <createTable tableName="jhi_user">
+         <column autoIncrement="true" name="id" type="BIGINT">
+            <constraints primaryKey="true" primaryKeyName="jhi_userPK"/>
+         </column>
+         <column name="created_by" type="VARCHAR(50)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="created_date" type="timestamp">
+            <constraints nullable="false"/>
+         </column>
+         <column name="last_modified_by" type="VARCHAR(50)"/>
+         <column name="last_modified_date" type="timestamp"/>
+         <column name="activated" type="BOOLEAN">
+            <constraints nullable="false"/>
+         </column>
+         <column name="activation_key" type="VARCHAR(20)"/>
+         <column name="email" type="VARCHAR(100)"/>
+         <column name="first_name" type="VARCHAR(50)"/>
+         <column name="lang_key" type="VARCHAR(5)"/>
+         <column name="last_name" type="VARCHAR(50)"/>
+         <column name="login" type="VARCHAR(50)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="password_hash" type="VARCHAR(60)"/>
+         <column name="reset_date" type="timestamp"/>
+         <column name="reset_key" type="VARCHAR(20)"/>
+      </createTable>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-13">
+      <createTable tableName="jhi_user_authority">
+         <column name="user_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+         <column name="authority_name" type="VARCHAR(50)">
+            <constraints nullable="false"/>
+         </column>
+      </createTable>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-14">
+      <createTable tableName="specification">
+         <column autoIncrement="true" name="id" type="BIGINT">
+            <constraints primaryKey="true" primaryKeyName="specificationPK"/>
+         </column>
+         <column name="comment" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="keywords" type="VARCHAR(255)"/>
+         <column name="name" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="organisation_id" type="VARCHAR(255)"/>
+         <column name="specification_id" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="status" type="VARCHAR(255)"/>
+         <column name="version" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="implemented_specification_version_id" type="BIGINT"/>
+         <column name="spec_as_doc_id" type="BIGINT"/>
+         <column name="spec_as_xml_id" type="BIGINT"/>
+      </createTable>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-15">
+      <createTable tableName="specification_docs">
+         <column name="specifications_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+         <column name="docs_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+      </createTable>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-16">
+      <createTable tableName="specification_template">
+         <column autoIncrement="true" name="id" type="BIGINT">
+            <constraints primaryKey="true" primaryKeyName="specification_templatePK"/>
+         </column>
+         <column name="comment" type="VARCHAR(255)"/>
+         <column name="name" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="type" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="version" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="xsd" type="BLOB">
+            <constraints nullable="false"/>
+         </column>
+         <column name="xsd_content_type" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="guideline_doc_id" type="BIGINT"/>
+         <column name="template_doc_id" type="BIGINT"/>
+      </createTable>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-17">
+      <createTable tableName="specification_template_docs">
+         <column name="specification_templates_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+         <column name="docs_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+      </createTable>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-18">
+      <createTable tableName="specification_template_set">
+         <column autoIncrement="true" name="id" type="BIGINT">
+            <constraints primaryKey="true" primaryKeyName="specification_template_setPK"/>
+         </column>
+         <column name="comment" type="VARCHAR(255)"/>
+         <column name="name" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="version" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+      </createTable>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-19">
+      <createTable tableName="specification_template_set_docs">
+         <column name="specification_template_sets_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+         <column name="docs_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+      </createTable>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-20">
+      <createTable tableName="specification_template_set_templates">
+         <column name="specification_template_sets_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+         <column name="templates_id" type="BIGINT">
+            <constraints nullable="false"/>
+         </column>
+      </createTable>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-21">
+      <createTable tableName="xml">
+         <column autoIncrement="true" name="id" type="BIGINT">
+            <constraints primaryKey="true" primaryKeyName="xmlPK"/>
+         </column>
+         <column name="comment" type="VARCHAR(255)"/>
+         <column name="content" type="BLOB">
+            <constraints nullable="false"/>
+         </column>
+         <column name="content_content_type" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+         <column name="name" type="VARCHAR(255)">
+            <constraints nullable="false"/>
+         </column>
+      </createTable>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-22">
+      <addPrimaryKey columnNames="designs_id, docs_id" tableName="design_docs"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-23">
+      <addPrimaryKey columnNames="designs_id, specifications_id"
+                     tableName="design_specifications"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-24">
+      <addPrimaryKey columnNames="instances_id, designs_id" tableName="instance_designs"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-25">
+      <addPrimaryKey columnNames="instances_id, docs_id" tableName="instance_docs"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-26">
+      <addPrimaryKey columnNames="event_id, name" tableName="jhi_persistent_audit_evt_data"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-27">
+      <addPrimaryKey columnNames="user_id, authority_name" tableName="jhi_user_authority"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-28">
+      <addPrimaryKey columnNames="specifications_id, docs_id" tableName="specification_docs"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-29">
+      <addPrimaryKey columnNames="specification_templates_id, docs_id"
+                     tableName="specification_template_docs"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-30">
+      <addPrimaryKey columnNames="specification_template_sets_id, docs_id"
+                     tableName="specification_template_set_docs"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-31">
+      <addPrimaryKey columnNames="specification_template_sets_id, templates_id"
+                     tableName="specification_template_set_templates"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-32">
+      <addPrimaryKey columnNames="name"
+                     constraintName="jhi_authorityPK"
+                     tableName="jhi_authority"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-33">
+      <addPrimaryKey columnNames="series"
+                     constraintName="jhi_persistent_tokenPK"
+                     tableName="jhi_persistent_token"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-34">
+      <addUniqueConstraint columnNames="design_as_doc_id"
+                           constraintName="UC_DESIGNDESIGN_AS_DOC_ID_COL"
+                           tableName="design"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-35">
+      <addUniqueConstraint columnNames="design_as_xml_id"
+                           constraintName="UC_DESIGNDESIGN_AS_XML_ID_COL"
+                           tableName="design"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-36">
+      <addUniqueConstraint columnNames="instance_as_doc_id"
+                           constraintName="UC_INSTANCEINSTANCE_AS_DOC_ID_COL"
+                           tableName="instance"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-37">
+      <addUniqueConstraint columnNames="instance_as_xml_id"
+                           constraintName="UC_INSTANCEINSTANCE_AS_XML_ID_COL"
+                           tableName="instance"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-38">
+      <addUniqueConstraint columnNames="email"
+                           constraintName="UC_JHI_USEREMAIL_COL"
+                           tableName="jhi_user"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-39">
+      <addUniqueConstraint columnNames="login"
+                           constraintName="UC_JHI_USERLOGIN_COL"
+                           tableName="jhi_user"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-40">
+      <addUniqueConstraint columnNames="spec_as_doc_id"
+                           constraintName="UC_SPECIFICATIONSPEC_AS_DOC_ID_COL"
+                           tableName="specification"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-41">
+      <addUniqueConstraint columnNames="spec_as_xml_id"
+                           constraintName="UC_SPECIFICATIONSPEC_AS_XML_ID_COL"
+                           tableName="specification"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-42">
+      <addForeignKeyConstraint baseColumnNames="implemented_specification_version_id"
+                               baseTableName="design"
+                               constraintName="FK_2psjotwelibwul5p2q9oakdbf"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="specification_template"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-43">
+      <addForeignKeyConstraint baseColumnNames="design_as_doc_id"
+                               baseTableName="design"
+                               constraintName="FK_4fqvepmbxjiblkkf8sirfc9m9"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="doc"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-44">
+      <addForeignKeyConstraint baseColumnNames="implemented_specification_version_id"
+                               baseTableName="instance"
+                               constraintName="FK_4g0jerokwdl93xnivm8gpkap7"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="specification_template"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-45">
+      <addForeignKeyConstraint baseColumnNames="template_doc_id"
+                               baseTableName="specification_template"
+                               constraintName="FK_6974jwmack614nyaeeg5di7qu"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="doc"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-46">
+      <addForeignKeyConstraint baseColumnNames="implemented_specification_version_id"
+                               baseTableName="specification"
+                               constraintName="FK_6fnuayu13v8axxhjhohpaau4o"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="specification_template"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-47">
+      <addForeignKeyConstraint baseColumnNames="instances_id"
+                               baseTableName="instance_docs"
+                               constraintName="FK_8f4g5w9skcyn6xu8jxqu4s732"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="instance"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-48">
+      <addForeignKeyConstraint baseColumnNames="design_as_xml_id"
+                               baseTableName="design"
+                               constraintName="FK_aauol4xi2xsjgw8q4fjjxgdx0"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="xml"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-49">
+      <addForeignKeyConstraint baseColumnNames="spec_as_xml_id"
+                               baseTableName="specification"
+                               constraintName="FK_atx450eothen4qdghghrg1mq"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="xml"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-50">
+      <addForeignKeyConstraint baseColumnNames="designs_id"
+                               baseTableName="instance_designs"
+                               constraintName="FK_bh51byqunngdsif8xsoyfbhyl"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="design"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-51">
+      <addForeignKeyConstraint baseColumnNames="docs_id"
+                               baseTableName="specification_docs"
+                               constraintName="FK_bjgyvefbea7pmavvk27x7ettp"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="doc"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-52">
+      <addForeignKeyConstraint baseColumnNames="guideline_doc_id"
+                               baseTableName="specification_template"
+                               constraintName="FK_bya9faxo2829clcvxj8nxuuau"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="doc"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-53">
+      <addForeignKeyConstraint baseColumnNames="user_id"
+                               baseTableName="jhi_persistent_token"
+                               constraintName="FK_c2yetr6vr7nrqhjvi1rl24b3l"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="jhi_user"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-54">
+      <addForeignKeyConstraint baseColumnNames="instances_id"
+                               baseTableName="instance_designs"
+                               constraintName="FK_d73ccj8u38qed2k2jbqb63h46"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="instance"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-55">
+      <addForeignKeyConstraint baseColumnNames="specifications_id"
+                               baseTableName="design_specifications"
+                               constraintName="FK_dqa5ab43ndlmwocxol7llv61k"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="specification"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-56">
+      <addForeignKeyConstraint baseColumnNames="event_id"
+                               baseTableName="jhi_persistent_audit_evt_data"
+                               constraintName="FK_evb970jo5bi8aon8s65c0lyyn"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="event_id"
+                               referencedTableName="jhi_persistent_audit_event"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-57">
+      <addForeignKeyConstraint baseColumnNames="instance_as_doc_id"
+                               baseTableName="instance"
+                               constraintName="FK_gq32irmf5yu82sx86ih3fgsnt"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="doc"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-58">
+      <addForeignKeyConstraint baseColumnNames="docs_id"
+                               baseTableName="specification_template_docs"
+                               constraintName="FK_h7qe74phbe3dntckmdpjfm7vy"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="doc"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-59">
+      <addForeignKeyConstraint baseColumnNames="authority_name"
+                               baseTableName="jhi_user_authority"
+                               constraintName="FK_ik5r332jlvpolfr7e5n7oi42l"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="name"
+                               referencedTableName="jhi_authority"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-60">
+      <addForeignKeyConstraint baseColumnNames="docs_id"
+                               baseTableName="specification_template_set_docs"
+                               constraintName="FK_j51t777h4yivh2exk53g6ajs0"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="doc"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-61">
+      <addForeignKeyConstraint baseColumnNames="templates_id"
+                               baseTableName="specification_template_set_templates"
+                               constraintName="FK_jvallppcienampura0931muwr"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="specification_template"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-62">
+      <addForeignKeyConstraint baseColumnNames="spec_as_doc_id"
+                               baseTableName="specification"
+                               constraintName="FK_k1vo2ss3y9no6yjjfcrc86sed"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="doc"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-63">
+      <addForeignKeyConstraint baseColumnNames="docs_id"
+                               baseTableName="instance_docs"
+                               constraintName="FK_kf94jiq0knpc0gjgik72ntb3h"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="doc"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-64">
+      <addForeignKeyConstraint baseColumnNames="docs_id"
+                               baseTableName="design_docs"
+                               constraintName="FK_kou7ax8hsi403jvpfs9sjg981"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="doc"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-65">
+      <addForeignKeyConstraint baseColumnNames="specifications_id"
+                               baseTableName="specification_docs"
+                               constraintName="FK_l9md2r0588uyl2mrjustc8mdp"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="specification"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-66">
+      <addForeignKeyConstraint baseColumnNames="specification_template_sets_id"
+                               baseTableName="specification_template_set_templates"
+                               constraintName="FK_mp2h3ug58evwybk4ur8ifacdn"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="specification_template_set"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-67">
+      <addForeignKeyConstraint baseColumnNames="specification_templates_id"
+                               baseTableName="specification_template_docs"
+                               constraintName="FK_n1umravhqhvwkfhujgqs44mgr"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="specification_template"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-68">
+      <addForeignKeyConstraint baseColumnNames="user_id"
+                               baseTableName="jhi_user_authority"
+                               constraintName="FK_pg0oaw6mr9pt3ibeihdc1jwof"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="jhi_user"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-69">
+      <addForeignKeyConstraint baseColumnNames="designs_id"
+                               baseTableName="design_docs"
+                               constraintName="FK_q60tebt0tbo8yt8x45wf341yq"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="design"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-70">
+      <addForeignKeyConstraint baseColumnNames="specification_template_sets_id"
+                               baseTableName="specification_template_set_docs"
+                               constraintName="FK_rua3sahmmj9bjpw40xtps38tw"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="specification_template_set"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-71">
+      <addForeignKeyConstraint baseColumnNames="instance_as_xml_id"
+                               baseTableName="instance"
+                               constraintName="FK_swfuwkflpfywn6qlwxlpe5bkb"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="xml"/>
+   </changeSet>
+   <changeSet author="vagrant (generated)" id="1470310459206-72">
+      <addForeignKeyConstraint baseColumnNames="designs_id"
+                               baseTableName="design_specifications"
+                               constraintName="FK_wqcmhiscoio5wulwpl0l4d4q"
+                               deferrable="false"
+                               initiallyDeferred="false"
+                               referencedColumnNames="id"
+                               referencedTableName="design"/>
+   </changeSet>
+</databaseChangeLog>

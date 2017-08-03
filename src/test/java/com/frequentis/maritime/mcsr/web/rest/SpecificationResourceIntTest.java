@@ -18,35 +18,48 @@
 
 package com.frequentis.maritime.mcsr.web.rest;
 
-import com.frequentis.maritime.mcsr.McsrApp;
-import com.frequentis.maritime.mcsr.domain.Specification;
-import com.frequentis.maritime.mcsr.repository.SpecificationRepository;
-import com.frequentis.maritime.mcsr.repository.search.SpecificationSearchRepository;
-import com.frequentis.maritime.mcsr.service.SpecificationService;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.frequentis.maritime.mcsr.domain.Specification;
+import com.frequentis.maritime.mcsr.domain.Xml;
+import com.frequentis.maritime.mcsr.repository.SpecificationRepository;
+import com.frequentis.maritime.mcsr.repository.search.SpecificationSearchRepository;
+import com.frequentis.maritime.mcsr.service.SpecificationService;
+import com.frequentis.maritime.mcsr.service.XmlService;
 
 
 /**
@@ -54,10 +67,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * @see SpecificationResource
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = McsrApp.class)
-@WebAppConfiguration
-@IntegrationTest
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles = "integration")
+@WithMockUser("test-user")
 public class SpecificationResourceIntTest {
 
     private static final String DEFAULT_NAME = "AAAAA";
@@ -74,6 +87,9 @@ public class SpecificationResourceIntTest {
     private static final String UPDATED_STATUS = "BBBBB";
     private static final String DEFAULT_ORGANIZATION_ID = "AAAAA";
     private static final String UPDATED_ORGANIZATION_ID = "BBBBB";
+    private static final String DEFAULT_XML_COMMENT = "LLLL";
+    private static final String DEFAULT_XML_CONTENTYPE = "application/xml";
+    private static final String DEFAULT_XML_NAME = "SpecTestXML";
 
     @Inject
     private SpecificationRepository specificationRepository;
@@ -90,18 +106,39 @@ public class SpecificationResourceIntTest {
     @Inject
     private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
 
+    @Inject
+    private ApplicationContext appContext;
+
+    @Inject
+    private XmlService xmlService;
+
     private MockMvc restSpecificationMockMvc;
 
     private Specification specification;
 
+    private Xml specificationXML;
+
     @PostConstruct
-    public void setup() {
+    public void setup() throws IOException {
         MockitoAnnotations.initMocks(this);
         SpecificationResource specificationResource = new SpecificationResource();
         ReflectionTestUtils.setField(specificationResource, "specificationService", specificationService);
         this.restSpecificationMockMvc = MockMvcBuilders.standaloneSetup(specificationResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
+
+        Path xmlPath = appContext.getResource("classpath:dataload/xml/AddressForPersonLookupServiceSpecification.xml").getFile().toPath();
+        String specificationXML = new String(Files.readAllBytes(xmlPath));
+
+        // XML for test
+        Xml xml = new Xml();
+        xml.setComment(DEFAULT_XML_COMMENT);
+        xml.setName(DEFAULT_XML_NAME);
+        xml.setContentContentType(DEFAULT_XML_CONTENTYPE);
+        xml.setContent(specificationXML);
+        xmlService.save(xml);
+        this.specificationXML = xml;
+
     }
 
     @Before
@@ -122,8 +159,10 @@ public class SpecificationResourceIntTest {
     public void createSpecification() throws Exception {
         int databaseSizeBeforeCreate = specificationRepository.findAll().size();
 
-        // Create the Specification
+        // XML is required in resource
+        specification.setSpecAsXml(specificationXML);
 
+        // Create the Specification
         restSpecificationMockMvc.perform(post("/api/specifications")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
                 .content(TestUtil.convertObjectToJsonBytes(specification)))
@@ -142,7 +181,7 @@ public class SpecificationResourceIntTest {
         assertThat(testSpecification.getOrganizationId()).isEqualTo(DEFAULT_ORGANIZATION_ID);
 
         // Validate the Specification in ElasticSearch
-        Specification specificationEs = specificationSearchRepository.findOne(testSpecification.getId());
+        Specification specificationEs = specificationSearchRepository.findById(testSpecification.getId()).get();
         assertThat(specificationEs).isEqualToComparingFieldByField(testSpecification);
     }
 
@@ -227,7 +266,7 @@ public class SpecificationResourceIntTest {
         // Get all the specifications
         restSpecificationMockMvc.perform(get("/api/specifications?sort=id,desc"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(specification.getId().intValue())))
                 .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
                 .andExpect(jsonPath("$.[*].version").value(hasItem(DEFAULT_VERSION.toString())))
@@ -247,7 +286,7 @@ public class SpecificationResourceIntTest {
         // Get the specification
         restSpecificationMockMvc.perform(get("/api/specifications/{id}", specification.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(jsonPath("$.id").value(specification.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
             .andExpect(jsonPath("$.version").value(DEFAULT_VERSION.toString()))
@@ -269,6 +308,8 @@ public class SpecificationResourceIntTest {
     @Test
     @Transactional
     public void updateSpecification() throws Exception {
+        // XML is required in resource
+        specification.setSpecAsXml(specificationXML);
         // Initialize the database
         specificationService.save(specification);
 
@@ -284,6 +325,7 @@ public class SpecificationResourceIntTest {
         updatedSpecification.setSpecificationId(UPDATED_SPECIFICATION_ID);
         updatedSpecification.setStatus(UPDATED_STATUS);
         updatedSpecification.setOrganizationId(UPDATED_ORGANIZATION_ID);
+        updatedSpecification.setSpecAsXml(specificationXML);
 
         restSpecificationMockMvc.perform(put("/api/specifications")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -303,12 +345,12 @@ public class SpecificationResourceIntTest {
         assertThat(testSpecification.getOrganizationId()).isEqualTo(UPDATED_ORGANIZATION_ID);
 
         // Validate the Specification in ElasticSearch
-        Specification specificationEs = specificationSearchRepository.findOne(testSpecification.getId());
+        Specification specificationEs = specificationSearchRepository.findById(testSpecification.getId()).get();
         assertThat(specificationEs).isEqualToComparingFieldByField(testSpecification);
     }
 
     @Test
-    @Transactional
+    @javax.transaction.Transactional
     public void deleteSpecification() throws Exception {
         // Initialize the database
         specificationService.save(specification);
@@ -321,7 +363,11 @@ public class SpecificationResourceIntTest {
                 .andExpect(status().isOk());
 
         // Validate ElasticSearch is empty
-        boolean specificationExistsInEs = specificationSearchRepository.exists(specification.getId());
+        specificationSearchRepository.refresh();
+
+        // FIXME HOTFIX! There is SD-ES bug DATAES-363
+        //boolean specificationExistsInEs = specificationSearchRepository.existsById(specification.getId());
+        boolean specificationExistsInEs = specificationSearchRepository.findById(specification.getId()).isPresent();
         assertThat(specificationExistsInEs).isFalse();
 
         // Validate the database is empty
@@ -338,7 +384,7 @@ public class SpecificationResourceIntTest {
         // Search the specification
         restSpecificationMockMvc.perform(get("/api/_search/specifications?query=id:" + specification.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(jsonPath("$.[*].id").value(hasItem(specification.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
             .andExpect(jsonPath("$.[*].version").value(hasItem(DEFAULT_VERSION.toString())))

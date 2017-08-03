@@ -17,22 +17,20 @@
  */
 package com.frequentis.maritime.mcsr.service;
 
-import com.frequentis.maritime.mcsr.domain.Doc;
-import com.frequentis.maritime.mcsr.repository.DocRepository;
-import com.frequentis.maritime.mcsr.repository.search.DocSearchRepository;
+import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
+
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static org.elasticsearch.index.query.QueryBuilders.*;
+import com.frequentis.maritime.mcsr.domain.Doc;
+import com.frequentis.maritime.mcsr.repository.DocRepository;
+import com.frequentis.maritime.mcsr.repository.search.DocSearchRepository;
 
 /**
  * Service Implementation for managing Doc.
@@ -84,7 +82,7 @@ public class DocService {
     @Transactional(readOnly = true)
     public Doc findOne(Long id) {
         log.debug("Request to get Doc : {}", id);
-        Doc doc = docRepository.findOne(id);
+        Doc doc = docRepository.findById(id).orElse(null);
         return doc;
     }
 
@@ -95,8 +93,8 @@ public class DocService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Doc : {}", id);
-        docRepository.delete(id);
-        docSearchRepository.delete(id);
+        docRepository.deleteById(id);
+        docSearchRepository.deleteById(id);
     }
 
     /**

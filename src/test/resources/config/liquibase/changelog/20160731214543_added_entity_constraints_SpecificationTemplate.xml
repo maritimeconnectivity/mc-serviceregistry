@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <!--
+        Added the constraints for entity SpecificationTemplate.
+    -->
+    <changeSet id="20160731214543-2" author="jhipster">
+        
+        <addForeignKeyConstraint baseColumnNames="guideline_doc_id"
+                                 baseTableName="specification_template"
+                                 constraintName="fk_specificationtemplate_guidelinedoc_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="doc"/>
+
+        <addForeignKeyConstraint baseColumnNames="template_doc_id"
+                                 baseTableName="specification_template"
+                                 constraintName="fk_specificationtemplate_templatedoc_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="doc"/>
+
+        <addForeignKeyConstraint baseColumnNames="specification_templates_id"
+                                 baseTableName="specification_template_docs"
+                                 constraintName="fk_specification_template_docs_specification_templates_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="specification_template"/>
+        <addForeignKeyConstraint baseColumnNames="docs_id"
+                                 baseTableName="specification_template_docs"
+                                 constraintName="fk_specification_template_docs_docs_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="doc"/>
+        
+        <addForeignKeyConstraint baseColumnNames="specification_templates_id"
+                                 baseTableName="specification_template_xsds"
+                                 constraintName="fk_specification_template_xsds_specification_templates_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="specification_template"/>
+        <addForeignKeyConstraint baseColumnNames="xsds_id"
+                                 baseTableName="specification_template_xsds"
+                                 constraintName="fk_specification_template_xsds_xsds_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="xsd"/>
+        
+    </changeSet>
+</databaseChangeLog>

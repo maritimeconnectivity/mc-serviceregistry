@@ -18,26 +18,54 @@
 
 package com.frequentis.maritime.mcsr.service;
 
+import java.lang.reflect.Method;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.elasticsearch.ResourceAlreadyExistsException;
+//import org.elasticsearch.indices.IndexAlreadyExistsException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.codahale.metrics.annotation.Timed;
-import com.frequentis.maritime.mcsr.domain.*;
-import com.frequentis.maritime.mcsr.repository.*;
-import com.frequentis.maritime.mcsr.repository.search.*;
+import com.frequentis.maritime.mcsr.domain.Design;
+import com.frequentis.maritime.mcsr.domain.Doc;
+import com.frequentis.maritime.mcsr.domain.Instance;
+import com.frequentis.maritime.mcsr.domain.Specification;
+import com.frequentis.maritime.mcsr.domain.SpecificationTemplate;
+import com.frequentis.maritime.mcsr.domain.SpecificationTemplateSet;
+import com.frequentis.maritime.mcsr.domain.User;
+import com.frequentis.maritime.mcsr.domain.Xml;
+import com.frequentis.maritime.mcsr.domain.Xsd;
+import com.frequentis.maritime.mcsr.repository.DesignRepository;
+import com.frequentis.maritime.mcsr.repository.DocRepository;
+import com.frequentis.maritime.mcsr.repository.InstanceRepository;
+import com.frequentis.maritime.mcsr.repository.SpecificationRepository;
+import com.frequentis.maritime.mcsr.repository.SpecificationTemplateRepository;
+import com.frequentis.maritime.mcsr.repository.SpecificationTemplateSetRepository;
+import com.frequentis.maritime.mcsr.repository.UserRepository;
+import com.frequentis.maritime.mcsr.repository.XmlRepository;
+import com.frequentis.maritime.mcsr.repository.XsdRepository;
+import com.frequentis.maritime.mcsr.repository.search.DesignSearchRepository;
+import com.frequentis.maritime.mcsr.repository.search.DocSearchRepository;
+import com.frequentis.maritime.mcsr.repository.search.InstanceSearchRepository;
+import com.frequentis.maritime.mcsr.repository.search.SpecificationSearchRepository;
+import com.frequentis.maritime.mcsr.repository.search.SpecificationTemplateSearchRepository;
+import com.frequentis.maritime.mcsr.repository.search.SpecificationTemplateSetSearchRepository;
+import com.frequentis.maritime.mcsr.repository.search.UserSearchRepository;
+import com.frequentis.maritime.mcsr.repository.search.XmlSearchRepository;
+import com.frequentis.maritime.mcsr.repository.search.XsdSearchRepository;
 import com.frequentis.maritime.mcsr.web.rest.registry.ServiceInstanceResource;
 import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
-import org.elasticsearch.indices.IndexAlreadyExistsException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.inject.Inject;
-import java.lang.reflect.Method;
-import java.util.List;
 
 @Service
 public class ElasticsearchIndexService {
@@ -127,16 +155,16 @@ public class ElasticsearchIndexService {
         elasticsearchTemplate.deleteIndex(entityClass);
         try {
             elasticsearchTemplate.createIndex(entityClass);
-        } catch (IndexAlreadyExistsException e) {
+        } catch (ResourceAlreadyExistsException  e) {
             // Do nothing. Index was already concurrently recreated by some other service.
         }
         elasticsearchTemplate.putMapping(entityClass);
         if (jpaRepository.count() > 0) {
             try {
                 Method m = jpaRepository.getClass().getMethod("findAllWithEagerRelationships");
-                elasticsearchRepository.save((List<T>) m.invoke(jpaRepository));
+                elasticsearchRepository.saveAll((List<T>) m.invoke(jpaRepository));
             } catch (Exception e) {
-                elasticsearchRepository.save(jpaRepository.findAll());
+                elasticsearchRepository.saveAll(jpaRepository.findAll());
             }
         }
         log.info("Elasticsearch: Indexed all rows for " + entityClass.getSimpleName());
@@ -150,9 +178,11 @@ public class ElasticsearchIndexService {
         //Don't delete the instance index because this index needs to be manually created
         //because spring-data can't handle geometry index creation
         //elasticsearchTemplate.deleteIndex(entityClass);
+        // Delete in Custom Spring Data Elasticsearch
+        elasticsearchTemplate.deleteIndex(Instance.class);
         try {
             elasticsearchTemplate.createIndex(Instance.class);
-        } catch (IndexAlreadyExistsException e) {
+        } catch (ResourceAlreadyExistsException  e) {
             // Do nothing. Index was already concurrently recreated by some other service.
         }
         elasticsearchTemplate.putMapping(Instance.class);

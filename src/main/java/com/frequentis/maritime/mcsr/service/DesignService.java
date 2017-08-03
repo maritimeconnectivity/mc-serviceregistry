@@ -95,8 +95,8 @@ public class DesignService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Design : {}", id);
-        designRepository.delete(id);
-        designSearchRepository.delete(id);
+        designRepository.deleteById(id);
+        designSearchRepository.deleteById(id);
     }
 
     /**

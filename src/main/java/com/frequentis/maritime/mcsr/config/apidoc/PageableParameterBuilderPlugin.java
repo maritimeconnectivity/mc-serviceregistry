@@ -62,7 +62,7 @@ public class PageableParameterBuilderPlugin implements ParameterBuilderPlugin {
 
     private Function<ResolvedType, ? extends ModelReference>
     createModelRefFactory(ParameterContext context) {
-        ModelContext modelContext = inputParam(context.methodParameter().getParameterType(),
+        ModelContext modelContext = inputParam(null, context.methodParameter().getParameterType(),
             context.getDocumentationType(),
             context.getAlternateTypeProvider(),
             context.getGenericNamingStrategy(),

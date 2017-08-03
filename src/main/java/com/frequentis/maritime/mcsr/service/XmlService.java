@@ -84,7 +84,7 @@ public class XmlService {
     @Transactional(readOnly = true)
     public Xml findOne(Long id) {
         log.debug("Request to get Xml : {}", id);
-        Xml xml = xmlRepository.findOne(id);
+        Xml xml = xmlRepository.findById(id).orElse(null);
         return xml;
     }
 
@@ -95,8 +95,8 @@ public class XmlService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Xml : {}", id);
-        xmlRepository.delete(id);
-        xmlSearchRepository.delete(id);
+        xmlRepository.deleteById(id);
+        xmlSearchRepository.deleteById(id);
     }
 
     /**

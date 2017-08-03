@@ -18,11 +18,27 @@
 package com.frequentis.maritime.mcsr.config;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.node.Node;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchProperties;
+import org.elasticsearch.node.Node;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.elasticsearch.client.TransportClientFactoryBean;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.EntityMapper;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
@@ -33,11 +49,27 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Configuration
 @AutoConfigureAfter(value = { JacksonConfiguration.class })
 public class ElasticSearchConfiguration {
+    private static final Logger log = LoggerFactory.getLogger(ElasticSearchConfiguration.class);
+
+    @Autowired
+    private ElasticsearchProperties properties;
 
     @Bean
     public ElasticsearchTemplate elasticsearchTemplate(Client client, Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder) {
         return new ElasticsearchTemplate(client, new CustomEntityMapper(jackson2ObjectMapperBuilder.createXmlMapper(false).build()));
     }
+
+    @Bean
+    public Node esClient() throws Exception {
+           Settings settings = Settings.builder()
+                    .put("path.home", "target/elasticsearch")
+                    .put("transport.type", "local")
+                    .put("http.enabled", false)
+                    .build();
+
+            return new Node(settings).start();
+    }
+
 
     public class CustomEntityMapper implements EntityMapper {
 

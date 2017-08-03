@@ -16,7 +16,7 @@ spring:
     jackson:
         serialization.write_dates_as_timestamps: false
     datasource:
-        url: jdbc:h2:mem:mcsr;DB_CLOSE_DELAY=-1
+        url:
         name:
         username:
         password:
@@ -28,11 +28,12 @@ spring:
         hibernate:
             ddl-auto: none
             naming-strategy: org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy
+            use-new-id-generator-mappings: false
         properties:
             hibernate.cache.use_second_level_cache: false
             hibernate.cache.use_query_cache: false
             hibernate.generate_statistics: true
-            hibernate.hbm2ddl.auto: validate
+#            hibernate.hbm2ddl.auto: validate        
     data:
         elasticsearch:
             cluster-name:

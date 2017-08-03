@@ -95,8 +95,8 @@ public class SpecificationTemplateSetService {
      */
     public void delete(Long id) {
         log.debug("Request to delete SpecificationTemplateSet : {}", id);
-        specificationTemplateSetRepository.delete(id);
-        specificationTemplateSetSearchRepository.delete(id);
+        specificationTemplateSetRepository.deleteById(id);
+        specificationTemplateSetSearchRepository.deleteById(id);
     }
 
     /**

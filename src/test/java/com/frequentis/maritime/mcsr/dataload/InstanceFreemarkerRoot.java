@@ -21,8 +21,12 @@ import com.opencsv.CSVReader;
 import com.spatial4j.core.context.SpatialContext;
 import com.spatial4j.core.shape.Point;
 import com.spatial4j.core.shape.impl.PointImpl;
+// @todo ShapeBuilder and RandomShapeGenerator
+//import org.elasticsearch.common.geo.builders.ShapeBuilder;
+//import org.elasticsearch.test.geo.RandomShapeGenerator;
+
+import org.elasticsearch.common.geo.builders.PointBuilder;
 import org.elasticsearch.common.geo.builders.ShapeBuilder;
-import org.elasticsearch.test.geo.RandomShapeGenerator;
 
 import java.io.FileReader;
 import java.util.List;
@@ -94,10 +98,11 @@ public class InstanceFreemarkerRoot {
         String[] csvEntry = portList.get(randInt(0,portList.size()));
         Point point = new PointImpl(Double.valueOf(csvEntry[0]), Double.valueOf(csvEntry[1]), SpatialContext.GEO);
         ShapeBuilder shapeBuilder = null;
-        while (shapeBuilder == null) {
-            shapeBuilder = RandomShapeGenerator.createShapeNear(random, point, RandomShapeGenerator.ShapeType.POLYGON);
-        }
-        setCoversAreaGeometryWKT(shapeBuilder.build().toString());
+        //while (shapeBuilder == null) {
+
+            //shapeBuilder = RandomShapeGenerator.createShapeNear(random, point, RandomShapeGenerator.ShapeType.POLYGON);
+        //}
+        //setCoversAreaGeometryWKT(shapeBuilder.build().toString());
         setCoversAreaName(csvEntry[4]);
         setCoversAreaDescription(csvEntry[4] + " " + csvEntry[5]);
     }

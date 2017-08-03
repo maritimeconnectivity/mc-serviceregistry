@@ -19,10 +19,12 @@
 package com.frequentis.maritime.mcsr.repository.search;
 
 import com.frequentis.maritime.mcsr.domain.Specification;
+
+import org.springframework.data.elasticsearch.repository.ElasticsearchCrudRepository;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
 /**
  * Spring Data ElasticSearch repository for the Specification entity.
  */
-public interface SpecificationSearchRepository extends ElasticsearchRepository<Specification, Long> {
+public interface SpecificationSearchRepository extends ElasticsearchCrudRepository<Specification, Long>, ElasticsearchRepository<Specification, Long> {
 }

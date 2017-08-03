@@ -1,5 +1,4 @@
 dist: trusty
-
 jdk:
   - openjdk8
 

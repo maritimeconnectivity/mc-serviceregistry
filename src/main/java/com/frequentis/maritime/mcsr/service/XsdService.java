@@ -84,7 +84,7 @@ public class XsdService {
     @Transactional(readOnly = true)
     public Xsd findOne(Long id) {
         log.debug("Request to get Xsd : {}", id);
-        Xsd xsd = xsdRepository.findOne(id);
+        Xsd xsd = xsdRepository.findById(id).orElse(null);
         return xsd;
     }
 
@@ -95,8 +95,9 @@ public class XsdService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Xsd : {}", id);
-        xsdRepository.delete(id);
-        xsdSearchRepository.delete(id);
+        Xsd xsd = xsdRepository.getOne(id);
+        xsdRepository.delete(xsd);
+        xsdSearchRepository.delete(xsd);
     }
 
     /**
