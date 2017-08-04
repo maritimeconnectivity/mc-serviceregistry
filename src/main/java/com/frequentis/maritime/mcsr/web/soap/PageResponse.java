@@ -14,10 +14,12 @@ public class PageResponse {
         if(page == null) {
             dto.page = 0;
             dto.pageCount = 0;
+            dto.itemTotalCount = 0;
             dto.content = new ArrayList<B>();
         } else {
             dto.page = page.getNumber();
             dto.pageCount = page.getTotalPages();
+            dto.itemTotalCount = page.getNumberOfElements();
             dto.content = new ArrayList<B>(converter.convert(page.getContent()));
         }
 

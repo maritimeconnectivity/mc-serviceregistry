@@ -50,6 +50,7 @@ public class WebServiceConfig {
     @Bean
     public Endpoint docResourceEndpoint(DocResource docResource) {
         EndpointImpl endpoint = new EndpointImpl(bus, docResource);
+
         endpoint.publish("/DocService");
         return endpoint;
     }

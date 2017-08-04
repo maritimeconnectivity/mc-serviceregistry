@@ -90,8 +90,7 @@ public class ServiceSpecificationResourceImpl implements ServiceSpecificationRes
     @Override
     public PageDTO<SpecificationDTO> getAllSpecifications(int page) {
         log.debug("SOAP request to get a page of Specifications");
-        Pageable pageable = new PageRequest(page, ITEMS_PER_PAGE);
-        Page<Specification> pageRequest = specificationService.findAll(pageable);
+        Page<Specification> pageRequest = specificationService.findAll(PageRequest.of(page, ITEMS_PER_PAGE));
 
         return PageResponse.buildFromPage(pageRequest, specificationConverter);
     }
@@ -112,8 +111,7 @@ public class ServiceSpecificationResourceImpl implements ServiceSpecificationRes
     @Override
     public PageDTO<SpecificationDTO> getAllSpecificationsById(String id, int page) {
         log.debug("SOAP request to get a page of Specifications by id {}", id);
-        Pageable pageable = new PageRequest(page, ITEMS_PER_PAGE);
-        Page<Specification> pagedata = specificationService.findAllByDomainId(id, pageable);
+        Page<Specification> pagedata = specificationService.findAllByDomainId(id, PageRequest.of(0, ITEMS_PER_PAGE));
 
         return PageResponse.buildFromPage(pagedata, specificationConverter);
     }
@@ -140,8 +138,7 @@ public class ServiceSpecificationResourceImpl implements ServiceSpecificationRes
     @Override
     public PageDTO<SpecificationDTO> searchSpecifications(SearchData searchData) {
         log.debug("SOAP request to search for a page {} of Specifications for query {}", searchData.page, searchData.query);
-        Pageable pageable = new PageRequest(searchData.page, ITEMS_PER_PAGE);
-        Page<Specification> page = specificationService.search(searchData.query, pageable);
+        Page<Specification> page = specificationService.search(searchData.query, PageRequest.of(searchData.page, ITEMS_PER_PAGE));
 
         return PageResponse.buildFromPage(page, specificationConverter);
     }

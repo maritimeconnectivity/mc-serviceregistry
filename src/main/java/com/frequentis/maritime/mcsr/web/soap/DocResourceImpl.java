@@ -2,7 +2,6 @@ package com.frequentis.maritime.mcsr.web.soap;
 
 
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.jws.WebService;
@@ -12,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +18,8 @@ import com.frequentis.maritime.mcsr.domain.Doc;
 import com.frequentis.maritime.mcsr.service.DocService;
 import com.frequentis.maritime.mcsr.web.soap.converters.Converter;
 import com.frequentis.maritime.mcsr.web.soap.dto.DocDTO;
-import com.frequentis.maritime.mcsr.web.soap.dto.SearchData;
+import com.frequentis.maritime.mcsr.web.soap.dto.DocDescriptorDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.PageDTO;
 
 @Component("docResourceSoap")
 @Transactional
@@ -33,36 +32,44 @@ public class DocResourceImpl implements DocResource {
     DocService docService;
     @Autowired
     Converter<Doc, DocDTO> docDTOConverter;
+    @Autowired
+    Converter<Doc, DocDescriptorDTO> docDescriptorDTOConverter;
 
     @Override
-    public List<DocDTO> getAllDocs() {
-        log.debug("SOAP request to get a page of Docs");
-        Pageable pageable = new PageRequest(0, ITEMS_PER_PAGE);
-        Page<Doc> page = docService.findAll(pageable);
+    public PageDTO<? extends DocDescriptorDTO> getAllDocs(int page) {
+        log.debug("SOAP request to get page {} of Docs", page);
+        Page<Doc> pageResult = docService.findAll(PageRequest.of(page, ITEMS_PER_PAGE));
 
         // We shoud use DTO objects
-        return new ArrayList<DocDTO>(docDTOConverter.convert(page.getContent()));
+        return PageResponse.buildFromPage(pageResult, docDescriptorDTOConverter);
     }
 
     @Override
-    public void createDoc(DocDTO doc) {
+    public DocDescriptorDTO createDoc(DocDTO doc) {
+    	log.debug("SOAP request to create Doc : {}", doc);
         Doc newDoc = new Doc();
         newDoc.setFilecontent(doc.filecontent);
         newDoc.setComment(doc.comment);
         newDoc.setFilecontentContentType(doc.filecontentContentType);
         newDoc.setMimetype(doc.mimetype);
-        log.debug("SOAP request to create Doc : {}", doc);
-        docService.save(newDoc);
+        newDoc.setName(doc.name);
+        return docDescriptorDTOConverter.convert(docService.save(newDoc));
     }
 
     @Override
-    public void updateDoc(DocDTO doc) {
+    public DocDescriptorDTO updateDoc(DocDTO doc) {
         log.debug("SOAP request to update Doc : {}", doc);
         Doc newDoc = new Doc();
         if (doc.id == null) {
-            createDoc(doc);
+            return createDoc(doc);
         }
-        docService.save(newDoc);
+        newDoc.setFilecontent(doc.filecontent);
+        newDoc.setComment(doc.comment);
+        newDoc.setFilecontentContentType(doc.filecontentContentType);
+        newDoc.setMimetype(doc.mimetype);
+        newDoc.setName(doc.name);
+        newDoc.setId(doc.id);
+        return docDescriptorDTOConverter.convert(docService.save(newDoc));
     }
 
     @Override
@@ -79,11 +86,10 @@ public class DocResourceImpl implements DocResource {
     }
 
     @Override
-    public List<Doc> searchDocs(SearchData searchdata) {
-        log.debug("REST request to search for a page of Docs for query {}", searchdata.query);
-        Pageable pageable = new PageRequest(searchdata.page, ITEMS_PER_PAGE);
-        Page<Doc> page = docService.search(searchdata.query, pageable);
-        return page.getContent();
+    public PageDTO<? extends DocDescriptorDTO> searchDocs(String query, int page) {
+        log.debug("REST request to search for a page of Docs for query {}", query);
+        Page<Doc> pageResponse = docService.search(query, PageRequest.of(page, ITEMS_PER_PAGE));
+        return PageResponse.buildFromPage(pageResponse, docDTOConverter);
     }
 
 
