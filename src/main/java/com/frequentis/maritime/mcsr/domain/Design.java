@@ -46,6 +46,7 @@ import com.frequentis.maritime.mcsr.domain.Xml;
 import io.swagger.annotations.ApiModel;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Holds a description of a technical design.A design can be compatible to one or morespecification templates.It has at least a technical representation of thedescriptiion in form of an XML and a filled out templateas e.g. word document.
@@ -81,6 +82,7 @@ public class Design implements Serializable {
     @NotNull
     @Column(name = "design_id", nullable = false)
     @Field(type = FieldType.text, index = false)
+    @JsonProperty("design_id")
     private String designId;
 
     @Column(name = "status")
@@ -89,6 +91,7 @@ public class Design implements Serializable {
 
     @Column(name = "organization_id")
     @Field(type = FieldType.text, index = false)
+    @JsonProperty("organization_id")
     private String organizationId;
 
     @OneToOne

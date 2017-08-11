@@ -16,12 +16,12 @@ public interface ServiceSpecificationResource {
 
     @WebMethod
     public void createSpecification(
-            @WebParam(name = "specification") @XmlElement(required = true) Specification specification,
+            @WebParam(name = "specification") @XmlElement(required = true) SpecificationDTO specification,
             @WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken) throws Exception;
 
     @WebMethod
     public void updateSpecification(
-            @WebParam(name = "specification") @XmlElement(required = true) Specification specification,
+            @WebParam(name = "specification") @XmlElement(required = true) SpecificationDTO specification,
             @WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken) throws IllegalAccessException, Exception;
 
     @WebMethod

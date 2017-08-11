@@ -1,26 +1,15 @@
 package com.frequentis.maritime.mcsr.web.soap.dto;
 
+import javax.xml.bind.annotation.XmlElement;
+
 import com.frequentis.maritime.mcsr.domain.Doc;
 import com.frequentis.maritime.mcsr.domain.Xml;
 
-public class DesignDTO {
+public class DesignDTO extends DesignDescriptorDTO {
 
-    public Long id;
+	@XmlElement(required = true)
+    public XmlDTO designAsXml;
 
-    public String name;
-
-    public String version;
-
-    public String comment;
-
-    public String designId;
-
-    public String status;
-
-    public String organizationId;
-
-    public Xml designAsXml;
-
-    public Doc designAsDoc;
+    public DocDTO designAsDoc;
 
 }

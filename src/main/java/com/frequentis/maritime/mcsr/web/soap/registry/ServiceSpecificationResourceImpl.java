@@ -31,6 +31,8 @@ import com.frequentis.maritime.mcsr.web.soap.converters.Converter;
 import com.frequentis.maritime.mcsr.web.soap.dto.PageDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.SearchData;
 import com.frequentis.maritime.mcsr.web.soap.dto.SpecificationDTO;
+import com.frequentis.maritime.mcsr.web.soap.errors.XmlValidateException;
+import com.frequentis.maritime.mcsr.web.util.WebUtils;
 
 
 @Component("serviceSpecificationResourceSoap")
@@ -42,40 +44,42 @@ public class ServiceSpecificationResourceImpl implements ServiceSpecificationRes
     SpecificationService specificationService;
     @Autowired
     Converter<Specification, SpecificationDTO> specificationConverter;
+    @Autowired
+    Converter<SpecificationDTO, Specification> specificationReverseConverter;
 
     @Override
-    public void createSpecification(Specification specification, String bearerToken) throws Exception {
-        log.debug("REST request to save Specification : {}", specification);
-        String organizationId = "";
-        try {
-            organizationId = HeaderUtil.extractOrganizationIdFromToken(bearerToken);
-        } catch (Exception e) {
-            log.warn("No organizationId could be parsed from the bearer token");
-        }
-        if (specification.getId() != null) {
+    public void createSpecification(SpecificationDTO specificationDTO, String bearerToken) throws Exception {
+        log.debug("REST request to save Specification : {}", specificationDTO);
+        String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
+        if (specificationDTO.id != null) {
             throw new IllegalArgumentException("A new specification cannot already have an ID");
+        }
+        
+        Specification specification = specificationReverseConverter.convert(specificationDTO);
+        if (specification == null || specification.getSpecAsXml() == null || specification.getSpecAsXml().getContent() == null) {
+        	throw new XmlValidateException("Specification must have a valid XML body");
         }
         String xml = specification.getSpecAsXml().getContent().toString();
         log.info("XML:" + xml);
-        XmlUtil.validateXml(xml, "ServiceSpecificationSchema.xsd");
+        try {
+        	XmlUtil.validateXml(xml, "ServiceSpecificationSchema.xsd");
+        } catch (Exception e) {
+        	throw new XmlValidateException("Specification must have a valid XML body", e);
+        }
 
         specification.setOrganizationId(organizationId);
         specificationService.save(specification);
     }
 
     @Override
-    public void updateSpecification(Specification specification, String bearerToken) throws IllegalAccessException, Exception {
-        log.debug("SOAP request to update Specification : {}", specification);
-        if (specification.getId() == null) {
-            createSpecification(specification, bearerToken);
+    public void updateSpecification(SpecificationDTO specificationDTO, String bearerToken) throws IllegalAccessException, Exception {
+        log.debug("SOAP request to update Specification : {}", specificationDTO);
+        if (specificationDTO.id == null) {
+            createSpecification(specificationDTO, bearerToken);
         }
 
-        String organizationId = "";
-        try {
-            organizationId = HeaderUtil.extractOrganizationIdFromToken(bearerToken);
-        } catch (Exception e) {
-            log.warn("No organizationId could be parsed from the bearer token");
-        }
+        Specification specification = specificationReverseConverter.convert(specificationDTO);
+        String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
         if (specification.getOrganizationId() != null && specification.getOrganizationId().length() > 0 && !organizationId.equals(specification.getOrganizationId())) {
             log.warn("Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+specification.getOrganizationId());
             throw new IllegalAccessException();

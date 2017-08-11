@@ -1,12 +1,16 @@
 package com.frequentis.maritime.mcsr.config;
 
+import java.util.List;
 
 import javax.servlet.Servlet;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBus;
+import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.transport.MessageObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +19,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.frequentis.maritime.mcsr.web.soap.DocResource;
+import com.frequentis.maritime.mcsr.web.soap.registry.ServiceInstanceResource;
 import com.frequentis.maritime.mcsr.web.soap.registry.ServiceSpecificationResource;
+import com.frequentis.maritime.mcsr.web.soap.registry.TechnicalDesignResource;
 
 /**
  * SOAP services configuration.
@@ -49,18 +55,36 @@ public class WebServiceConfig {
 
     @Bean
     public Endpoint docResourceEndpoint(DocResource docResource) {
-        EndpointImpl endpoint = new EndpointImpl(bus, docResource);
-
-        endpoint.publish("/DocService");
-        return endpoint;
+        return publishEndpoint(docResource, "/DocResource");
     }
 
     @Bean
     public Endpoint serviceSpecificationResourceEndpoint(ServiceSpecificationResource resource) {
-        EndpointImpl endpoint = new EndpointImpl(bus, resource);
-        endpoint.publish("/ServiceSpecification");
-        return endpoint;
+        return publishEndpoint(resource, "/ServiceSpecification");
+    }
+    
+    @Bean
+    public Endpoint technicalDesignResource(TechnicalDesignResource resource) {
+    	return publishEndpoint(resource, "/TechnicalDesignResource");
+    }
+    
+    @Bean
+    public Endpoint technicalInstanceResource(ServiceInstanceResource resource) {
+    	return publishEndpoint(resource, "/ServiceInstanceResource");
     }
 
+    private Endpoint publishEndpoint(Object resource, String url) {
+    	EndpointImpl ep = new EndpointImpl(bus, resource);
+    	ep.publish(url);
+    	org.apache.cxf.endpoint.Endpoint endp = ep.getServer().getEndpoint();
+    	List<Interceptor<? extends Message>> outInterceptors = endp.getOutInterceptors();
+    	for(Interceptor<? extends Message> i : outInterceptors) {
+    		log.error("INT {}", i.getClass());
+    	}
+    	MessageObserver outFaultObserver = endp.getOutFaultObserver();
+    	log.error("Observer {}", outFaultObserver);
+
+    	return ep;
+    }
 
 }

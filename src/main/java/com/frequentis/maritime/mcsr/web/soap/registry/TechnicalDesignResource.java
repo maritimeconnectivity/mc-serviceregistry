@@ -24,21 +24,19 @@ import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import com.frequentis.maritime.mcsr.domain.Design;
+import com.frequentis.maritime.mcsr.web.soap.dto.DesignDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.DesignDescriptorDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.PageDTO;
+import com.frequentis.maritime.mcsr.web.soap.errors.AccessDeniedException;
+import com.frequentis.maritime.mcsr.web.soap.errors.XmlValidateException;
 
 /**
  * 
  * @author Lukas Vorisek
  *
  */
-@WebService(targetNamespace = "com.frequentis.maritime.mcsr.web.soap.registry.TechnicalDesignResource", name = "TechnicalDesignResource")
+@WebService(targetNamespace = "com.frequentis.maritime.mcsr.web.soap.registry.TechnicalDesignResource", 
+	name = "TechnicalDesignResource")
 public interface TechnicalDesignResource {
 
 
@@ -46,13 +44,13 @@ public interface TechnicalDesignResource {
      * Create a new design.
      *
      * @param design the design to create
-     * @return the ResponseEntity with status 201 (Created) and with body the new design, or with status 400 (Bad Request) if the design has already an ID
+     * @return the ResponseEntity with status 201 (Created) and with body the new design, or with status 400 (Bad Request) 
+     * if the design has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
 	@WebMethod
-    public DesignDescriptorDTO createDesign(
-    		@WebParam(name = "design") @XmlElement(required = true) Design design, 
-    		@WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken) throws Exception, URISyntaxException;
+    public DesignDescriptorDTO createDesign(@WebParam(name = "design") @XmlElement(required = true) DesignDTO design, 
+    		@WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken) throws Exception, XmlValidateException;
 
     /**
      * Updates an existing design.
@@ -64,8 +62,9 @@ public interface TechnicalDesignResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     public DesignDescriptorDTO updateDesign(
-    		@WebParam(name = "design") @XmlElement(required = true) Design design, 
-    		@RequestHeader String bearerToken) throws Exception, URISyntaxException;
+    		@WebParam(name = "design") @XmlElement(required = true) DesignDTO design, 
+    		@WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken
+    		) throws Exception, URISyntaxException;
 
     /**
      * Get all the designs.
@@ -74,7 +73,8 @@ public interface TechnicalDesignResource {
      * @return the ResponseEntity with status 200 (OK) and the list of designs in body
      * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
      */
-    public PageDTO<DesignDescriptorDTO> getAllDesigns(@WebParam(name = "page") @XmlElement(required = false, defaultValue = "0") int page);
+    public PageDTO<DesignDescriptorDTO> getAllDesigns(
+    		@WebParam(name = "page") @XmlElement(required = false, defaultValue = "0") int page);
 
     /**
      * Get the "id" design with version "version".
@@ -83,7 +83,9 @@ public interface TechnicalDesignResource {
      * @param version the version of the design to retrieve, "latest" for the highest version number
      * @return the ResponseEntity with status 200 (OK) and with body the design, or with status 404 (Not Found)
      */
-    public ResponseEntity<Design> getDesign(@WebParam String id, @PathVariable String version);
+    public DesignDTO getDesign(
+    		@WebParam(name="id") @XmlElement(required = true) String id, 
+    		@WebParam(name="version") @XmlElement(required = false, defaultValue = "latest") String version);
 
     /**
      * Get all designs with id "id" across all versions.
@@ -91,7 +93,9 @@ public interface TechnicalDesignResource {
      * @param id the domain id of the design to retrieve
      * @return the result of the search
      */
-    public PageDTO<DesignDescriptorDTO> getAllDesignsById(@WebParam String id, @WebParam int page);
+    public PageDTO<DesignDescriptorDTO> getAllDesignsById(
+    		@WebParam(name="id") @XmlElement(required = true) String id, 
+    		@WebParam(name="page") @XmlElement(required = false, defaultValue = "0") int page);
 
     /**
      * Get all designs for specification id "id" across all versions.
@@ -99,7 +103,9 @@ public interface TechnicalDesignResource {
      * @param id the domain id of the specification for which all designs are to be retrieved
      * @return the result of the search
      */
-    public PageDTO<DesignDescriptorDTO> getAllDesignsBySpecificationId(@WebParam String id, @WebParam int page);
+    public PageDTO<DesignDescriptorDTO> getAllDesignsBySpecificationId(
+    		@WebParam(name="id") @XmlElement(required = true) String id, 
+    		@WebParam(name="page") @XmlElement(required = false, defaultValue = "0") int page);
     
     /**
      * Delete the "id" design of version "version".
@@ -107,8 +113,12 @@ public interface TechnicalDesignResource {
      * @param id the id of the design to delete
      * @param version the version of the design to delete
      * @return the ResponseEntity with status 200 (OK)
+     * @throws AccessDeniedException 
      */
-    public void deleteDesign(@WebParam String id, @WebParam String version, @RequestHeader("Authorization") String bearerToken);
+    public void deleteDesign(
+    		@WebParam(name="id") @XmlElement(required = true) String id, 
+    		@WebParam(name="version") @XmlElement(required = true) String version, 
+    		@WebParam(name="bearerToken") @XmlElement(required = true) String bearerToken) throws AccessDeniedException;
 
     /**
      * Search for the design corresponding
@@ -117,7 +127,9 @@ public interface TechnicalDesignResource {
      * @param query the query of the design search
      * @return the result of the search
      */
-    public PageDTO<DesignDescriptorDTO> searchDesigns(@RequestParam String query, @WebParam int page);
+    public PageDTO<DesignDescriptorDTO> searchDesigns(
+    		@WebParam(name="query") @XmlElement(required = true) String query,
+    		@WebParam(name="page") @XmlElement(required = false, defaultValue = "0") int page);
 
     /**
      * Update status of the "id" design of version "version".
@@ -127,7 +139,12 @@ public interface TechnicalDesignResource {
      * @param status the new status
      * @return the ResponseEntity with status 200 (OK)
      */
-    public void updateDesignStatus(@WebParam String id, @WebParam String version, @WebParam String status, @RequestHeader("Authorization") String bearerToken) throws Exception;
+    public void updateDesignStatus(
+    		@WebParam(name="id") @XmlElement(required = true) String id, 
+    		@WebParam(name="version") @XmlElement(required = true) String version, 
+    		@WebParam(name="status") @XmlElement(required = true) String status, 
+    		@WebParam(name="bearerToken") @XmlElement(required = true) String bearerToken) 
+    		throws Exception, AccessDeniedException;
 
 
 }

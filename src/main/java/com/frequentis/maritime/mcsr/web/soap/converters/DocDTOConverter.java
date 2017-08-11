@@ -15,6 +15,9 @@ public class DocDTOConverter extends AbstractConverter<Doc, DocDTO>  {
 
     @Override
     public DocDTO convert(Doc from) {
+    	if(from == null) {
+    		return null;
+    	}
     	DocDTO ddto = (DocDTO) descriptorDTO.convert(from);
         ddto.filecontentContentType = from.getFilecontentContentType();
         ddto.filecontent = from.getFilecontent();

@@ -187,7 +187,9 @@ public class DesignService {
         log.debug("Request to get Design by domain id {}", domainId);
         Page<Design> designs = null;
         try {
-            designs = designSearchRepository.search(queryStringQuery("design_id=\""+domainId), pageable);
+        	// I think that this doesn't make sense.
+            // designs = designSearchRepository.search(queryStringQuery("design_id=\""+domainId), pageable);
+        	designs = designSearchRepository.search(queryStringQuery("design_id:=" + domainId), pageable);
         } catch (Exception e) {
             log.debug("Could not find design for domain id {}", domainId);
             e.printStackTrace();

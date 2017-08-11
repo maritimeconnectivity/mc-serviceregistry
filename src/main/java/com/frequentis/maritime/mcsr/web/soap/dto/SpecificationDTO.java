@@ -20,4 +20,8 @@ public class SpecificationDTO {
     public String status;
     @XmlElement(required = true)
     public String organizationId;
+    @XmlElement(required = true)
+    public XmlDTO specAsXml;
+    @XmlElement(required = false)
+    public DocDTO specAsDoc;
 }
