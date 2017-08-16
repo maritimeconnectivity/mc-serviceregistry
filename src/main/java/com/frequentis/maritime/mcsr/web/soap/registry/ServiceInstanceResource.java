@@ -24,8 +24,10 @@ import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
 
 import com.frequentis.maritime.mcsr.domain.Instance;
-import com.frequentis.maritime.mcsr.web.soap.dto.InstanceDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.PageDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.doc.DocDescriptorDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.instance.InstanceDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.instance.InstanceParameterDTO;
 import com.frequentis.maritime.mcsr.web.soap.errors.AccessDeniedException;
 import com.frequentis.maritime.mcsr.web.soap.errors.InstanceAlreadyExistException;
 import com.frequentis.maritime.mcsr.web.soap.errors.ProcessingException;
@@ -34,17 +36,37 @@ import com.frequentis.maritime.mcsr.web.soap.errors.XmlValidateException;
 @WebService
 public interface ServiceInstanceResource {
     /**
-     * POST  /serviceInstance : Create a new instance.
+     * Create a new instance.
+     * 
+     * Atributes:
+     * 	<ul>
+     *  	<li>name</li>
+     *  	<li>version</li>
+     *  	<li>instanceId</li>
+     *  	<li>keywords</li>
+     *  	<li>status</li>
+     *  	<li>comment</li>
+     *  	<li>endpointUri</li>
+     *  	<li>mmsi</li>
+     *  	<li>imo</li>
+     *  	<li>serviceType</li>
+     *  	<li>geometry</li>
+     *  	<li>unlocode</li>
+     *  </ul>
+     * are parsed from XML.
+     * 
      *
      * @param instance the instance to create
+     * @param bearerToken
      * @return the ResponseEntity with status 201 (Created) and with body the new instance, or with status 400 (Bad Request) if the instance has already an ID
-     * @throws Exception 
-     * @throws URISyntaxException if the Location URI syntax is incorrect
+     * @throws AccessDeniedException
+     * @throws XmlValidateException
+     * @throws InstanceAlreadyExistException
      */
     public InstanceDTO createInstance(
-    		@WebParam(name = "instance") @XmlElement(required = true) InstanceDTO instance, 
+    		@WebParam(name = "instance") @XmlElement(required = true) InstanceParameterDTO instance, 
     		@WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken) 
-    				throws AccessDeniedException, XmlValidateException, InstanceAlreadyExistException;
+    				throws AccessDeniedException, XmlValidateException, InstanceAlreadyExistException, ProcessingException;
 
     /**
      * PUT  /serviceInstance : Updates an existing instance.
@@ -57,9 +79,9 @@ public interface ServiceInstanceResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     public InstanceDTO updateInstance(
-    		@WebParam(name = "instance") @XmlElement(required = true) InstanceDTO instance, 
+    		@WebParam(name = "instance") @XmlElement(required = true) InstanceParameterDTO instance, 
     		@WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken) 
-    				throws AccessDeniedException, XmlValidateException, InstanceAlreadyExistException;
+    				throws AccessDeniedException, XmlValidateException, InstanceAlreadyExistException, ProcessingException;
 
     /**
      * GET  /serviceInstance : get all the instances.
@@ -77,7 +99,7 @@ public interface ServiceInstanceResource {
      * @param version the version of the instance to retrieve, "latest" for the highest version number
      * @return the ResponseEntity with status 200 (OK) and with body the instance, or with status 404 (Not Found)
      */
-    public Instance getInstance(
+    public InstanceDTO getInstance(
     		@WebParam(name = "id") @XmlElement(required = true) String id, 
     		@WebParam(name = "version") @XmlElement(required = true) String version, 
     		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc);
@@ -148,6 +170,7 @@ public interface ServiceInstanceResource {
      *
      * @param latitude the latitude of the search position
      * @param longitude the longitude of the search position
+     * @param query if is {@value null} then match all
      * @return the result of the search
      * @throws ProcessingException 
      * @throws Exception 
@@ -155,12 +178,12 @@ public interface ServiceInstanceResource {
      */
     public PageDTO<InstanceDTO> searchInstancesByLocation(
     		@WebParam(name = "latitude") @XmlElement(required = true) String latitude, 
-    		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc, 
     		@WebParam(name = "longitude") @XmlElement(required = true) String longitude, 
     		@WebParam(name = "query") @XmlElement(required = true) String query, 
+    		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc, 
     		@WebParam(name = "page") @XmlElement(required = true) int page)
     				throws AccessDeniedException, ProcessingException;
-
+ 
     /**
      * SEARCH  /_searchGeometryGeoJSON/serviceInstance?geometry=:geometry : search for the instance corresponding
      * to the supplied position
@@ -172,8 +195,8 @@ public interface ServiceInstanceResource {
      */
     public PageDTO<InstanceDTO> searchInstancesByGeometryGeojson(
     		@WebParam(name = "geometry") @XmlElement(required = true) String geometry, 
-    		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc, 
     		@WebParam(name = "query") @XmlElement(required = true) String query, 
+    		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc, 
     		@WebParam(name = "page") @XmlElement(required = true) int page) throws Exception;
 
     /**
@@ -188,7 +211,7 @@ public interface ServiceInstanceResource {
     public PageDTO<InstanceDTO> searchInstancesByGeometryWKT(
     		@WebParam(name = "geometry") @XmlElement(required = true) String geometry,
     		@WebParam(name = "query") @XmlElement(required = true) String query, 
-    		@WebParam(name = "includeDoc") @XmlElement(required = true) String includeDoc, 
+    		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc, 
     		@WebParam(name = "page") @XmlElement(required = true) int page) throws Exception;
 
     /**

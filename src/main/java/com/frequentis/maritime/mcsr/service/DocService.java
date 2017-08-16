@@ -106,6 +106,7 @@ public class DocService {
     @Transactional(readOnly = true)
     public Page<Doc> search(String query, Pageable pageable) {
         log.debug("Request to search for a page of Docs for query {}", query);
+        log.debug("Doc search regusets query {}", queryStringQuery(query));
         return docSearchRepository.search(queryStringQuery(query), pageable);
     }
 }

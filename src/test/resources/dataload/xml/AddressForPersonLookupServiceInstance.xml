@@ -16,8 +16,7 @@
   ~ You should have received a copy of the GNU Affero General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-
-<ServiceInstanceSchema:serviceInstance xmlns:ServiceInstanceSchema="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceInstanceSchema.xsd" xmlns:ServiceSpecificationSchema="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceSpecificationSchema.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceInstanceSchema.xsd ServiceInstanceSchema.xsd ">
+<serviceInstance xmlns="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceInstanceSchema.xsd" xmlns:ServiceSpecificationSchema="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceSpecificationSchema.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceInstanceSchema.xsd ServiceInstanceSchema.xsd ">
 	<id>urn:mrn:mcl:service:specification:example:13d293c8-bee5-4d63-aba3-c735983885a7</id>
 	<version>1.0.0</version>
 	<name>John Doe's Address Person Lookup Service Implementation</name>
@@ -37,7 +36,7 @@
 		<coversArea>
 			<name>Bermuda Triangle</name>
 			<description>Loosely defined region in the western part of the North Atlantic Ocean.</description>
-			<geometryAsWKT>POLYGON(-80.190 25.774, -66.118 18.466, -64.757 32.321, -80.190 25.774</geometryAsWKT>
+			<geometryAsWKT>POLYGON((-80.190 25.774, -66.118 18.466, -64.757 32.321, -80.190 25.774))</geometryAsWKT>
 		</coversArea>
 	</coversAreas>
 
@@ -46,17 +45,17 @@
 		<version>1.0.0</version>
 	</implementsServiceDesign>
 	<producedBy>
-		<id>urn:mrn:mcl:user:example:johndoe</id>
-		<name>John Doe</name>
-		<description>John Doe is the authority for standards at example.com</description>
-		<contactInfo>johndoe@example.com</contactInfo>
-		<isCommercial>false</isCommercial>
+		<ServiceSpecificationSchema:id>urn:mrn:mcl:user:example:johndoe</ServiceSpecificationSchema:id>
+		<ServiceSpecificationSchema:name>John Doe</ServiceSpecificationSchema:name>
+		<ServiceSpecificationSchema:description>John Doe is the authority for standards at example.com</ServiceSpecificationSchema:description>
+		<ServiceSpecificationSchema:contactInfo>johndoe@example.com</ServiceSpecificationSchema:contactInfo>
+		<ServiceSpecificationSchema:isCommercial>false</ServiceSpecificationSchema:isCommercial>
 	</producedBy>
 	<providedBy>
-		<id>urn:mrn:mcl:user:example:johndoe</id>
-		<name>Jane Doe</name>
-		<description>Jane Doe is the authority for providing services at example.com</description>
-		<contactInfo>janedoe@example.com</contactInfo>
-		<isCommercial>false</isCommercial>
+		<ServiceSpecificationSchema:id>urn:mrn:mcl:user:example:johndoe</ServiceSpecificationSchema:id>
+		<ServiceSpecificationSchema:name>Jane Doe</ServiceSpecificationSchema:name>
+		<ServiceSpecificationSchema:description>Jane Doe is the authority for providing services at example.com</ServiceSpecificationSchema:description>
+		<ServiceSpecificationSchema:contactInfo>janedoe@example.com</ServiceSpecificationSchema:contactInfo>
+		<ServiceSpecificationSchema:isCommercial>false</ServiceSpecificationSchema:isCommercial>
 	</providedBy>
-</ServiceInstanceSchema:serviceInstance>
+</serviceInstance>

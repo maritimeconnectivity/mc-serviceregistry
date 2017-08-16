@@ -21,10 +21,10 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.frequentis.maritime.mcsr.web.soap.dto.DesignDTO;
-import com.frequentis.maritime.mcsr.web.soap.dto.DesignDescriptorDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.PageDTO;
-import com.frequentis.maritime.mcsr.web.soap.dto.XmlDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.design.DesignDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.design.DesignDescriptorDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.xml.XmlDTO;
 import com.frequentis.maritime.mcsr.web.soap.errors.XmlValidateException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,10 +115,11 @@ public class TechnicalDesignResourceTest {
 		assertThat(createdDesign.name, is(designDTO.name));
 	}
 	
-	@Test 
+	// TODO Donesn't work with other tests
+	@Test
 	public void documentCounts() throws XmlValidateException, Exception {
 		// Given
-		long count = client.getAllDesigns(0).itemTotalCount;
+		long count = designResourceInternal.getAllDesigns(0).itemTotalCount;
 
 		// When
 		designResourceInternal.createDesign(prepareValidDesignDTO(), TOKEN);
@@ -153,7 +154,7 @@ public class TechnicalDesignResourceTest {
 		DesignDescriptorDTO newDesign = designResourceInternal.createDesign(prepareValidDesignDTO(), TOKEN);
 
 		// When
-		PageDTO<DesignDescriptorDTO> searchResult = client.getAllDesignsById(newDesign.id.toString(), 0);
+		PageDTO<DesignDescriptorDTO> searchResult = client.getAllDesignsById(newDesign.designId, 0);
 		
 		// Then
 		assertEquals("ID must be same", newDesign.id, searchResult.content.get(0).id);
@@ -168,7 +169,7 @@ public class TechnicalDesignResourceTest {
 		DesignDescriptorDTO newDto = designResourceInternal.createDesign(prepareValidDesignDTO(), TOKEN);
 		
 		// When
-		client.deleteDesign(newDto.id.toString(), newDto.version, TOKEN);
+		client.deleteDesign(newDto.designId, newDto.version, TOKEN);
 		
 		// Then
 		long countAfter = designResourceInternal.getAllDesigns(0).itemTotalCount;

@@ -1,16 +1,11 @@
 package com.frequentis.maritime.mcsr.config;
 
-import java.util.List;
-
 import javax.servlet.Servlet;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBus;
-import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.transport.MessageObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +14,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.frequentis.maritime.mcsr.web.soap.DocResource;
+import com.frequentis.maritime.mcsr.web.soap.SpecificationTemplateResource;
+import com.frequentis.maritime.mcsr.web.soap.XmlResource;
+import com.frequentis.maritime.mcsr.web.soap.XsdResource;
 import com.frequentis.maritime.mcsr.web.soap.registry.ServiceInstanceResource;
 import com.frequentis.maritime.mcsr.web.soap.registry.ServiceSpecificationResource;
 import com.frequentis.maritime.mcsr.web.soap.registry.TechnicalDesignResource;
@@ -43,7 +41,6 @@ public class WebServiceConfig {
 
     @Bean
     public ServletRegistrationBean<Servlet> registerApacheCxfServlet() {
-        log.debug("Test register");
         Servlet sl = new org.apache.cxf.transport.servlet.CXFServlet();
         ServletRegistrationBean<Servlet> srb = new ServletRegistrationBean<>();
         srb.addUrlMappings("/services/*");
@@ -56,6 +53,21 @@ public class WebServiceConfig {
     @Bean
     public Endpoint docResourceEndpoint(DocResource docResource) {
         return publishEndpoint(docResource, "/DocResource");
+    }
+    
+    @Bean
+    public Endpoint xmlResourceEndpoint(XmlResource xmlResource) {
+    	return publishEndpoint(xmlResource, "/XmlResource");
+    }
+    
+//    @Bean
+//    public Endpoint specificationTemplateResourceEndpoint(SpecificationTemplateResource resource) {
+//    	return publishEndpoint(resource, "/SpecificationTemplateResource");
+//    }
+    
+    @Bean
+    public Endpoint xsdResourceEndpoint(XsdResource xsdResource) {
+    	return publishEndpoint(xsdResource, "/XsdResource");
     }
 
     @Bean
@@ -76,13 +88,6 @@ public class WebServiceConfig {
     private Endpoint publishEndpoint(Object resource, String url) {
     	EndpointImpl ep = new EndpointImpl(bus, resource);
     	ep.publish(url);
-    	org.apache.cxf.endpoint.Endpoint endp = ep.getServer().getEndpoint();
-    	List<Interceptor<? extends Message>> outInterceptors = endp.getOutInterceptors();
-    	for(Interceptor<? extends Message> i : outInterceptors) {
-    		log.error("INT {}", i.getClass());
-    	}
-    	MessageObserver outFaultObserver = endp.getOutFaultObserver();
-    	log.error("Observer {}", outFaultObserver);
 
     	return ep;
     }

@@ -82,7 +82,7 @@ public class Design implements Serializable {
     @NotNull
     @Column(name = "design_id", nullable = false)
     @Field(type = FieldType.text, index = false)
-    @JsonProperty("design_id")
+    @JsonProperty("designId")
     private String designId;
 
     @Column(name = "status")
@@ -91,7 +91,7 @@ public class Design implements Serializable {
 
     @Column(name = "organization_id")
     @Field(type = FieldType.text, index = false)
-    @JsonProperty("organization_id")
+    @JsonProperty("organizationId")
     private String organizationId;
 
     @OneToOne

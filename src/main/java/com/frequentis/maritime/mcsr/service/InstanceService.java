@@ -34,6 +34,7 @@ import org.elasticsearch.common.xcontent.NamedXContentRegistry;
 import org.elasticsearch.common.xcontent.XContentParser;
 import org.elasticsearch.common.xcontent.json.JsonXContent;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryShardContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.geo.GeoShape;
 import org.springframework.data.elasticsearch.core.geo.GeoShapeModule;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 /**
@@ -91,6 +94,7 @@ public class InstanceService {
 
     public Instance saveGeometry(Instance instance) throws Exception{
         //Save instance to DB
+    	log.debug("saveGeometry for instance {}", instance);
         JsonNode geometry = instance.getGeometry();
         if (instance.getGeometry() == null || instance.getGeometry().asText() == null || instance.getGeometry().asText() == "null") {
             log.debug("Setting whole-earth coverage");
@@ -256,7 +260,7 @@ public class InstanceService {
         log.debug("Request to get Instance by domain id {}", QueryParser.escape(domainId));
         Page<Instance> instances = null;
         try {
-            instances = instanceSearchRepository.search(queryStringQuery("instanceId:" + QueryParser.escape(domainId)), pageable);
+            instances = instanceSearchRepository.search(queryStringQuery("instance_id:" + QueryParser.escape(domainId)), pageable);
         } catch (Exception e) {
             log.debug("Could not find instance for domain id {}", domainId);
             e.printStackTrace();

@@ -8,16 +8,16 @@ import javax.xml.bind.annotation.XmlElement;
 
 import org.apache.cxf.annotations.WSDLDocumentation;
 
-import com.frequentis.maritime.mcsr.web.soap.dto.DocDTO;
-import com.frequentis.maritime.mcsr.web.soap.dto.DocDescriptorDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.PageDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.doc.DocDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.doc.DocDescriptorDTO;
 
 @WebService(targetNamespace = "http://target.namespace/", name = "Doc")
 public interface DocResource {
     @WebMethod
     @WebResult(name = "documents")
     @WSDLDocumentation("This method list all documents.")
-    public PageDTO<? extends DocDescriptorDTO> getAllDocs(@WebParam(name = "page") @XmlElement(required = true, defaultValue = "0") int page);
+    public PageDTO<DocDescriptorDTO> getAllDocs(@WebParam(name = "page") @XmlElement(required = true, defaultValue = "0") int page);
 
     @WebMethod
     @WSDLDocumentation("This method crate new document.")
@@ -39,5 +39,5 @@ public interface DocResource {
     @WebMethod
     @WebResult(name = "documents")
     @WSDLDocumentation("Find documents")
-    public PageDTO<? extends DocDescriptorDTO> searchDocs(@WebParam(name = "query") @XmlElement(required = true) String query, @WebParam(name = "page") @XmlElement(required = false, defaultValue = "0") int page);
+    public PageDTO<DocDescriptorDTO> searchDocs(@WebParam(name = "query") @XmlElement(required = true) String query, @WebParam(name = "page") @XmlElement(required = false, defaultValue = "0") int page);
 }

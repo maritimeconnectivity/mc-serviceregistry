@@ -8,25 +8,25 @@ import javax.xml.bind.annotation.XmlElement;
 
 import com.frequentis.maritime.mcsr.domain.Specification;
 import com.frequentis.maritime.mcsr.web.soap.dto.PageDTO;
-import com.frequentis.maritime.mcsr.web.soap.dto.SearchData;
-import com.frequentis.maritime.mcsr.web.soap.dto.SpecificationDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.specification.SpecificationDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.specification.SpecificationDescriptorDTO;
 
 @WebService(targetNamespace = "com.frequentis.maritime.mcsr.web.soap.registry.ServiceInstanceResource", name = "ServiceSpecification")
 public interface ServiceSpecificationResource {
 
     @WebMethod
-    public void createSpecification(
+    public SpecificationDescriptorDTO createSpecification(
             @WebParam(name = "specification") @XmlElement(required = true) SpecificationDTO specification,
             @WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken) throws Exception;
 
     @WebMethod
-    public void updateSpecification(
+    public SpecificationDescriptorDTO updateSpecification(
             @WebParam(name = "specification") @XmlElement(required = true) SpecificationDTO specification,
             @WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken) throws IllegalAccessException, Exception;
 
     @WebMethod
     @WebResult(name = "specifications")
-    public PageDTO<SpecificationDTO> getAllSpecifications(
+    public PageDTO<SpecificationDescriptorDTO> getAllSpecifications(
             @WebParam(name = "page") int page);
 
     @WebMethod
@@ -37,7 +37,7 @@ public interface ServiceSpecificationResource {
 
     @WebMethod
     @WebResult(name = "specifications")
-    public PageDTO<SpecificationDTO> getAllSpecificationsById(
+    public PageDTO<SpecificationDescriptorDTO> getAllSpecificationsById(
             @WebParam(name = "specificationId") @XmlElement(required = true) String id,
             @WebParam(name = "page") @XmlElement(required = true) int page);
 
@@ -49,8 +49,9 @@ public interface ServiceSpecificationResource {
 
     @WebMethod
     @WebResult(name = "specifications")
-    public PageDTO<SpecificationDTO> searchSpecifications(
-            @WebParam(name = "searchData") @XmlElement(required = true) SearchData searchData);
+    public PageDTO<SpecificationDescriptorDTO> searchSpecifications(
+            @WebParam(name = "searchData") @XmlElement(required = true) String query, 
+            @WebParam(name = "page") @XmlElement(required = false, defaultValue = "0") int page);
 
     @WebMethod
     public void updateSpecificationStatus(

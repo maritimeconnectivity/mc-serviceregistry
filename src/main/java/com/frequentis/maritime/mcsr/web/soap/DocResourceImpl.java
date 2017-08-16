@@ -1,9 +1,5 @@
 package com.frequentis.maritime.mcsr.web.soap;
 
-
-
-import java.util.List;
-
 import javax.jws.WebService;
 
 import org.slf4j.Logger;
@@ -16,10 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.frequentis.maritime.mcsr.domain.Doc;
 import com.frequentis.maritime.mcsr.service.DocService;
-import com.frequentis.maritime.mcsr.web.soap.converters.Converter;
-import com.frequentis.maritime.mcsr.web.soap.dto.DocDTO;
-import com.frequentis.maritime.mcsr.web.soap.dto.DocDescriptorDTO;
+import com.frequentis.maritime.mcsr.web.soap.converters.doc.DocDTOConverter;
+import com.frequentis.maritime.mcsr.web.soap.converters.doc.DocDescriptorDTOConverter;
 import com.frequentis.maritime.mcsr.web.soap.dto.PageDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.doc.DocDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.doc.DocDescriptorDTO;
 
 @Component("docResourceSoap")
 @Transactional
@@ -31,12 +28,12 @@ public class DocResourceImpl implements DocResource {
     @Autowired
     DocService docService;
     @Autowired
-    Converter<Doc, DocDTO> docDTOConverter;
+    DocDTOConverter docDTOConverter;
     @Autowired
-    Converter<Doc, DocDescriptorDTO> docDescriptorDTOConverter;
+    DocDescriptorDTOConverter docDescriptorDTOConverter;
 
     @Override
-    public PageDTO<? extends DocDescriptorDTO> getAllDocs(int page) {
+    public PageDTO<DocDescriptorDTO> getAllDocs(int page) {
         log.debug("SOAP request to get page {} of Docs", page);
         Page<Doc> pageResult = docService.findAll(PageRequest.of(page, ITEMS_PER_PAGE));
 
@@ -86,10 +83,10 @@ public class DocResourceImpl implements DocResource {
     }
 
     @Override
-    public PageDTO<? extends DocDescriptorDTO> searchDocs(String query, int page) {
+    public PageDTO<DocDescriptorDTO> searchDocs(String query, int page) {
         log.debug("REST request to search for a page of Docs for query {}", query);
         Page<Doc> pageResponse = docService.search(query, PageRequest.of(page, ITEMS_PER_PAGE));
-        return PageResponse.buildFromPage(pageResponse, docDTOConverter);
+        return PageResponse.buildFromPage(pageResponse, docDescriptorDTOConverter);
     }
 
 

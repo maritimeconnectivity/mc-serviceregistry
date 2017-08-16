@@ -22,10 +22,12 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -79,20 +81,20 @@ public class SpecificationTemplate implements Serializable {
     @Column(name = "comment")
     private String comment;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private Doc guidelineDoc;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private Doc templateDoc;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JoinTable(name = "specification_template_docs",
                joinColumns = @JoinColumn(name="specification_templates_id", referencedColumnName="ID"),
                inverseJoinColumns = @JoinColumn(name="docs_id", referencedColumnName="ID"))
     private Set<Doc> docs = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JoinTable(name = "specification_template_xsds",
                joinColumns = @JoinColumn(name="specification_templates_id", referencedColumnName="ID"),

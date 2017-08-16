@@ -24,9 +24,9 @@ import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
 
-import com.frequentis.maritime.mcsr.web.soap.dto.DesignDTO;
-import com.frequentis.maritime.mcsr.web.soap.dto.DesignDescriptorDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.PageDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.design.DesignDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.design.DesignDescriptorDTO;
 import com.frequentis.maritime.mcsr.web.soap.errors.AccessDeniedException;
 import com.frequentis.maritime.mcsr.web.soap.errors.XmlValidateException;
 

@@ -1,36 +1,27 @@
 package com.frequentis.maritime.mcsr.web.soap.registry;
 
-import java.io.IOException;
-import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathExpressionException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.xml.sax.SAXException;
 
 import com.frequentis.maritime.mcsr.domain.Specification;
 import com.frequentis.maritime.mcsr.domain.Xml;
 import com.frequentis.maritime.mcsr.service.SpecificationService;
+import com.frequentis.maritime.mcsr.service.XmlService;
 import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
-import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 import com.frequentis.maritime.mcsr.web.soap.PageResponse;
 import com.frequentis.maritime.mcsr.web.soap.converters.Converter;
+import com.frequentis.maritime.mcsr.web.soap.converters.specification.SpecificationDTOConverter;
+import com.frequentis.maritime.mcsr.web.soap.converters.specification.SpecificationDescriptorDTOConverter;
 import com.frequentis.maritime.mcsr.web.soap.dto.PageDTO;
-import com.frequentis.maritime.mcsr.web.soap.dto.SearchData;
-import com.frequentis.maritime.mcsr.web.soap.dto.SpecificationDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.specification.SpecificationDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.specification.SpecificationDescriptorDTO;
+import com.frequentis.maritime.mcsr.web.soap.errors.ProcessingException;
 import com.frequentis.maritime.mcsr.web.soap.errors.XmlValidateException;
 import com.frequentis.maritime.mcsr.web.util.WebUtils;
 
@@ -43,19 +34,21 @@ public class ServiceSpecificationResourceImpl implements ServiceSpecificationRes
     @Autowired
     SpecificationService specificationService;
     @Autowired
-    Converter<Specification, SpecificationDTO> specificationConverter;
+    XmlService xmlService;
     @Autowired
-    Converter<SpecificationDTO, Specification> specificationReverseConverter;
+    SpecificationDTOConverter specificationConverter;
+    @Autowired
+    SpecificationDescriptorDTOConverter specificationDescriptorConverter;
 
     @Override
-    public void createSpecification(SpecificationDTO specificationDTO, String bearerToken) throws Exception {
+    public SpecificationDescriptorDTO createSpecification(SpecificationDTO specificationDTO, String bearerToken) throws Exception {
         log.debug("REST request to save Specification : {}", specificationDTO);
         String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
         if (specificationDTO.id != null) {
             throw new IllegalArgumentException("A new specification cannot already have an ID");
         }
         
-        Specification specification = specificationReverseConverter.convert(specificationDTO);
+        Specification specification = specificationConverter.convertReverse(specificationDTO);
         if (specification == null || specification.getSpecAsXml() == null || specification.getSpecAsXml().getContent() == null) {
         	throw new XmlValidateException("Specification must have a valid XML body");
         }
@@ -68,17 +61,19 @@ public class ServiceSpecificationResourceImpl implements ServiceSpecificationRes
         }
 
         specification.setOrganizationId(organizationId);
+        xmlService.save(specification.getSpecAsXml());
         specificationService.save(specification);
+        return specificationDescriptorConverter.convert(specification);
     }
 
     @Override
-    public void updateSpecification(SpecificationDTO specificationDTO, String bearerToken) throws IllegalAccessException, Exception {
+    public SpecificationDescriptorDTO updateSpecification(SpecificationDTO specificationDTO, String bearerToken) throws IllegalAccessException, Exception {
         log.debug("SOAP request to update Specification : {}", specificationDTO);
         if (specificationDTO.id == null) {
             createSpecification(specificationDTO, bearerToken);
         }
 
-        Specification specification = specificationReverseConverter.convert(specificationDTO);
+        Specification specification = specificationConverter.convertReverse(specificationDTO);
         String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
         if (specification.getOrganizationId() != null && specification.getOrganizationId().length() > 0 && !organizationId.equals(specification.getOrganizationId())) {
             log.warn("Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+specification.getOrganizationId());
@@ -89,14 +84,15 @@ public class ServiceSpecificationResourceImpl implements ServiceSpecificationRes
         XmlUtil.validateXml(xml, "ServiceSpecificationSchema.xsd");
 
         specificationService.save(specification);
+        return specificationDescriptorConverter.convert(specification);
     }
 
     @Override
-    public PageDTO<SpecificationDTO> getAllSpecifications(int page) {
+    public PageDTO<SpecificationDescriptorDTO> getAllSpecifications(int page) {
         log.debug("SOAP request to get a page of Specifications");
         Page<Specification> pageRequest = specificationService.findAll(PageRequest.of(page, ITEMS_PER_PAGE));
 
-        return PageResponse.buildFromPage(pageRequest, specificationConverter);
+        return PageResponse.buildFromPage(pageRequest, specificationDescriptorConverter);
     }
 
     @Override
@@ -113,11 +109,11 @@ public class ServiceSpecificationResourceImpl implements ServiceSpecificationRes
     }
 
     @Override
-    public PageDTO<SpecificationDTO> getAllSpecificationsById(String id, int page) {
+    public PageDTO<SpecificationDescriptorDTO> getAllSpecificationsById(String id, int page) {
         log.debug("SOAP request to get a page of Specifications by id {}", id);
-        Page<Specification> pagedata = specificationService.findAllByDomainId(id, PageRequest.of(0, ITEMS_PER_PAGE));
+        Page<Specification> pagedata = specificationService.findAllByDomainId(id, PageRequest.of(page, ITEMS_PER_PAGE));
 
-        return PageResponse.buildFromPage(pagedata, specificationConverter);
+        return PageResponse.buildFromPage(pagedata, specificationDescriptorConverter);
     }
 
     @Override
@@ -140,24 +136,19 @@ public class ServiceSpecificationResourceImpl implements ServiceSpecificationRes
     }
 
     @Override
-    public PageDTO<SpecificationDTO> searchSpecifications(SearchData searchData) {
-        log.debug("SOAP request to search for a page {} of Specifications for query {}", searchData.page, searchData.query);
-        Page<Specification> page = specificationService.search(searchData.query, PageRequest.of(searchData.page, ITEMS_PER_PAGE));
+    public PageDTO<SpecificationDescriptorDTO> searchSpecifications(String query, int page) {
+        log.debug("SOAP request to search for a page {} of Specifications for query {}", page, query);
+        Page<Specification> pageOfSpecification = specificationService.search(query, PageRequest.of(page, ITEMS_PER_PAGE));
 
-        return PageResponse.buildFromPage(page, specificationConverter);
+        return PageResponse.buildFromPage(pageOfSpecification, specificationDescriptorConverter);
     }
 
     @Override
-    public void updateSpecificationStatus(String id, String version, String status, String bearerToken) throws IllegalAccessException, Exception {
+    public void updateSpecificationStatus(String id, String version, String status, String bearerToken) throws IllegalAccessException, ProcessingException {
         log.debug("SOAP request to update status of Specification {} of version {}", id, version);
         Specification specification = specificationService.findByDomainId(id, version);
 
-        String organizationId = "";
-        try {
-            organizationId = HeaderUtil.extractOrganizationIdFromToken(bearerToken);
-        } catch (Exception e) {
-            log.warn("No organizationId could be parsed from the bearer token");
-        }
+        String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
         if (specification.getOrganizationId() != null && specification.getOrganizationId().length() > 0 && !organizationId.equals(specification.getOrganizationId())) {
             log.warn("Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+specification.getOrganizationId());
             throw new IllegalAccessException();
@@ -167,7 +158,12 @@ public class ServiceSpecificationResourceImpl implements ServiceSpecificationRes
         Xml specificationXml = specification.getSpecAsXml();
         String xml = specificationXml.getContent().toString();
         //Update the status value inside the xml definition
-        String resultXml = XmlUtil.updateXmlNode(status, xml, "/ServiceSpecificationSchema:serviceSpecification/status");
+        String resultXml;
+        try {
+        	resultXml = XmlUtil.updateXmlNode(status, xml, "/serviceSpecification/status");
+        } catch (Exception e) {
+        	throw new ProcessingException(e.getMessage());
+        }
         specificationXml.setContent(resultXml);
         specification.setSpecAsXml(specificationXml);
 

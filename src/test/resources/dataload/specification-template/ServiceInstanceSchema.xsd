@@ -178,14 +178,14 @@
 
                 - geometryAsWKT A polygon described in WKT (Well Known Text) with coordinates in
                                 coordinate reference system EPSG:4326,
-                                e.g. POLYGON(LON1 LAT1, LON2 LAT2, LON3, LAT3, LON1 LAT1).
+                                e.g. POLYGON((LON1 LAT1, LON2 LAT2, LON3, LAT3, LON1 LAT1)).
                                 If the element is empty, the default is the whole world.
             </documentation>
 		</annotation>
 		<all>
 			<element name="name" type="string" minOccurs="1" maxOccurs="1"/>
 			<element name="description" type="string" minOccurs="1" maxOccurs="1"/>
-			<element name="geometryAsWKT" type="string" default="POLYGON(-180 -90, 180 -90, 180 90, -180 90, -180 -90" minOccurs="1" maxOccurs="1"/>
+			<element name="geometryAsWKT" type="string" default="POLYGON((-180 -90, 180 -90, 180 90, -180 90, -180 -90))" minOccurs="1" maxOccurs="1"/>
 		</all>
 	</complexType>
 

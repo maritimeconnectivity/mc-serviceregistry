@@ -19,7 +19,7 @@ public class PageResponse {
         } else {
             dto.page = page.getNumber();
             dto.pageCount = page.getTotalPages();
-            dto.itemTotalCount = page.getNumberOfElements();
+            dto.itemTotalCount = page.getTotalElements();
             dto.content = new ArrayList<B>(converter.convert(page.getContent()));
         }
 

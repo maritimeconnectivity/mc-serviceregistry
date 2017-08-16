@@ -39,6 +39,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
@@ -82,6 +83,7 @@ public class Specification implements Serializable {
 
     @NotNull
     @Column(name = "specification_id", nullable = false)
+    @JsonProperty("specificationId")
     @Field(type = FieldType.text, index = false)
     private String specificationId;
 
@@ -90,6 +92,7 @@ public class Specification implements Serializable {
     private String status;
 
     @Column(name = "organization_id")
+    @JsonProperty("organizationId")
     @Field(type = FieldType.text, index = false)
     private String organizationId;
 

@@ -7,15 +7,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.frequentis.maritime.mcsr.domain.Design;
+import com.frequentis.maritime.mcsr.domain.Doc;
 import com.frequentis.maritime.mcsr.domain.Instance;
 import com.frequentis.maritime.mcsr.domain.Specification;
+import com.frequentis.maritime.mcsr.service.DesignService;
+import com.frequentis.maritime.mcsr.service.DocService;
 import com.frequentis.maritime.mcsr.service.InstanceService;
+import com.frequentis.maritime.mcsr.service.XmlService;
 import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 import com.frequentis.maritime.mcsr.web.soap.PageResponse;
 import com.frequentis.maritime.mcsr.web.soap.converters.Converter;
-import com.frequentis.maritime.mcsr.web.soap.dto.InstanceDTO;
+import com.frequentis.maritime.mcsr.web.soap.converters.instance.InstanceDTOConverter;
+import com.frequentis.maritime.mcsr.web.soap.converters.instance.InstanceParameterDTOToInstanceConverter;
 import com.frequentis.maritime.mcsr.web.soap.dto.PageDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.instance.InstanceDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.instance.InstanceParameterDTO;
 import com.frequentis.maritime.mcsr.web.soap.errors.AccessDeniedException;
 import com.frequentis.maritime.mcsr.web.soap.errors.InstanceAlreadyExistException;
 import com.frequentis.maritime.mcsr.web.soap.errors.ProcessingException;
@@ -37,67 +44,86 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 	InstanceService instanceService;
 	
 	@Inject
-	Converter<Instance, InstanceDTO> instanceDtoConverter;
+	DesignService designService;
 	
 	@Inject
-	Converter<InstanceDTO, Instance> instanceReverseDtoConverter;
+	InstanceDTOConverter instanceDtoConverter;
+	
+	@Inject
+	InstanceParameterDTOToInstanceConverter instanceParameterConverter;
+	
 
 	@Override
-	public InstanceDTO createInstance(InstanceDTO instanceDto, String bearerToken) 
-			throws AccessDeniedException, InstanceAlreadyExistException, XmlValidateException {
+	public InstanceDTO createInstance(InstanceParameterDTO instanceDto, String bearerToken) 
+			throws AccessDeniedException, InstanceAlreadyExistException, XmlValidateException, ProcessingException {
 		log.debug("SOAP request to create instance");
 		String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
 		if(instanceDto.id != null) {
 			throw new InstanceAlreadyExistException("A new instance cannot already have an ID");
 		}
-		Instance instance = instanceReverseDtoConverter.convert(instanceDto);
+		Instance instance = instanceParameterConverter.convert(instanceDto);
 		
 		if(instance.getInstanceAsXml() == null || instance.getInstanceAsXml().getContent() == null) {
 			throw new XmlValidateException("Instance must be created as XML (instanceAsXml must not be null)");
 		}
-		String xml = instance.getInstanceAsXml().getContent().toString();
-		log.info("XML: " + xml);
-		try {
-			XmlUtil.validateXml(xml, SCHEMA_SERVICE_INSTANCE);
-			instance = InstanceUtil.parseInstanceAttributesFromXML(instance);
-		} catch (Exception e) {
-			throw new XmlValidateException(e.getMessage(), e);
+
+		if(instance.getInstanceAsXml() != null && instance.getInstanceAsXml().getContent() != null) {
+			String xml = instance.getInstanceAsXml().getContent().toString();
+			log.info("XML: " + xml);
+			try {
+				XmlUtil.validateXml(xml, SCHEMA_SERVICE_INSTANCE);
+				instance = InstanceUtil.parseInstanceAttributesFromXML(instance);
+			} catch (Exception e) {
+				throw new XmlValidateException(e.getMessage(), e);
+			}
 		}
 		instance.setOrganizationId(organizationId);
 		
 		// Why? It's so ugly (based on REST service implementation)
         if (instance.getDesigns() != null && instance.getDesigns().size() > 0) {
             Design design = instance.getDesigns().iterator().next();
+            log.error("Design {}", design);
             if (design != null) {
+            	// We need reference ID
+            	designService.save(design);
                 instance.setDesignId(design.getDesignId());
                 if (design.getSpecifications() != null && design.getSpecifications().size()> 0) {
                     Specification specification = design.getSpecifications().iterator().next();
                     if (specification != null) {
                         instance.setSpecificationId(specification.getSpecificationId());
+                        
                     }
                 }
             }
         }
-        
+      
         Instance result = instanceService.save(instance);
-        try {
-	        result = InstanceUtil.parseInstanceGeometryFromXML(result);
-	        instanceService.saveGeometry(result);
-        } catch (Exception e) {
-        	throw new XmlValidateException(e.getMessage(), e);
+        if(result.getInstanceAsXml() != null && result.getInstanceAsXml().getContent() != null) {
+	        try {
+	        	result = InstanceUtil.parseInstanceGeometryFromXML(result);
+	        } catch (Exception e) {
+	        	throw new XmlValidateException(e.getMessage(), e);
+	        }
         }
-
+        
+        // saveGeometry must be call even thought geometry is null (design decision?)
+        try {
+			instanceService.saveGeometry(result);
+		} catch (Exception e) {
+			throw new ProcessingException(e.getMessage());
+		}
+        
         return instanceDtoConverter.convert(result);
 	}
 
 	@Override
-	public InstanceDTO updateInstance(InstanceDTO instanceDto, String bearerToken)
-			throws AccessDeniedException, XmlValidateException, InstanceAlreadyExistException {
+	public InstanceDTO updateInstance(InstanceParameterDTO instanceDto, String bearerToken)
+			throws AccessDeniedException, XmlValidateException, InstanceAlreadyExistException, ProcessingException {
 		log.debug("SOAP request to update instance");
 		if (instanceDto.id == null) {
 			return createInstance(instanceDto, bearerToken);
 		}
-		Instance instance = instanceReverseDtoConverter.convert(instanceDto);
+		Instance instance = instanceParameterConverter.convert(instanceDto);
 		
 		if (instance.getInstanceAsXml() == null || instance.getInstanceAsXml().getContent() == null) {
 			throw new XmlValidateException("Instance must be created as XML (instanceAsXml must not be null)");
@@ -157,7 +183,7 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 	}
 
 	@Override
-	public Instance getInstance(String id, String version, boolean includeDoc) {
+	public InstanceDTO getInstance(String id, String version, boolean includeDoc) {
 		log.debug("SOAP request to get Instance via domain id {} and version {}", id, version);
 		Instance instance = null;
 		if(version.equalsIgnoreCase("latest")) {
@@ -170,7 +196,7 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 			instance.setInstanceAsDoc(null);
 		}
 		
-		return instance;
+		return instanceDtoConverter.convert(instance);
 	}
 
 	@Override
@@ -198,6 +224,8 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 			log.warn(msg);
             throw new AccessDeniedException(msg);
 		}
+		
+		instanceService.delete(instance.getId());
 	}
 
 	@Override
@@ -242,7 +270,7 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 	}
 
 	@Override
-	public PageDTO<InstanceDTO> searchInstancesByLocation(String latitude, boolean includeDoc, String longitude, String query, int page) throws ProcessingException {
+	public PageDTO<InstanceDTO> searchInstancesByLocation(String latitude, String longitude, String query, boolean includeDoc, int page) throws ProcessingException {
 		Page<Instance> pageOfInstances;
         log.debug("SOAP request to get Instance by lat {} long {}", latitude, longitude);
         try {
@@ -261,8 +289,7 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 	}
 
 	@Override
-	public PageDTO<InstanceDTO> searchInstancesByGeometryGeojson(String geometry, boolean includeDoc,
-	        String query, int page) throws Exception {
+	public PageDTO<InstanceDTO> searchInstancesByGeometryGeojson(String geometry, String query, boolean includeDoc, int page) throws Exception {
         log.debug("SOAP request to get Instance by geojson ", geometry);
         Page<Instance> pageOfInstances = instanceService.findByGeoshape(geometry, query, PageRequest.of(page, ITEMS_PER_PAGE));
         removeIncludedDoc(pageOfInstances, includeDoc);
@@ -271,7 +298,7 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 	}
 
 	@Override
-	public PageDTO<InstanceDTO> searchInstancesByGeometryWKT(String geometry, String query, String includeDoc, int page) throws ProcessingException {
+	public PageDTO<InstanceDTO> searchInstancesByGeometryWKT(String geometry, String query, boolean includeDoc, int page) throws ProcessingException {
         log.debug("SOAP request to get Instance by wkt ", geometry);
         String geoJson = null;
         Page<Instance> pageOfInstances;
@@ -282,7 +309,7 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
         } catch (Exception e) {
         	throw new ProcessingException(e.getMessage(), e);
         }
-        if (pageOfInstances != null && pageOfInstances.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
+        if (pageOfInstances != null && pageOfInstances.getContent() != null && !includeDoc) {
             for(Instance instance : pageOfInstances.getContent()) {
                 instance.setDocs(null);
                 instance.setInstanceAsDoc(null);

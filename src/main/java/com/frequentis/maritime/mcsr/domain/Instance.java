@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -43,6 +44,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.frequentis.maritime.mcsr.domain.util.JsonNodeConverter;
 import com.frequentis.maritime.mcsr.domain.util.JsonNodeGeoShapeConverter;
@@ -75,15 +77,15 @@ public class Instance implements Serializable {
     private Long id;
 
     @NotNull
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = true)
     private String name;
 
     @NotNull
-    @Column(name = "version", nullable = false)
+    @Column(name = "version", nullable = true)
     private String version;
 
     @NotNull
-    @Column(name = "comment", nullable = false)
+    @Column(name = "comment", nullable = true)
     private String comment;
 
     @Column(name = "geometry", columnDefinition = "LONGTEXT")
@@ -94,65 +96,72 @@ public class Instance implements Serializable {
     private String geometryContentType;
 
     @NotNull
-    @Column(name = "instance_id", nullable = false)
-    @Field(type = FieldType.text, index = false)
+    @Column(name = "instance_id", nullable = true)
+    @JsonProperty("instance_id")
+    @Field(type = FieldType.text, index = true)
     private String instanceId;
 
     @Column(name = "keywords")
     private String keywords;
 
     @Column(name = "status")
-    @Field(type = FieldType.text, index = false)
+    @Field(type = FieldType.text, index = true)
     private String status;
 
     @Column(name = "organization_id")
-    @Field(type = FieldType.text, index = false)
+    @JsonProperty("organization_id")
+    @Field(type = FieldType.text, index = true)
     private String organizationId;
 
     @Column(name = "unlocode")
-    @Field(type = FieldType.text, index = false)
+    @Field(type = FieldType.text, index = true)
     private String unlocode;
 
     @Column(name = "endpoint_uri")
-    @Field(type = FieldType.text, index = false)
+    @JsonProperty("endpoint_uri")
+    @Field(type = FieldType.text, index = true)
     private String endpointUri;
 
     @Column(name = "endpoint_type")
-    @Field(type = FieldType.text, index = false)
+    @JsonProperty("endpoint_type")
+    @Field(type = FieldType.text, index = true)
     private String endpointType;
 
     @Column(name = "mmsi")
-    @Field(type = FieldType.text, index = false)
+    @Field(type = FieldType.text, index = true)
     private String mmsi;
 
     @Column(name = "imo")
-    @Field(type = FieldType.text, index = false)
+    @Field(type = FieldType.text, index = true)
     private String imo;
 
     @Column(name = "service_type")
-    @Field(type = FieldType.text, index = false)
+    @JsonProperty("service_type")
+    @Field(type = FieldType.text, index = true)
     private String serviceType;
 
     @Column(name = "design_id")
-    @Field(type = FieldType.text, index = false)
+    @JsonProperty("design_id")
+    @Field(type = FieldType.text, index = true)
     private String designId;
 
     @Column(name = "specification_id")
-    @Field(type = FieldType.text, index = false)
+    @JsonProperty("specification_id")
+    @Field(type = FieldType.text, index = true)
     private String specificationId;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(unique = true)
     private Xml instanceAsXml;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(unique = true)
     private Doc instanceAsDoc;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private SpecificationTemplate implementedSpecificationVersion;
 
-    @ManyToMany(fetch=FetchType.LAZY)
+    @ManyToMany(fetch=FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JoinTable(name = "instance_designs",
@@ -160,7 +169,7 @@ public class Instance implements Serializable {
                inverseJoinColumns = @JoinColumn(name="designs_id", referencedColumnName="ID"))
     private Set<Design> designs = new HashSet<>();
 
-    @ManyToMany(fetch=FetchType.LAZY)
+    @ManyToMany(fetch=FetchType.LAZY, cascade = CascadeType.PERSIST)
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JoinTable(name = "instance_docs",
                joinColumns = @JoinColumn(name="instances_id", referencedColumnName="ID"),

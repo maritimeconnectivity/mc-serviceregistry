@@ -16,13 +16,15 @@ import com.frequentis.maritime.mcsr.service.DesignService;
 import com.frequentis.maritime.mcsr.service.XmlService;
 import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 import com.frequentis.maritime.mcsr.web.soap.PageResponse;
-import com.frequentis.maritime.mcsr.web.soap.dto.DesignDTO;
-import com.frequentis.maritime.mcsr.web.soap.dto.DesignDescriptorDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.PageDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.design.DesignDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.design.DesignDescriptorDTO;
 import com.frequentis.maritime.mcsr.web.soap.errors.AccessDeniedException;
 import com.frequentis.maritime.mcsr.web.soap.errors.XmlValidateException;
 import com.frequentis.maritime.mcsr.web.util.WebUtils;
 import com.frequentis.maritime.mcsr.web.soap.converters.Converter;
+import com.frequentis.maritime.mcsr.web.soap.converters.design.DesignConverter;
+import com.frequentis.maritime.mcsr.web.soap.converters.design.DesignDescriptorConverter;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -43,13 +45,9 @@ public class TechnicalDesignResourceImpl implements TechnicalDesignResource {
 	private XmlService xmlService;
 	
 	@Inject
-	private Converter<Design, DesignDTO> designConverter;
-	
+	private DesignConverter designConverter;
 	@Inject
-	private Converter<DesignDTO, Design> designReverseConverter;
-	
-	@Inject
-	private Converter<Design, DesignDescriptorDTO> designDescriptorConverter;
+	private DesignDescriptorConverter designDescriptorConverter;
 
 	/**
 	 * {@inheritDoc}
@@ -59,7 +57,7 @@ public class TechnicalDesignResourceImpl implements TechnicalDesignResource {
 	public DesignDescriptorDTO createDesign(DesignDTO designDto, String bearerToken) throws XmlValidateException, Exception {
 		log.debug("SOAP request to create design");
 		String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
-		Design design = designReverseConverter.convert(designDto);
+		Design design = designConverter.convertReverse(designDto);
 		
 		
 		if(design.getId() != null) {
@@ -92,7 +90,7 @@ public class TechnicalDesignResourceImpl implements TechnicalDesignResource {
 		if(designDto.id == null) {
 			return createDesign(designDto, bearerToken);
 		}
-		Design design = designReverseConverter.convert(designDto);
+		Design design = designConverter.convertReverse(designDto);
 		
 		String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
 		if(!DesignUtils.matchOrganizationId(design, organizationId)) {
