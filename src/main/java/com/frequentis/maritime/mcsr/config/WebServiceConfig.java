@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.frequentis.maritime.mcsr.web.soap.DocResource;
+import com.frequentis.maritime.mcsr.web.soap.ElasticsearchIndexResource;
 import com.frequentis.maritime.mcsr.web.soap.SpecificationTemplateResource;
 import com.frequentis.maritime.mcsr.web.soap.SpecificationTemplateSetResource;
 import com.frequentis.maritime.mcsr.web.soap.XmlResource;
@@ -54,6 +55,11 @@ public class WebServiceConfig {
     @Bean
     public Endpoint docResourceEndpoint(DocResource docResource) {
         return publishEndpoint(docResource, "/DocResource");
+    }
+    
+    @Bean
+    public Endpoint elasticsearchIndexResourceEndpoint(ElasticsearchIndexResource resource) {
+    	return publishEndpoint(resource, "/ElasticsearchIndexResource");
     }
     
     @Bean
