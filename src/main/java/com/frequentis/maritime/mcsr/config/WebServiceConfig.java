@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.frequentis.maritime.mcsr.web.soap.DocResource;
 import com.frequentis.maritime.mcsr.web.soap.SpecificationTemplateResource;
+import com.frequentis.maritime.mcsr.web.soap.SpecificationTemplateSetResource;
 import com.frequentis.maritime.mcsr.web.soap.XmlResource;
 import com.frequentis.maritime.mcsr.web.soap.XsdResource;
 import com.frequentis.maritime.mcsr.web.soap.registry.ServiceInstanceResource;
@@ -53,6 +54,11 @@ public class WebServiceConfig {
     @Bean
     public Endpoint docResourceEndpoint(DocResource docResource) {
         return publishEndpoint(docResource, "/DocResource");
+    }
+    
+    @Bean
+    public Endpoint specificationTemplateSetResourceEndpoint(SpecificationTemplateSetResource resource) {
+    	return publishEndpoint(resource, "/SpecificationTemplateSetResource");
     }
     
     @Bean
