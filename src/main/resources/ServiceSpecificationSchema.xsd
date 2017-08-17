@@ -285,23 +285,29 @@
 	<complexType name="ServiceDataModel">
 		<annotation>
 			<documentation>
-				The serviceDataModel is a logical model. It is formally described in XSD to achieve interoperability
+				The serviceDataModel is a logical model. It is formally described to achieve interoperability
 				and decouple it from implementing physical data models described in e.g. SOAP or REST.
+				The serviceDataModel is described in one of the two sub-elements: 
+					either in XSD format (definitionAsXSD) 
+					or in any another format, formulated in plaint text (definitionAsText).
 				The model can either be described in-line, or existing schemata can be imported.
+				Exactly one of the two optional sub-elements (definitionAsXSD or definitionAsText) has to be provided.
 
 				Elements of a serviceDataModel are:
 
 				- definitionAsXSD  The definition of the service data model described in XSD.
+				- definitionAsText  The definition of the service data model described in text format.
 			</documentation>
 		</annotation>
 		<all>
-			<element name="definitionAsXSD" minOccurs="1" maxOccurs="1">
+			<element name="definitionAsXSD" minOccurs="0" maxOccurs="1">
 				<complexType>
 					<sequence>
 						<any namespace="http://www.w3.org/2001/XMLSchema" processContents="lax"/>
 					</sequence>
 				</complexType>
 			</element>
+			<element name="definitionAsText" type="string" minOccurs="0" maxOccurs="1"/>
 		</all>
 	</complexType>
 </schema>
