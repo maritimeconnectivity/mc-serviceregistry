@@ -267,7 +267,7 @@ public class ServiceInstanceResourceTest {
 		long itemCountBefore = instanceInternal.getAllInstances(false, 0).itemTotalCount;
 
 		// When
-		InstanceDTO saved = client.createInstance(instance, TOKEN);
+		InstanceDTO saved = instanceInternal.createInstance(instance, TOKEN);
 
 		// Then
 		assertEquals(iv.name, saved.name);

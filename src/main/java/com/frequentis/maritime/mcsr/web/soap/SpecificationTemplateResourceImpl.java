@@ -1,6 +1,7 @@
 package com.frequentis.maritime.mcsr.web.soap;
 
 import javax.jws.WebService;
+import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,7 @@ public class SpecificationTemplateResourceImpl implements SpecificationTemplateR
 	 * @throws ProcessingException 
 	 */
 	@Override
+	@Transactional
 	public SpecificationTemplateDescriptorDTO createSpecificationTemplate(
 			SpecificationTemplateParameterDTO specificationTemplate) throws ProcessingException {
 		
@@ -62,6 +64,7 @@ public class SpecificationTemplateResourceImpl implements SpecificationTemplateR
 	 * @throws ProcessingException 
 	 */
 	@Override
+	@Transactional
 	public SpecificationTemplateDescriptorDTO updateSpecificationTemplate(
 			SpecificationTemplateParameterDTO specificationTemplate) throws ProcessingException {
 		

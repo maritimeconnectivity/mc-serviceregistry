@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -84,30 +85,30 @@ public class Specification implements Serializable {
     @NotNull
     @Column(name = "specification_id", nullable = false)
     @JsonProperty("specificationId")
-    @Field(type = FieldType.text, index = false)
+    @Field(type = FieldType.text, index = true)
     private String specificationId;
 
     @Column(name = "status")
-    @Field(type = FieldType.text, index = false)
+    @Field(type = FieldType.text, index = true)
     private String status;
 
     @Column(name = "organization_id")
     @JsonProperty("organizationId")
-    @Field(type = FieldType.text, index = false)
+    @Field(type = FieldType.text, index = true)
     private String organizationId;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(unique = true)
     private Xml specAsXml;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(unique = true)
     private Doc specAsDoc;
 
     @ManyToOne
     private SpecificationTemplate implementedSpecificationVersion;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.PERSIST)
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JoinTable(name = "specification_docs",
                joinColumns = @JoinColumn(name="specifications_id", referencedColumnName="ID"),

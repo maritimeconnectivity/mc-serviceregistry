@@ -2,6 +2,7 @@ package com.frequentis.maritime.mcsr.web.soap.registry;
 
 import javax.inject.Inject;
 import javax.jws.WebService;
+import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 @Component("serviceInstanceResourceSoap")
+@Transactional
 @WebService(endpointInterface = "com.frequentis.maritime.mcsr.web.soap.registry.ServiceInstanceResource")
 public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 	private static final String SCHEMA_SERVICE_INSTANCE = "ServiceInstanceSchema.xsd";

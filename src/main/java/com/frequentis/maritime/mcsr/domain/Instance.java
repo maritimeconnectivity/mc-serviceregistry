@@ -46,6 +46,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.frequentis.maritime.mcsr.domain.util.GeoShapeNodeConverter;
 import com.frequentis.maritime.mcsr.domain.util.JsonNodeConverter;
 import com.frequentis.maritime.mcsr.domain.util.JsonNodeGeoShapeConverter;
 
@@ -89,7 +90,7 @@ public class Instance implements Serializable {
     private String comment;
 
     @Column(name = "geometry", columnDefinition = "LONGTEXT")
-    @Convert(converter = JsonNodeConverter.class)
+    @Convert(converter = GeoShapeNodeConverter.class)
     private GeoShape<?> geometry;
 
     @Column(name = "geometry_content_type")
@@ -97,7 +98,7 @@ public class Instance implements Serializable {
 
     @NotNull
     @Column(name = "instance_id", nullable = true)
-    @JsonProperty("instance_id")
+    @JsonProperty("instanceId")
     @Field(type = FieldType.text, index = true)
     private String instanceId;
 

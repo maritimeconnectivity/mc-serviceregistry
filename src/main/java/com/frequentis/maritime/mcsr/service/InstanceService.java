@@ -260,7 +260,7 @@ public class InstanceService {
         log.debug("Request to get Instance by domain id {}", QueryParser.escape(domainId));
         Page<Instance> instances = null;
         try {
-            instances = instanceSearchRepository.search(queryStringQuery("instance_id:" + QueryParser.escape(domainId)), pageable);
+            instances = instanceSearchRepository.search(queryStringQuery("instanceId:" + QueryParser.escape(domainId)), pageable);
         } catch (Exception e) {
             log.debug("Could not find instance for domain id {}", domainId);
             e.printStackTrace();

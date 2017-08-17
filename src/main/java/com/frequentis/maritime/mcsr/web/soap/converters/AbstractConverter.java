@@ -102,7 +102,6 @@ public abstract class AbstractConverter<F, T> implements Converter<F, T> {
     	if(col == null) {
     		return null;
     	}
-    	System.out.println("item " + col.iterator().next());
     	if(col instanceof Set) {
     		return (Set) col;
     	}

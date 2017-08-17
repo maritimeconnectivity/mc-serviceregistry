@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import com.frequentis.maritime.mcsr.domain.Doc;
 import com.frequentis.maritime.mcsr.domain.Xsd;
+import com.frequentis.maritime.mcsr.domain.enumeration.SpecificationTemplateType;
 import com.frequentis.maritime.mcsr.service.DocService;
 import com.frequentis.maritime.mcsr.service.XsdService;
 import com.frequentis.maritime.mcsr.web.soap.dto.PageDTO;
@@ -45,10 +46,10 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-//@RunWith(SpringRunner.class)
-//@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-//@ActiveProfiles(profiles = "integration")
-//@WithMockUser("test-user")
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles = "integration")
+@WithMockUser("test-user")
 public class SpecificationTemplateResourceTest {
 	Logger log = LoggerFactory.getLogger(SpecificationTemplateResourceTest.class);
 	private static final int RANDOM_NAME_LENGTH = 12;
@@ -137,11 +138,13 @@ public class SpecificationTemplateResourceTest {
 		specificationTemplate.templateDoc = randomDoc();
 		specificationTemplate.docs = new ArrayList<>(Arrays.asList(randomDoc(), randomDoc()));
 		specificationTemplate.xsds = new ArrayList<>(Arrays.asList(randomXsd(), randomXsd()));
+		SpecificationTemplateType [] types = SpecificationTemplateType.values();
+		specificationTemplate.type = types[(int) (Math.random() * types.length)];
 		
 		return specificationTemplate;
 	}
 
-	//@Test TMP disabled
+	@Test
 	public void create() throws ProcessingException {
 		// Given
 		SpecificationTemplateParameterDTO newXsd = createSpecificationTempalte();
@@ -155,7 +158,7 @@ public class SpecificationTemplateResourceTest {
 		assertEquals(newXsd.comment, savedDocument.comment);
 	}
 	
-	//@Test TMP disabled
+	@Test
 	public void getSpecificationTemplate() throws ProcessingException {
 		// Given
 		SpecificationTemplateParameterDTO newXsd = createSpecificationTempalte();
@@ -177,7 +180,7 @@ public class SpecificationTemplateResourceTest {
 		
 	}
 	
-	//@Test TMP disabled
+	@Test
 	public void getAllXsds() throws ProcessingException {
 		// Given
 		int instanceCount = 5;
@@ -205,7 +208,7 @@ public class SpecificationTemplateResourceTest {
 		}
 	}
 	
-	//@Test TMP disabled
+	@Test
 	public void searchXml() throws ProcessingException {
 		// Given
 		SpecificationTemplateParameterDTO template = createSpecificationTempalte();
@@ -226,7 +229,7 @@ public class SpecificationTemplateResourceTest {
 		assertEquals(2, resultPage.itemTotalCount);
 	}
 	
-	//@Test TMP disabled
+	@Test
 	public void updateXsd() throws ProcessingException {
 		// Given
 		String oldName = RandomStringUtils.randomAlphabetic(RANDOM_NAME_LENGTH);
@@ -244,7 +247,7 @@ public class SpecificationTemplateResourceTest {
 		assertEquals(newName, storedXml.name);
 	}
 	
-	//@Test TMP disabled
+	@Test
 	public void deleteSpecificationTemplate() throws ProcessingException {
 		// Given
 		SpecificationTemplateDescriptorDTO newTemplate = internal.createSpecificationTemplate(createSpecificationTempalte());

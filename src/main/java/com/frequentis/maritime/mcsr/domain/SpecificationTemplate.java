@@ -81,7 +81,7 @@ public class SpecificationTemplate implements Serializable {
     @Column(name = "comment")
     private String comment;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private Doc guidelineDoc;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
@@ -94,7 +94,7 @@ public class SpecificationTemplate implements Serializable {
                inverseJoinColumns = @JoinColumn(name="docs_id", referencedColumnName="ID"))
     private Set<Doc> docs = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JoinTable(name = "specification_template_xsds",
                joinColumns = @JoinColumn(name="specification_templates_id", referencedColumnName="ID"),

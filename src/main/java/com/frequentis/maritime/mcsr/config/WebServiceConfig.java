@@ -60,10 +60,10 @@ public class WebServiceConfig {
     	return publishEndpoint(xmlResource, "/XmlResource");
     }
     
-//    @Bean
-//    public Endpoint specificationTemplateResourceEndpoint(SpecificationTemplateResource resource) {
-//    	return publishEndpoint(resource, "/SpecificationTemplateResource");
-//    }
+    @Bean
+    public Endpoint specificationTemplateResourceEndpoint(SpecificationTemplateResource resource) {
+    	return publishEndpoint(resource, "/SpecificationTemplateResource");
+    }
     
     @Bean
     public Endpoint xsdResourceEndpoint(XsdResource xsdResource) {

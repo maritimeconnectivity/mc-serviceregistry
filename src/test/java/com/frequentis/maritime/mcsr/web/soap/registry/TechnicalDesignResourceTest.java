@@ -41,8 +41,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -157,6 +156,7 @@ public class TechnicalDesignResourceTest {
 		PageDTO<DesignDescriptorDTO> searchResult = client.getAllDesignsById(newDesign.designId, 0);
 		
 		// Then
+		assertNotNull(searchResult.content);
 		assertEquals("ID must be same", newDesign.id, searchResult.content.get(0).id);
 		assertEquals("NAME must be same", newDesign.name, searchResult.content.get(0).name);
 		

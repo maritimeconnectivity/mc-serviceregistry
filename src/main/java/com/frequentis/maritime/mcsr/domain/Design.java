@@ -81,16 +81,16 @@ public class Design implements Serializable {
 
     @NotNull
     @Column(name = "design_id", nullable = false)
-    @Field(type = FieldType.text, index = false)
+    @Field(type = FieldType.text, index = true)
     @JsonProperty("designId")
     private String designId;
 
     @Column(name = "status")
-    @Field(type = FieldType.text, index = false)
+    @Field(type = FieldType.text, index = true)
     private String status;
 
     @Column(name = "organization_id")
-    @Field(type = FieldType.text, index = false)
+    @Field(type = FieldType.text, index = true)
     @JsonProperty("organizationId")
     private String organizationId;
 
