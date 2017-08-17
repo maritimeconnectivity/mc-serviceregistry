@@ -14,9 +14,13 @@ import com.frequentis.maritime.mcsr.domain.Xml;
 import com.frequentis.maritime.mcsr.web.soap.converters.AbstractConverter;
 import com.frequentis.maritime.mcsr.web.soap.converters.Converter;
 import com.frequentis.maritime.mcsr.web.soap.converters.design.DesignConverter;
+import com.frequentis.maritime.mcsr.web.soap.converters.design.DesignReferenceConverter;
 import com.frequentis.maritime.mcsr.web.soap.converters.doc.DocDTOConverter;
+import com.frequentis.maritime.mcsr.web.soap.converters.doc.DocReferenceConverter;
 import com.frequentis.maritime.mcsr.web.soap.converters.specification.SpecificationTemplateDTOConverter;
+import com.frequentis.maritime.mcsr.web.soap.converters.specification.SpecificationTemplateReferenceConverter;
 import com.frequentis.maritime.mcsr.web.soap.converters.xml.XmlDTOConverter;
+import com.frequentis.maritime.mcsr.web.soap.converters.xml.XmlReferenceConverter;
 import com.frequentis.maritime.mcsr.web.soap.dto.design.DesignDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.doc.DocDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.instance.InstanceDTO;
@@ -28,16 +32,16 @@ import com.frequentis.maritime.mcsr.web.soap.dto.xml.XmlDTO;
 public class InstanceParameterDTOToInstanceConverter extends AbstractConverter<InstanceParameterDTO, Instance> {
 
 	@Autowired
-	XmlDTOConverter xmlConverter;
+	XmlReferenceConverter xmlConverter;
 	
 	@Autowired
-	DocDTOConverter docConverter;
+	DocReferenceConverter docConverter;
 	
 	@Autowired
-	DesignConverter designConverter;
+	DesignReferenceConverter designConverter;
 	
 	@Autowired
-	SpecificationTemplateDTOConverter templateConverter;
+	SpecificationTemplateReferenceConverter templateConverter;
 
     @Override
     public Instance convert(InstanceParameterDTO f) {
@@ -47,11 +51,11 @@ public class InstanceParameterDTOToInstanceConverter extends AbstractConverter<I
         Instance d = new Instance();
         d.setId(f.id);
         d.setUnlocode(f.unlocode);
-        d.setInstanceAsXml(xmlConverter.convertReverse(f.instanceAsXml));
-        d.setInstanceAsDoc(docConverter.convertReverse(f.instanceAsDoc));
-        //d.setImplementedSpecificationVersion(templateConverter.convertReverse(f.implementedSpecificationVersion));
-        //d.setDocs(castToSet(docConverter.convertReverse(f.docs)));
-        //d.setDesigns(castToSet(designConverter.convertReverse(f.designs)));
+        d.setInstanceAsXml(xmlConverter.convert(f.instanceAsXml));
+        d.setInstanceAsDoc(docConverter.convert(f.instanceAsDoc));
+        d.setImplementedSpecificationVersion(templateConverter.convert(f.implementedSpecificationVersion));
+        d.setDocs(castToSet(docConverter.convert(f.docs)));
+        d.setDesigns(castToSet(designConverter.convert(f.designs)));
 
         return d;
     }

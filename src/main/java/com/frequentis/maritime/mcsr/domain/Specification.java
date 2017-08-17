@@ -97,11 +97,11 @@ public class Specification implements Serializable {
     @Field(type = FieldType.text, index = true)
     private String organizationId;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne
     @JoinColumn(unique = true)
     private Xml specAsXml;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne
     @JoinColumn(unique = true)
     private Doc specAsDoc;
 

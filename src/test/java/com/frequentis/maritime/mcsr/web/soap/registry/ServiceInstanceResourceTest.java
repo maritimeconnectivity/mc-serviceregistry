@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.transaction.Transactional;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -27,6 +28,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -41,14 +43,25 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.frequentis.maritime.mcsr.domain.Design;
+import com.frequentis.maritime.mcsr.domain.Doc;
+import com.frequentis.maritime.mcsr.domain.SpecificationTemplate;
+import com.frequentis.maritime.mcsr.domain.Xml;
 import com.frequentis.maritime.mcsr.domain.enumeration.SpecificationTemplateType;
+import com.frequentis.maritime.mcsr.service.DocService;
+import com.frequentis.maritime.mcsr.service.SpecificationTemplateService;
+import com.frequentis.maritime.mcsr.service.XmlService;
 import com.frequentis.maritime.mcsr.web.soap.dto.PageDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.design.DesignDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.design.DesignReference;
 import com.frequentis.maritime.mcsr.web.soap.dto.doc.DocDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.doc.DocReference;
 import com.frequentis.maritime.mcsr.web.soap.dto.instance.InstanceDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.instance.InstanceParameterDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.specification.SpecificationTemplateDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.specification.SpecificationTemplateReference;
 import com.frequentis.maritime.mcsr.web.soap.dto.xml.XmlDTO;
+import com.frequentis.maritime.mcsr.web.soap.dto.xml.XmlReference;
 import com.frequentis.maritime.mcsr.web.soap.errors.ProcessingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +93,15 @@ public class ServiceInstanceResourceTest {
 
 	@Autowired
 	private ServiceInstanceResource instanceInternal;
+	
+	@Autowired
+	DocService docService;
+	
+	@Autowired
+	XmlService xmlService;
+	
+	@Autowired
+	SpecificationTemplateService specTemplateService;
 
 	@LocalServerPort
 	private int port;
@@ -120,10 +142,10 @@ public class ServiceInstanceResourceTest {
 		public String keywords;
 		public String wktGeometry;
 		public String unloCode;
-		public SpecificationTemplateDTO implementedSpecificationVersion;
-		public List<DocDTO> docs;
-		public DocDTO instanceAsDoc;
-		public List<DesignDTO> designs;
+		public SpecificationTemplateReference implementedSpecificationVersion;
+		public List<DocReference> docs;
+		public DocReference instanceAsDoc;
+		public List<DesignReference> designs;
 
 		public InstanceValues() {
 			// Name
@@ -148,36 +170,69 @@ public class ServiceInstanceResourceTest {
 			keywords = sb.toString();
 			// UnloCode
 			unloCode = "CZ";
-
+			
+			instanceAsDoc = createRandomDocReference(name);
+			docs = new ArrayList<DocReference>();
+			docs.add(createRandomDocReference(name + RandomStringUtils.randomAlphanumeric(10)));
+			docs.add(createRandomDocReference(name + RandomStringUtils.randomAlphanumeric(10)));
+			
+			SpecificationTemplate st = new SpecificationTemplate();
+			String rsn = RandomStringUtils.randomAlphanumeric(20);
+			st.setName(rsn);
+			st.setComment(rsn);
+			st.setType(SpecificationTemplateType.INSTANCE);
+			st.setVersion(rsn);
+			specTemplateService.save(st);
+			implementedSpecificationVersion = new SpecificationTemplateReference();
+			implementedSpecificationVersion.id = st.getId();
 		}
 
-		private DesignDTO createRandomDesign(String name2) {
-			DesignDTO designDTO = new DesignDTO();
-			designDTO.name = "DesignFor" + name2;
-			designDTO.comment = "caw";
-			designDTO.designAsDoc = createRandomDoc(designDTO.name);
-			designDTO.designAsXml = new XmlDTO();
-			designDTO.designAsXml.name = "EMPTY XML";
-			designDTO.designAsXml.comment = "EMPTY XML";
-			designDTO.status = STATUSES[0];
-			designDTO.version = "1.0." + (int) (Math.random() * 9);
-			designDTO.designId = "dsg:" + randomStringGenerator(30);
-			return null;
+		@Transactional
+		private DesignReference createRandomDesign(String name2) {
+			Doc doc = docService.save(createRandomDoc(name2 + "dad"));
+			
+			Xml xml = new Xml();
+			xml.setName(name2);
+			xml.setComment("dwdw");
+			xml.setContent("daddddwa");
+			xml.setContentContentType("text/plain");
+			xmlService.save(xml);
+			
+			Design designDTO = new Design();
+			designDTO.setName("DesignFor" + name2);
+			designDTO.setComment("caw");
+			designDTO.setDesignAsDoc(doc);
+			designDTO.setDesignAsXml(xml);
+			designDTO.setStatus(STATUSES[0]);
+			designDTO.setVersion("1.0." + (int) (Math.random() * 9));
+			designDTO.setDesignId("dsg:" + randomStringGenerator(30));
+			
+			DesignReference dr = new DesignReference();
+			dr.id = designDTO.getId();
+			return dr;
 		}
 
-		public DocDTO createRandomDoc(String fn) {
-			DocDTO nd = new DocDTO();
-			nd.name = "GuidlineDoc fro " + fn;
-			nd.comment = randomStringGenerator(5);
-			nd.filecontent = "plain text".getBytes();
-			nd.filecontentContentType = "text/plain";
-			nd.mimetype = "text/plain";
+		public Doc createRandomDoc(String fn) {
+			Doc nd = new Doc();
+			nd.setName("GuidlineDoc fro " + fn);
+			nd.setComment(randomStringGenerator(5));
+			nd.setFilecontent("plain text".getBytes());
+			nd.setFilecontentContentType("text/plain");
+			nd.setMimetype("text/plain");
 
 			return nd;
 		}
+		
+		public DocReference createRandomDocReference(String fn) {
+			Doc d = createRandomDoc(fn);
+			docService.save(d);
+			DocReference dr = new DocReference();
+			dr.id = d.getId();
+			return dr;
+		}
 
-		public DocDTO createGuidlineDoc(String fn) {
-			return createRandomDoc(fn);
+		public DocReference createGuidlineDoc(String fn) {
+			return createRandomDocReference(fn);
 		}
 
 		public InstanceValues copy() {
@@ -250,11 +305,17 @@ public class ServiceInstanceResourceTest {
 		transformer.transform(ds, sr);
 
 		inst.unlocode = values.unloCode;
-		inst.instanceAsXml = new XmlDTO();
-		inst.instanceAsXml.name = "Xml for instance " + values.name;
-		inst.instanceAsXml.comment = "Some comment " + (int) Math.random() * 3000;
-		inst.instanceAsXml.contentContentType = "application/xml";
-		inst.instanceAsXml.content = sw.toString();
+		// Instance as XML
+		Xml instanceAsXml = new Xml();
+		instanceAsXml.setName("Xml for instance " + values.name);
+		instanceAsXml.setComment("Some comment " + (int) Math.random() * 3000);
+		instanceAsXml.setContentContentType("application/xml");
+		instanceAsXml.setContent(sw.toString());
+		xmlService.save(instanceAsXml);
+		XmlReference xmlRef = new XmlReference();
+		xmlRef.id = instanceAsXml.getId();
+		inst.instanceAsXml = xmlRef;
+		
 		inst.instanceAsDoc = values.instanceAsDoc;
 		return inst;
 	}
@@ -267,7 +328,7 @@ public class ServiceInstanceResourceTest {
 		long itemCountBefore = instanceInternal.getAllInstances(false, 0).itemTotalCount;
 
 		// When
-		InstanceDTO saved = instanceInternal.createInstance(instance, TOKEN);
+		InstanceDTO saved = client.createInstance(instance, TOKEN);
 
 		// Then
 		assertEquals(iv.name, saved.name);
@@ -300,7 +361,7 @@ public class ServiceInstanceResourceTest {
 	@Test
 	public void getAllInstances() throws ProcessingException, Exception {
 		// Given
-		int instanceCount = 5;
+		int instanceCount = 3;
 		long startCount = instanceInternal.getAllInstances(false, 0).itemTotalCount;
 		InstanceDTO[] instances = new InstanceDTO[instanceCount];
 		for (int i = 0; i < instanceCount; i++) {
@@ -338,6 +399,8 @@ public class ServiceInstanceResourceTest {
 			iv.version = versionPrefix + i;
 			template = prepareValidWithXML(iv);
 			instances[i] = instanceInternal.createInstance(template, TOKEN);
+			iv = new InstanceValues();
+			iv.instanceId = instances[i].instanceId;
 		}
 
 		// When
@@ -370,7 +433,7 @@ public class ServiceInstanceResourceTest {
 	public void searchInstance() throws Exception {
 		// Given
 		String prefix = "akd08u9i0_ed4e4d43e43_" + ((int) (Math.random() * 100000)) + "_kbkiww09x_";
-		int instanceCount = 4;
+		int instanceCount = 3;
 		InstanceDTO[] instances = new InstanceDTO[instanceCount];
 		for (int i = 0; i < instanceCount; i++) {
 			InstanceValues iv = new InstanceValues();
@@ -390,7 +453,7 @@ public class ServiceInstanceResourceTest {
 		// Given
 		String customKeyword = randomStringGenerator(12);
 
-		int instanceCount = 4;
+		int instanceCount = 3;
 		InstanceDTO[] instances = new InstanceDTO[instanceCount];
 		for (int i = 0; i < instanceCount; i++) {
 			InstanceValues iv = new InstanceValues();

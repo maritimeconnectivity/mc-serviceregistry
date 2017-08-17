@@ -151,18 +151,18 @@ public class Instance implements Serializable {
     @Field(type = FieldType.text, index = true)
     private String specificationId;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne
     @JoinColumn(unique = true)
     private Xml instanceAsXml;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne
     @JoinColumn(unique = true)
     private Doc instanceAsDoc;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     private SpecificationTemplate implementedSpecificationVersion;
 
-    @ManyToMany(fetch=FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToMany(fetch=FetchType.LAZY)
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JoinTable(name = "instance_designs",
@@ -170,7 +170,7 @@ public class Instance implements Serializable {
                inverseJoinColumns = @JoinColumn(name="designs_id", referencedColumnName="ID"))
     private Set<Design> designs = new HashSet<>();
 
-    @ManyToMany(fetch=FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToMany(fetch=FetchType.LAZY)
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JoinTable(name = "instance_docs",
                joinColumns = @JoinColumn(name="instances_id", referencedColumnName="ID"),

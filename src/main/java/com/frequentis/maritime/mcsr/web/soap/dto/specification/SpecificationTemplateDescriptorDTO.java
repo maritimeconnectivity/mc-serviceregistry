@@ -6,8 +6,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import com.frequentis.maritime.mcsr.domain.enumeration.SpecificationTemplateType;
 
 @XmlRootElement(name = "SpecificationTemplate")
-public class SpecificationTemplateDescriptorDTO {
-    public Long id;
+public class SpecificationTemplateDescriptorDTO extends SpecificationTemplateReference {
     @XmlElement(required = true)
     public String name;
     @XmlElement(required = true)

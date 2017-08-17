@@ -81,13 +81,13 @@ public class SpecificationTemplate implements Serializable {
     @Column(name = "comment")
     private String comment;
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToOne
     private Doc guidelineDoc;
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToOne
     private Doc templateDoc;
 
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToMany
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JoinTable(name = "specification_template_docs",
                joinColumns = @JoinColumn(name="specification_templates_id", referencedColumnName="ID"),

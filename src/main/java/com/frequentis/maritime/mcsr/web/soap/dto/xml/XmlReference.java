@@ -4,8 +4,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "Xml")
-public class XmlDescriptorDTO extends XmlReference {
-	@XmlElement(required = true)
-	public String name;
-	public String comment;
+public class XmlReference {
+	public Long id;
 }
