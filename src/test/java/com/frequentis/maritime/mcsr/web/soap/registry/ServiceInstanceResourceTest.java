@@ -84,7 +84,7 @@ import static org.junit.Assert.*;
 @WithMockUser("test-user")
 public class ServiceInstanceResourceTest {
 	Logger log = LoggerFactory.getLogger(ServiceInstanceResourceTest.class);
-	private static final String TOKEN = "";
+	private static final String TOKEN = "dwad45a4w5dw5a.urn:mrn:stm:org:carment.dw5a4d5wad5aw5d";
 	private static int instanceId = 0;
 
 	@Autowired

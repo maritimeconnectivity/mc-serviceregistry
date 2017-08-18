@@ -10,6 +10,9 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Service;
 
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
+import org.boon.Terminal.Escape;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -21,6 +24,8 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.frequentis.maritime.mcsr.domain.Specification;
+import com.frequentis.maritime.mcsr.service.SpecificationService;
 import com.frequentis.maritime.mcsr.web.soap.dto.PageDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.specification.SpecificationDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.specification.SpecificationDescriptorDTO;
@@ -50,6 +55,7 @@ import static org.junit.Assert.assertThat;
 public class ServiceSpecificationResourceTest {
 	Logger log = LoggerFactory.getLogger(ServiceSpecificationResourceTest.class);
 	private static final String TOKEN = "";
+	private static final String ORGANIZATION_ID = "urn:mrn:stm:org:carment";
 	private static int specificationId = 0;
 
 	@Autowired
@@ -59,6 +65,9 @@ public class ServiceSpecificationResourceTest {
 	@Autowired
 	private ServiceSpecificationResource serviceSpecificationResourceInternal;
 	
+	@Autowired
+	private	SpecificationService specService;
+
 	@LocalServerPort
 	private int port;
 	
@@ -280,8 +289,35 @@ public class ServiceSpecificationResourceTest {
 		assertEquals(4, results2.content.size());
 		
 	}
-	
-	
+
+
+	@Test
+	public void searchSpecificationByOrganizationId() throws Exception {
+		// Given
+		int instanceCount = 3;
+		SpecificationDTO newSpec = prepareValidSpecificationDTO();
+		for(int i = 0; i < instanceCount; i++) {
+			newSpec = prepareValidSpecificationDTO();
+			long id = serviceSpecificationResourceInternal.createSpecification(newSpec, TOKEN).id;
+			// Workaround for setting organizationId
+			Specification spec = specService.findOne(id);
+			spec.setOrganizationId(ORGANIZATION_ID);
+			specService.save(spec);
+
+			// Random name data
+			newSpec = prepareValidSpecificationDTO();
+			serviceSpecificationResourceInternal.createSpecification(newSpec, TOKEN);
+		}
+
+		// When
+		PageDTO<?> results = client.searchSpecifications("organizationId:" + QueryParser.escape(ORGANIZATION_ID) + "*", 0);
+
+		// Then
+		assertEquals(instanceCount, results.itemTotalCount);
+
+	}
+
+
 	private static Matcher<SpecificationDescriptorDTO> hasSpecification(SpecificationDescriptorDTO spec) {
 		return new BaseMatcher<SpecificationDescriptorDTO>() {
 
