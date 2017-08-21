@@ -27,6 +27,8 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -56,9 +58,11 @@ public class Doc implements Serializable {
 
     @NotNull
     @Column(name = "name", nullable = false)
+    @Field(type = FieldType.keyword, index = true)
     private String name;
 
     @Column(name = "comment")
+    @Field(type = FieldType.text, index = true)
     private String comment;
 
     @NotNull

@@ -79,14 +79,17 @@ public class Instance implements Serializable {
 
     @NotNull
     @Column(name = "name", nullable = true)
+    @Field(type = FieldType.keyword, index = true)
     private String name;
 
     @NotNull
     @Column(name = "version", nullable = true)
+    @Field(type = FieldType.keyword, index = true)
     private String version;
 
     @NotNull
     @Column(name = "comment", nullable = true)
+    @Field(type = FieldType.text, index = true)
     private String comment;
 
     @Column(name = "geometry", columnDefinition = "LONGTEXT")
@@ -99,56 +102,56 @@ public class Instance implements Serializable {
     @NotNull
     @Column(name = "instance_id", nullable = true)
     @JsonProperty("instanceId")
-    @Field(type = FieldType.text, index = true)
+    @Field(type = FieldType.keyword, index = true)
     private String instanceId;
 
     @Column(name = "keywords")
     private String keywords;
 
     @Column(name = "status")
-    @Field(type = FieldType.text, index = true)
+    @Field(type = FieldType.keyword, index = true)
     private String status;
 
     @Column(name = "organization_id")
     @JsonProperty("organization_id")
-    @Field(type = FieldType.text, index = true)
+    @Field(type = FieldType.keyword, index = true)
     private String organizationId;
 
     @Column(name = "unlocode")
-    @Field(type = FieldType.text, index = true)
+    @Field(type = FieldType.keyword, index = true)
     private String unlocode;
 
     @Column(name = "endpoint_uri")
     @JsonProperty("endpoint_uri")
-    @Field(type = FieldType.text, index = true)
+    @Field(type = FieldType.keyword, index = true)
     private String endpointUri;
 
     @Column(name = "endpoint_type")
     @JsonProperty("endpoint_type")
-    @Field(type = FieldType.text, index = true)
+    @Field(type = FieldType.keyword, index = true)
     private String endpointType;
 
     @Column(name = "mmsi")
-    @Field(type = FieldType.text, index = true)
+    @Field(type = FieldType.keyword, index = true)
     private String mmsi;
 
     @Column(name = "imo")
-    @Field(type = FieldType.text, index = true)
+    @Field(type = FieldType.keyword, index = true)
     private String imo;
 
     @Column(name = "service_type")
     @JsonProperty("service_type")
-    @Field(type = FieldType.text, index = true)
+    @Field(type = FieldType.keyword, index = true)
     private String serviceType;
 
     @Column(name = "design_id")
     @JsonProperty("design_id")
-    @Field(type = FieldType.text, index = true)
+    @Field(type = FieldType.keyword, index = true)
     private String designId;
 
     @Column(name = "specification_id")
     @JsonProperty("specification_id")
-    @Field(type = FieldType.text, index = true)
+    @Field(type = FieldType.keyword, index = true)
     private String specificationId;
 
     @OneToOne

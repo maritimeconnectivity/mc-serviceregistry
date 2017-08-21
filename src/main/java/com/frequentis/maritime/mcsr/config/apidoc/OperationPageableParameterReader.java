@@ -2,9 +2,11 @@ package com.frequentis.maritime.mcsr.config.apidoc;
 
 import com.fasterxml.classmate.ResolvedType;
 import com.fasterxml.classmate.TypeResolver;
+import com.frequentis.maritime.mcsr.config.TestTurnOffCondition;
 import com.google.common.base.Function;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +27,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static springfox.documentation.spi.schema.contexts.ModelContext.inputParam;
 
 @Component
+@Conditional(TestTurnOffCondition.class)
 @Order(Ordered.LOWEST_PRECEDENCE)
 public class OperationPageableParameterReader implements OperationBuilderPlugin {
     private final TypeNameExtractor nameExtractor;
@@ -95,4 +98,5 @@ public class OperationPageableParameterReader implements OperationBuilderPlugin 
                 context.getIgnorableParameterTypes());
         return ResolvedTypes.modelRefFactory(modelContext, nameExtractor);
     }
+    
 }

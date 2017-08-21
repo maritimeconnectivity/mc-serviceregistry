@@ -41,6 +41,8 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import io.swagger.annotations.ApiModel;
 
@@ -67,10 +69,12 @@ public class SpecificationTemplate implements Serializable {
 
     @NotNull
     @Column(name = "name", nullable = false)
+    @Field(type = FieldType.keyword, index = true)
     private String name;
 
     @NotNull
     @Column(name = "version", nullable = false)
+    @Field(type = FieldType.keyword, index = true)
     private String version;
 
     @NotNull
@@ -79,6 +83,7 @@ public class SpecificationTemplate implements Serializable {
     private SpecificationTemplateType type;
 
     @Column(name = "comment")
+    @Field(type = FieldType.text, index = true)
     private String comment;
 
     @ManyToOne

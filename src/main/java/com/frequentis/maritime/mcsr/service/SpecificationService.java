@@ -186,7 +186,7 @@ public class SpecificationService {
         log.debug("Request to get Specification by domain id {}", domainId);
         Page<Specification> specifications = null;
         try {
-            specifications = specificationSearchRepository.search(queryStringQuery("specificationId:="+domainId), pageable);
+            specifications = specificationSearchRepository.search(queryStringQuery("specificationId:"+domainId), pageable);
         } catch (Exception e) {
             log.debug("Could not find specification for domain id {}", domainId);
             e.printStackTrace();

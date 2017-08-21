@@ -69,10 +69,12 @@ public class Design implements Serializable {
 
     @NotNull
     @Column(name = "name", nullable = false)
+    @Field(type = FieldType.keyword, index = true)
     private String name;
 
     @NotNull
     @Column(name = "version", nullable = false)
+    @Field(type = FieldType.keyword, index = true)
     private String version;
 
     @NotNull
@@ -81,16 +83,16 @@ public class Design implements Serializable {
 
     @NotNull
     @Column(name = "design_id", nullable = false)
-    @Field(type = FieldType.text, index = true)
+    @Field(type = FieldType.keyword, index = true)
     @JsonProperty("designId")
     private String designId;
 
     @Column(name = "status")
-    @Field(type = FieldType.text, index = true)
+    @Field(type = FieldType.keyword, index = true)
     private String status;
 
     @Column(name = "organization_id")
-    @Field(type = FieldType.text, index = true)
+    @Field(type = FieldType.keyword, index = true)
     @JsonProperty("organizationId")
     private String organizationId;
 

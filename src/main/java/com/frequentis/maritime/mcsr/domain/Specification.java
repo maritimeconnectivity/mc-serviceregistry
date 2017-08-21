@@ -69,32 +69,36 @@ public class Specification implements Serializable {
 
     @NotNull
     @Column(name = "name", nullable = false)
+    @Field(type = FieldType.keyword, index = true)
     private String name;
 
     @NotNull
     @Column(name = "version", nullable = false)
+    @Field(type = FieldType.keyword, index = true)
     private String version;
 
     @NotNull
     @Column(name = "comment", nullable = false)
+    @Field(type = FieldType.text, index = true)
     private String comment;
 
     @Column(name = "keywords")
+    @Field(type = FieldType.keyword, index = true)
     private String keywords;
 
     @NotNull
     @Column(name = "specification_id", nullable = false)
     @JsonProperty("specificationId")
-    @Field(type = FieldType.text, index = true)
+    @Field(type = FieldType.keyword, index = true)
     private String specificationId;
 
     @Column(name = "status")
-    @Field(type = FieldType.text, index = true)
+    @Field(type = FieldType.keyword, index = true)
     private String status;
 
     @Column(name = "organization_id")
     @JsonProperty("organizationId")
-    @Field(type = FieldType.text, index = true)
+    @Field(type = FieldType.keyword, index = true)
     private String organizationId;
 
     @OneToOne
