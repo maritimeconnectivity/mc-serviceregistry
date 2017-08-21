@@ -80,10 +80,11 @@ public class SpecificationTemplate implements Serializable {
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
+    @Field(type = FieldType.keyword, index = true)
     private SpecificationTemplateType type;
 
     @Column(name = "comment")
-    @Field(type = FieldType.text, index = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String comment;
 
     @ManyToOne

@@ -97,6 +97,7 @@ public class Instance implements Serializable {
     private GeoShape<?> geometry;
 
     @Column(name = "geometry_content_type")
+    @Field(type = FieldType.keyword, index = true)
     private String geometryContentType;
 
     @NotNull

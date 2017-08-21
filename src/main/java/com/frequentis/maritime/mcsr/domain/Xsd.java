@@ -61,7 +61,7 @@ public class Xsd implements Serializable {
     private String name;
 
     @Column(name = "comment")
-    @Field(type = FieldType.text, index = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String comment;
 
     @NotNull

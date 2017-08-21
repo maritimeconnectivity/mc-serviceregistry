@@ -79,6 +79,7 @@ public class Design implements Serializable {
 
     @NotNull
     @Column(name = "comment", nullable = false)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String comment;
 
     @NotNull

@@ -79,7 +79,7 @@ public class Specification implements Serializable {
 
     @NotNull
     @Column(name = "comment", nullable = false)
-    @Field(type = FieldType.text, index = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String comment;
 
     @Column(name = "keywords")

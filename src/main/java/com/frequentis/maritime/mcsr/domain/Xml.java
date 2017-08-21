@@ -60,13 +60,13 @@ public class Xml implements Serializable {
     private String name;
 
     @Column(name = "comment")
-    @Field(type = FieldType.text, index = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String comment;
 
     @NotNull
 //    @Lob
     @Column(name = "content", nullable = false, columnDefinition = "LONGTEXT")
-    @Field(type = FieldType.keyword, index = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String content;
 
     @Column(name = "content_content_type", nullable = false)
