@@ -114,7 +114,7 @@ public class Instance implements Serializable {
     private String status;
 
     @Column(name = "organization_id")
-    @JsonProperty("organization_id")
+    @JsonProperty("organizationId")
     @Field(type = FieldType.keyword, index = true)
     private String organizationId;
 
@@ -123,12 +123,12 @@ public class Instance implements Serializable {
     private String unlocode;
 
     @Column(name = "endpoint_uri")
-    @JsonProperty("endpoint_uri")
+    @JsonProperty("endpointUri")
     @Field(type = FieldType.keyword, index = true)
     private String endpointUri;
 
     @Column(name = "endpoint_type")
-    @JsonProperty("endpoint_type")
+    @JsonProperty("endpointType")
     @Field(type = FieldType.keyword, index = true)
     private String endpointType;
 
@@ -141,17 +141,17 @@ public class Instance implements Serializable {
     private String imo;
 
     @Column(name = "service_type")
-    @JsonProperty("service_type")
+    @JsonProperty("serviceType")
     @Field(type = FieldType.keyword, index = true)
     private String serviceType;
 
     @Column(name = "design_id")
-    @JsonProperty("design_id")
+    @JsonProperty("designId")
     @Field(type = FieldType.keyword, index = true)
     private String designId;
 
     @Column(name = "specification_id")
-    @JsonProperty("specification_id")
+    @JsonProperty("specificationId")
     @Field(type = FieldType.keyword, index = true)
     private String specificationId;
 
