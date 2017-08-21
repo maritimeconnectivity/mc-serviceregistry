@@ -28,10 +28,12 @@ import com.frequentis.maritime.mcsr.web.util.WebUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
 
 @Component("technicalDesignResourceSoap")
 @WebService(endpointInterface = "com.frequentis.maritime.mcsr.web.soap.registry.TechnicalDesignResource")
+@Secured("ROLE_USER")
 public class TechnicalDesignResourceImpl implements TechnicalDesignResource {
 	private static final Logger log = LoggerFactory.getLogger(TechnicalDesignResourceImpl.class);
 	private static final int ITEMS_PER_PAGE = 10;

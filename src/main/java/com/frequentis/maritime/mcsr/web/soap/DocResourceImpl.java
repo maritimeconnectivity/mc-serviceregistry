@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import com.frequentis.maritime.mcsr.web.soap.dto.doc.DocDescriptorDTO;
 @Component("docResourceSoap")
 @Transactional
 @WebService(serviceName="DocService", portName = "DocPort", endpointInterface = "com.frequentis.maritime.mcsr.web.soap.DocResource")
+@Secured("ROLE_USER")
 public class DocResourceImpl implements DocResource {
     Logger log = LoggerFactory.getLogger(DocResourceImpl.class);
     public static final int ITEMS_PER_PAGE = 50;

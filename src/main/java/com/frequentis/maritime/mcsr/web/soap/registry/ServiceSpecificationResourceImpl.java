@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ import com.frequentis.maritime.mcsr.web.util.WebUtils;
 
 @Component("serviceSpecificationResourceSoap")
 @Transactional
+@Secured("ROLE_USER")
 public class ServiceSpecificationResourceImpl implements ServiceSpecificationResource {
     public static final int ITEMS_PER_PAGE = 10;
     private static final Logger log = LoggerFactory.getLogger(ServiceSpecificationResourceImpl.class);

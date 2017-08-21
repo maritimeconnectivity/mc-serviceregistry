@@ -38,11 +38,13 @@ import com.frequentis.maritime.mcsr.web.soap.errors.ProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
 
 @Component
 @Transactional
 @WebService(endpointInterface = "com.frequentis.maritime.mcsr.web.soap.SpecificationTemplateSetResource")
+@Secured("ROLE_USER")
 public class SpecificationTemplateSetResourceImpl implements SpecificationTemplateSetResource {
 	private static final Logger log = LoggerFactory.getLogger(SpecificationTemplateSetResourceImpl.class);
 

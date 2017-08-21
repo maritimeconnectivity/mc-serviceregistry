@@ -28,10 +28,12 @@ import com.frequentis.maritime.mcsr.service.ElasticsearchIndexService;
 import com.frequentis.maritime.mcsr.web.soap.errors.ProcessingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
 
 @Component
 @WebService(endpointInterface = "com.frequentis.maritime.mcsr.web.soap.ElasticsearchIndexResource")
+@Secured("ROLE_USER")
 public class ElasticsearchIndexResourceImpl implements ElasticsearchIndexResource {
 	private final static Logger log = LoggerFactory.getLogger(ElasticsearchIndexResourceImpl.class);
 	
