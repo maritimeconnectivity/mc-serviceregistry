@@ -47,7 +47,6 @@ import org.springframework.web.context.request.WebRequest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.frequentis.maritime.mcsr.domain.Design;
-import com.frequentis.maritime.mcsr.domain.Xml;
 import com.frequentis.maritime.mcsr.domain.util.DesignUtils;
 import com.frequentis.maritime.mcsr.service.DesignService;
 import com.frequentis.maritime.mcsr.web.rest.DesignResource;

@@ -88,7 +88,7 @@ public class WebServiceConfig {
     }
     
     @Bean
-    public Endpoint technicalDesignResource(TechnicalDesignResource resource) {
+    public Endpoint technicalDesignResourceEdnpoint(TechnicalDesignResource resource) {
     	return publishEndpoint(resource, "/TechnicalDesignResource");
     }
     
