@@ -56,7 +56,7 @@ public class Xml implements Serializable {
 
     @NotNull
     @Column(name = "name", nullable = false)
-    @Field(type = FieldType.keyword, index = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String name;
 
     @Column(name = "comment")
@@ -70,7 +70,7 @@ public class Xml implements Serializable {
     private String content;
 
     @Column(name = "content_content_type", nullable = false)
-    @Field(type = FieldType.keyword, index = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String contentContentType;
 
     public Long getId() {

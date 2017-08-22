@@ -79,17 +79,17 @@ public class Instance implements Serializable {
 
     @NotNull
     @Column(name = "name", nullable = true)
-    @Field(type = FieldType.keyword, index = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String name;
 
     @NotNull
     @Column(name = "version", nullable = true)
-    @Field(type = FieldType.keyword, index = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String version;
 
     @NotNull
     @Column(name = "comment", nullable = true)
-    @Field(type = FieldType.text, index = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String comment;
 
     @Column(name = "geometry", columnDefinition = "LONGTEXT")
@@ -107,6 +107,7 @@ public class Instance implements Serializable {
     private String instanceId;
 
     @Column(name = "keywords")
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String keywords;
 
     @Column(name = "status")

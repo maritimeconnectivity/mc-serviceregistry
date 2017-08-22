@@ -58,7 +58,7 @@ public class Doc implements Serializable {
 
     @NotNull
     @Column(name = "name", nullable = false)
-    @Field(type = FieldType.keyword, index = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String name;
 
     @Column(name = "comment")
@@ -67,16 +67,17 @@ public class Doc implements Serializable {
 
     @NotNull
     @Column(name = "mimetype", nullable = false)
-    @Field(type = FieldType.keyword, index = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String mimetype;
 
     @NotNull
     @Lob
     @Column(name = "filecontent", nullable = false)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private byte[] filecontent;
 
     @Column(name = "filecontent_content_type", nullable = false)
-    @Field(type = FieldType.keyword, index = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String filecontentContentType;
 
     @ManyToMany(mappedBy = "docs")

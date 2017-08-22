@@ -65,16 +65,17 @@ public class Specification implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private Long id;
 
     @NotNull
     @Column(name = "name", nullable = false)
-    @Field(type = FieldType.keyword, index = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String name;
 
     @NotNull
     @Column(name = "version", nullable = false)
-    @Field(type = FieldType.keyword, index = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String version;
 
     @NotNull
@@ -83,7 +84,7 @@ public class Specification implements Serializable {
     private String comment;
 
     @Column(name = "keywords")
-    @Field(type = FieldType.keyword, index = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String keywords;
 
     @NotNull

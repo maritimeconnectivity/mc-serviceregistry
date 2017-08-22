@@ -69,18 +69,17 @@ public class SpecificationTemplate implements Serializable {
 
     @NotNull
     @Column(name = "name", nullable = false)
-    @Field(type = FieldType.keyword, index = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String name;
 
     @NotNull
     @Column(name = "version", nullable = false)
-    @Field(type = FieldType.keyword, index = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String version;
 
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    @Field(type = FieldType.keyword, index = true)
     private SpecificationTemplateType type;
 
     @Column(name = "comment")
