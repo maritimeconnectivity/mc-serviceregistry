@@ -51,6 +51,7 @@ import com.frequentis.maritime.mcsr.domain.enumeration.SpecificationTemplateType
 import com.frequentis.maritime.mcsr.service.DocService;
 import com.frequentis.maritime.mcsr.service.SpecificationTemplateService;
 import com.frequentis.maritime.mcsr.service.XmlService;
+import com.frequentis.maritime.mcsr.web.soap.SoapTestUtils;
 import com.frequentis.maritime.mcsr.web.soap.dto.PageDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.design.DesignDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.design.DesignReference;
@@ -81,7 +82,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "integration")
-@WithMockUser("test-user")
+@WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "USER"})
 public class ServiceInstanceResourceTest {
 	Logger log = LoggerFactory.getLogger(ServiceInstanceResourceTest.class);
 	private static final String TOKEN = "dwad45a4w5dw5a.urn:mrn:stm:org:carment.dw5a4d5wad5aw5d";
@@ -128,6 +129,7 @@ public class ServiceInstanceResourceTest {
 		        "ServiceInstanceResourceImplService"));
 
 		client = s.getPort(ServiceInstanceResource.class);
+		SoapTestUtils.addHttpBasicSecurity(client);
 	}
 
 	private InstanceParameterDTO prepareValidWithXML() throws Exception {

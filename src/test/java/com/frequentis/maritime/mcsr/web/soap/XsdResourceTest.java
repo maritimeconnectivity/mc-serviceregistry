@@ -42,7 +42,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "integration")
-@WithMockUser("test-user")
+@WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "USER"})
 public class XsdResourceTest {
 	Logger log = LoggerFactory.getLogger(XsdResourceTest.class);
 	private static final int RANDOM_NAME_LENGTH = 12;
@@ -67,6 +67,7 @@ public class XsdResourceTest {
 		Service s = Service.create(wsdlUrl, new QName("http://soap.web.mcsr.maritime.frequentis.com/", "XsdResourceImplService"));
 		
 		client = s.getPort(XsdResource.class);
+		SoapTestUtils.addHttpBasicSecurity(client);
 	}
 	
 	private XsdDTO createXsd() {

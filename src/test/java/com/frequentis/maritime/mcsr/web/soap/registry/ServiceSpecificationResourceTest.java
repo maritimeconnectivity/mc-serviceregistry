@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import com.frequentis.maritime.mcsr.domain.Specification;
 import com.frequentis.maritime.mcsr.service.SpecificationService;
+import com.frequentis.maritime.mcsr.web.soap.SoapTestUtils;
 import com.frequentis.maritime.mcsr.web.soap.dto.PageDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.specification.SpecificationDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.specification.SpecificationDescriptorDTO;
@@ -51,7 +52,7 @@ import static org.junit.Assert.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "integration")
-@WithMockUser("test-user")
+@WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "USER"})
 public class ServiceSpecificationResourceTest {
 	Logger log = LoggerFactory.getLogger(ServiceSpecificationResourceTest.class);
 	private static final String TOKEN = "";
@@ -98,6 +99,7 @@ public class ServiceSpecificationResourceTest {
 		Service s = Service.create(wsdlUrl, new QName("http://registry.soap.web.mcsr.maritime.frequentis.com/", "ServiceSpecificationResourceImplService"));
 		
 		client = s.getPort(ServiceSpecificationResource.class);
+		SoapTestUtils.addHttpBasicSecurity(client);
 	}
 	
 

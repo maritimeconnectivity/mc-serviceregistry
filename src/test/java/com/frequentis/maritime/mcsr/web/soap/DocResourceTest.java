@@ -15,6 +15,10 @@ import javax.xml.ws.Endpoint;
 import javax.xml.ws.Service;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.transport.http.HTTPConduit;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Description;
@@ -37,6 +41,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -44,7 +49,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "integration")
-@WithMockUser("test-user")
+@WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "USER"})
 public class DocResourceTest {
 	Logger log = LoggerFactory.getLogger(DocResourceTest.class);
 	private static final int RANDOM_NAME_LENGTH = 12;
@@ -69,6 +74,8 @@ public class DocResourceTest {
 		Service s = Service.create(wsdlUrl, new QName("http://soap.web.mcsr.maritime.frequentis.com/", "DocService"));
 		
 		client = s.getPort(DocResource.class);
+		SoapTestUtils.addHttpBasicSecurity(client);
+		
 	}
 	
 	private DocDTO createDocument() {

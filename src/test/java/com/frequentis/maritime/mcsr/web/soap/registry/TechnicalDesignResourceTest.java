@@ -7,13 +7,11 @@ import java.net.URL;
 import java.nio.file.Files;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Endpoint;
 import javax.xml.ws.Service;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,6 +19,7 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.frequentis.maritime.mcsr.web.soap.SoapTestUtils;
 import com.frequentis.maritime.mcsr.web.soap.dto.PageDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.design.DesignDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.design.DesignDescriptorDTO;
@@ -28,7 +27,6 @@ import com.frequentis.maritime.mcsr.web.soap.dto.xml.XmlDTO;
 import com.frequentis.maritime.mcsr.web.soap.errors.XmlValidateException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -46,15 +44,11 @@ import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "integration")
-@WithMockUser("test-user")
+@WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "USER"})
 public class TechnicalDesignResourceTest {
 	Logger log = LoggerFactory.getLogger(TechnicalDesignResourceTest.class);
 	private static final String TOKEN = "";
 	private static int usedDesignId = 0;
-
-	@Autowired
-	@Qualifier("technicalDesignResource")
-	private Endpoint designResource;
 	
 	@Autowired
 	private TechnicalDesignResource designResourceInternal;
@@ -62,18 +56,11 @@ public class TechnicalDesignResourceTest {
 	@Autowired
 	ElasticsearchTemplate est;
 	
-	
-	
 	@LocalServerPort
 	private int port;
 	
 	private TechnicalDesignResource client;
 	private static String xml;
-	
-	@Test
-	public void designResourceExist() {
-		Assert.assertNotNull(designResource);
-	}
 	
 	@BeforeClass
 	public static void loadResources() throws IOException {
@@ -88,7 +75,7 @@ public class TechnicalDesignResourceTest {
 		Service s = Service.create(wsdlUrl, new QName("http://registry.soap.web.mcsr.maritime.frequentis.com/", "TechnicalDesignResourceImplService"));
 		
 		client = s.getPort(TechnicalDesignResource.class);
-
+		SoapTestUtils.addHttpBasicSecurity(client);
 	}
 	
 
@@ -114,7 +101,6 @@ public class TechnicalDesignResourceTest {
 		assertThat(createdDesign.name, is(designDTO.name));
 	}
 	
-	// TODO Donesn't work with other tests
 	@Test
 	public void documentCounts() throws XmlValidateException, Exception {
 		// Given
@@ -239,10 +225,10 @@ public class TechnicalDesignResourceTest {
 		assertEquals(newName, currentDesign.name);
 	}
 	
-	//TODO
+	
 	//@Test
 	public void getAllDesignBySpecificationId() {
-
+	    // TODO There should be some test for getting all designs by specification id
 	}
 	
 	@Test

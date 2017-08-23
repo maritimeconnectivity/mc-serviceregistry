@@ -49,7 +49,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "integration")
-@WithMockUser("test-user")
+@WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "USER"})
 public class SpecificationTemplateResourceTest {
 	Logger log = LoggerFactory.getLogger(SpecificationTemplateResourceTest.class);
 	private static final int RANDOM_NAME_LENGTH = 12;
@@ -80,6 +80,7 @@ public class SpecificationTemplateResourceTest {
 		Service s = Service.create(wsdlUrl, new QName("http://soap.web.mcsr.maritime.frequentis.com/", "SpecificationTemplateResourceImplService"));
 		
 		client = s.getPort(SpecificationTemplateResource.class);
+		SoapTestUtils.addHttpBasicSecurity(client);
 		
 		// PrepareDocs
 		prepareDocs();
