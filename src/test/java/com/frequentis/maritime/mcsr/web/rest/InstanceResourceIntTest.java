@@ -28,14 +28,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.xml.transform.TransformerException;
 
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.http.entity.ContentType;
+import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,10 +63,22 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.frequentis.maritime.mcsr.builders.XMLInstanceBuilder;
 import com.frequentis.maritime.mcsr.domain.Instance;
+import com.frequentis.maritime.mcsr.domain.Xml;
 import com.frequentis.maritime.mcsr.repository.InstanceRepository;
+import com.frequentis.maritime.mcsr.repository.XmlRepository;
 import com.frequentis.maritime.mcsr.repository.search.InstanceSearchRepository;
+import com.frequentis.maritime.mcsr.repository.search.XmlSearchRepository;
 import com.frequentis.maritime.mcsr.service.InstanceService;
+import com.frequentis.maritime.mcsr.service.XmlService;
+import com.frequentis.maritime.mcsr.xmls.CoversAreaType;
+import com.frequentis.maritime.mcsr.xmls.CoverageArea;
+import com.frequentis.maritime.mcsr.xmls.InstanceXML;
+import com.frequentis.maritime.mcsr.xmls.InstanceXML.Status;
+import com.frequentis.maritime.mcsr.xmls.ServiceDesignReference;
+import com.frequentis.maritime.mcsr.xmls.ServiceLevel;
+import com.frequentis.maritime.mcsr.xmls.VendorInfo;
 
 
 /**
@@ -103,12 +123,14 @@ public class InstanceResourceIntTest {
     private static final String UPDATED_INSTANCE_ID = "BBBBB";
     private static final String DEFAULT_KEYWORDS = "AAAAA";
     private static final String UPDATED_KEYWORDS = "BBBBB";
-    private static final String DEFAULT_STATUS = "AAAAA";
-    private static final String UPDATED_STATUS = "BBBBB";
+    private static final String DEFAULT_STATUS = Status.provisional.name();
+    private static final String UPDATED_STATUS = Status.deleted.name();
     private static final String DEFAULT_ORGANIZATION_ID = "AAAAA";
     private static final String UPDATED_ORGANIZATION_ID = "BBBBB";
     private static final String DEFAULT_UNLOCODE = "AAAAA";
     private static final String UPDATED_UNLOCODE = "BBBBB";
+    private static final String DEFAULT_IMO = "AAAAA";
+    private static final String UPDATED_IMO = "BBBBB";
     private static final String DEFAULT_ENDPOINT_URI = "AAAAA";
     private static final String UPDATED_ENDPOINT_URI = "BBBBB";
     private static final String DEFAULT_ENDPOINT_TYPE = "AAAAA";
@@ -119,6 +141,12 @@ public class InstanceResourceIntTest {
 
     @Inject
     private InstanceService instanceService;
+    
+    @Inject
+    private XmlService xmlService;
+    
+    @Inject
+    private XmlSearchRepository xmlSearchRepository;
 
     @Inject
     private InstanceSearchRepository instanceSearchRepository;
@@ -132,6 +160,9 @@ public class InstanceResourceIntTest {
     private MockMvc restInstanceMockMvc;
 
     private Instance instance;
+    
+    @Inject
+    private InstanceResource instanceResource;
 
     @Autowired
     private ApplicationContext appContext;
@@ -152,24 +183,92 @@ public class InstanceResourceIntTest {
     }
 
     @Before
-    public void initTest() {
+    public void initTest() throws TransformerException {
         instanceSearchRepository.deleteAll();
         instance = new Instance();
+        // Common
+        instance.setEndpointType(DEFAULT_ENDPOINT_TYPE);
+        instance.setGeometryContentType(DEFAULT_GEOMETRY_CONTENT_TYPE);
+        instance.setOrganizationId(DEFAULT_ORGANIZATION_ID);
+        
+        // All these field are overridden by XML (XML is required)
         instance.setName(DEFAULT_NAME);
         instance.setVersion(DEFAULT_VERSION);
         instance.setComment(DEFAULT_COMMENT);
-        instance.setGeometryContentType(DEFAULT_GEOMETRY_CONTENT_TYPE);
         instance.setInstanceId(DEFAULT_INSTANCE_ID);
         instance.setKeywords(DEFAULT_KEYWORDS);
         instance.setStatus(DEFAULT_STATUS);
-        instance.setOrganizationId(DEFAULT_ORGANIZATION_ID);
         instance.setUnlocode(DEFAULT_UNLOCODE);
         instance.setEndpointUri(DEFAULT_ENDPOINT_URI);
-        instance.setEndpointType(DEFAULT_ENDPOINT_TYPE);
+
+        // Create XML
+        xmlSearchRepository.deleteAll();
+        
+        Xml xml = new Xml();
+        xml.setName(DEFAULT_NAME);
+        xml.setComment(DEFAULT_COMMENT);
+        xml.setContentContentType(MediaType.APPLICATION_XML_VALUE);
+
+        XMLInstanceBuilder xmlBuilder = new XMLInstanceBuilder();
+        InstanceXML x = xmlBuilder.getBuilderXml();
+        x.setName(DEFAULT_NAME);
+        x.setDescription(DEFAULT_COMMENT);
+        x.setURL(DEFAULT_ENDPOINT_URI);
+        x.setKeywords(DEFAULT_KEYWORDS);
+        x.setId(DEFAULT_INSTANCE_ID);
+        x.setStatus(Status.valueOf(DEFAULT_STATUS));
+        x.setServiceType(DEFAULT_ENDPOINT_TYPE);
+        x.setIMO(DEFAULT_IMO);
+        x.setVersion(DEFAULT_VERSION);
+        x.setMMSI(RandomStringUtils.randomAlphabetic(5));
+        x.setRequiresAuthorization("false");
+        
+        VendorInfo producedBy = x.getProducedBy();
+        producedBy.setContactInfo(RandomStringUtils.randomAlphabetic(15));
+        producedBy.setName(RandomStringUtils.randomAlphabetic(15));
+        producedBy.setId(RandomStringUtils.randomAlphabetic(15));
+        producedBy.setOrganizationId(RandomStringUtils.randomAlphabetic(15));
+        producedBy.setDescription(RandomStringUtils.randomAlphabetic(15));
+        
+        VendorInfo providedBy = x.getProvidedBy();
+        providedBy.setContactInfo(RandomStringUtils.randomAlphabetic(15));
+        providedBy.setName(RandomStringUtils.randomAlphabetic(15));
+        providedBy.setId(RandomStringUtils.randomAlphabetic(15));
+        providedBy.setOrganizationId(RandomStringUtils.randomAlphabetic(15));
+        providedBy.setDescription(RandomStringUtils.randomAlphabetic(15));
+        
+        ServiceLevel offersServiceLevel = x.getOffersServiceLevel();
+        offersServiceLevel.setName(RandomStringUtils.randomAlphabetic(15));
+        offersServiceLevel.setAvailability(1);
+        offersServiceLevel.setDescription(RandomStringUtils.randomAlphabetic(15));
+        
+        CoversAreaType conversAreas = x.getCoversAreas();
+        // Requires plenty of heap (parsing JSON with unls)
+        // conversAreas.setUnLoCode(DEFAULT_UNLOCODE);
+        
+        List<CoverageArea> coversArea = new ArrayList<>();
+        CoverageArea ca = new CoverageArea();
+        ca.setName("Bermuda Triangle");
+        ca.setDescription("Loosely defined region in the western part of the North Atlantic Ocean.");
+        ca.setGeometryAsWKT("POLYGON((-80.190 25.774, -66.118 18.466, -64.757 32.321, -80.190 25.774))");
+        coversArea.add(ca);
+        conversAreas.setCoversArea(coversArea);
+
+        
+        ServiceDesignReference implementsServiceDesign = x.getImplementsServiceDesign();
+        implementsServiceDesign.setId("awdwad");
+        implementsServiceDesign.setVersion("dwadwdwad");
+       
+        xml.setContent(xmlBuilder.buildXmlString());
+        xmlService.save(xml);
+        
+        // Set XML
+        
+        instance.setInstanceAsXml(xml);
     }
 
     // TODO This test can't work. XML is required argument.
-    //@Test
+    @Test
     @Transactional
     public void createInstance() throws Exception {
         int databaseSizeBeforeCreate = instanceRepository.findAll().size();
@@ -193,7 +292,7 @@ public class InstanceResourceIntTest {
         assertThat(testInstance.getKeywords()).isEqualTo(DEFAULT_KEYWORDS);
         assertThat(testInstance.getStatus()).isEqualTo(DEFAULT_STATUS);
         assertThat(testInstance.getOrganizationId()).isEqualTo(DEFAULT_ORGANIZATION_ID);
-        assertThat(testInstance.getUnlocode()).isEqualTo(DEFAULT_UNLOCODE);
+//        assertThat(testInstance.getUnlocode()).isEqualTo(DEFAULT_UNLOCODE);
         assertThat(testInstance.getEndpointUri()).isEqualTo(DEFAULT_ENDPOINT_URI);
         assertThat(testInstance.getEndpointType()).isEqualTo(DEFAULT_ENDPOINT_TYPE);
 
@@ -207,7 +306,7 @@ public class InstanceResourceIntTest {
         assertThat(instanceEs.getKeywords()).isEqualTo(DEFAULT_KEYWORDS);
         assertThat(instanceEs.getStatus()).isEqualTo(DEFAULT_STATUS);
         assertThat(instanceEs.getOrganizationId()).isEqualTo(DEFAULT_ORGANIZATION_ID);
-        assertThat(instanceEs.getUnlocode()).isEqualTo(DEFAULT_UNLOCODE);
+//        assertThat(instanceEs.getUnlocode()).isEqualTo(DEFAULT_UNLOCODE);
         assertThat(instanceEs.getEndpointUri()).isEqualTo(DEFAULT_ENDPOINT_URI);
         assertThat(instanceEs.getEndpointType()).isEqualTo(DEFAULT_ENDPOINT_TYPE);
     }
@@ -284,8 +383,7 @@ public class InstanceResourceIntTest {
         assertThat(instances).hasSize(databaseSizeBeforeTest);
     }
 
-    // TODO This test can't work. XML is required argument.
-    //@Test
+    @Test
     @Transactional
     public void getAllInstances() throws Exception {
         // Initialize the database
@@ -294,7 +392,7 @@ public class InstanceResourceIntTest {
         // Get all the instances
         restInstanceMockMvc.perform(get("/api/instances?sort=id,desc"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(instance.getId().intValue())))
                 .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
                 .andExpect(jsonPath("$.[*].version").value(hasItem(DEFAULT_VERSION.toString())))
@@ -309,8 +407,7 @@ public class InstanceResourceIntTest {
                 .andExpect(jsonPath("$.[*].endpointType").value(hasItem(DEFAULT_ENDPOINT_TYPE.toString())));
     }
 
-    // TODO This test can't work. XML is required argument.
-    //@Test
+    @Test
     @Transactional
     public void getInstance() throws Exception {
         // Initialize the database
@@ -319,7 +416,7 @@ public class InstanceResourceIntTest {
         // Get the instance
         restInstanceMockMvc.perform(get("/api/instances/{id}", instance.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(instance.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
             .andExpect(jsonPath("$.version").value(DEFAULT_VERSION.toString()))
@@ -343,7 +440,7 @@ public class InstanceResourceIntTest {
     }
 
     // TODO This test can't work. XML is required argument.
-    //@Test
+    @Test
     @Transactional
     public void updateInstance() throws Exception {
         // Initialize the database
@@ -354,17 +451,79 @@ public class InstanceResourceIntTest {
         // Update the instance
         Instance updatedInstance = new Instance();
         updatedInstance.setId(instance.getId());
-        updatedInstance.setName(UPDATED_NAME);
-        updatedInstance.setVersion(UPDATED_VERSION);
-        updatedInstance.setComment(UPDATED_COMMENT);
         updatedInstance.setGeometryContentType(UPDATED_GEOMETRY_CONTENT_TYPE);
-        updatedInstance.setInstanceId(UPDATED_INSTANCE_ID);
-        updatedInstance.setKeywords(UPDATED_KEYWORDS);
-        updatedInstance.setStatus(UPDATED_STATUS);
         updatedInstance.setOrganizationId(UPDATED_ORGANIZATION_ID);
-        updatedInstance.setUnlocode(UPDATED_UNLOCODE);
-        updatedInstance.setEndpointUri(UPDATED_ENDPOINT_URI);
         updatedInstance.setEndpointType(UPDATED_ENDPOINT_TYPE);
+        
+        // Required by validation in controller
+        updatedInstance.setName(DEFAULT_NAME);
+        updatedInstance.setVersion(DEFAULT_VERSION);
+        updatedInstance.setComment(DEFAULT_COMMENT);
+        updatedInstance.setInstanceId(DEFAULT_INSTANCE_ID);
+        updatedInstance.setKeywords(DEFAULT_KEYWORDS);
+        updatedInstance.setStatus(DEFAULT_STATUS);
+        updatedInstance.setUnlocode(DEFAULT_UNLOCODE);
+        updatedInstance.setEndpointUri(DEFAULT_ENDPOINT_URI);
+        
+        Xml xml = new Xml();
+        xml.setName(DEFAULT_NAME);
+        xml.setComment(DEFAULT_COMMENT);
+        xml.setContentContentType(MediaType.APPLICATION_XML_VALUE);
+
+        XMLInstanceBuilder xmlBuilder = new XMLInstanceBuilder();
+        InstanceXML x = xmlBuilder.getBuilderXml();
+        x.setName(UPDATED_VERSION);
+        x.setDescription(UPDATED_COMMENT);
+        x.setURL(UPDATED_ENDPOINT_URI);
+        x.setKeywords(UPDATED_KEYWORDS);
+        x.setId(UPDATED_INSTANCE_ID);
+        x.setStatus(Status.valueOf(UPDATED_STATUS));
+        x.setServiceType(UPDATED_ENDPOINT_TYPE);
+        x.setIMO(UPDATED_IMO);
+        x.setVersion(UPDATED_VERSION);
+        x.setMMSI(RandomStringUtils.randomAlphabetic(5));
+        x.setRequiresAuthorization("false");
+        
+        VendorInfo producedBy = x.getProducedBy();
+        producedBy.setContactInfo(RandomStringUtils.randomAlphabetic(15));
+        producedBy.setName(UPDATED_NAME);
+        producedBy.setId(RandomStringUtils.randomAlphabetic(15));
+        producedBy.setOrganizationId(RandomStringUtils.randomAlphabetic(15));
+        producedBy.setDescription(RandomStringUtils.randomAlphabetic(15));
+        
+        VendorInfo providedBy = x.getProvidedBy();
+        providedBy.setContactInfo(RandomStringUtils.randomAlphabetic(15));
+        providedBy.setName(RandomStringUtils.randomAlphabetic(15));
+        providedBy.setId(RandomStringUtils.randomAlphabetic(15));
+        providedBy.setOrganizationId(RandomStringUtils.randomAlphabetic(15));
+        providedBy.setDescription(RandomStringUtils.randomAlphabetic(15));
+        
+        ServiceLevel offersServiceLevel = x.getOffersServiceLevel();
+        offersServiceLevel.setName(RandomStringUtils.randomAlphabetic(15));
+        offersServiceLevel.setAvailability(1);
+        offersServiceLevel.setDescription(RandomStringUtils.randomAlphabetic(15));
+        
+        CoversAreaType conversAreas = x.getCoversAreas();
+        // Requires plenty of heap (parsing JSON with unls)
+        // conversAreas.setUnLoCode(DEFAULT_UNLOCODE);
+        
+        List<CoverageArea> coversArea = new ArrayList<>();
+        CoverageArea ca = new CoverageArea();
+        ca.setName("Bermuda Triangle");
+        ca.setDescription("Loosely defined region in the western part of the North Atlantic Ocean.");
+        ca.setGeometryAsWKT("POLYGON((-80.190 25.774, -66.118 18.466, -64.757 32.321, -80.190 25.774))");
+        coversArea.add(ca);
+        conversAreas.setCoversArea(coversArea);
+
+        
+        ServiceDesignReference implementsServiceDesign = x.getImplementsServiceDesign();
+        implementsServiceDesign.setId("awdwad");
+        implementsServiceDesign.setVersion("dwadwdwad");
+       
+        xml.setContent(xmlBuilder.buildXmlString());
+        xmlService.save(xml);
+        
+        updatedInstance.setInstanceAsXml(xml);
 
         restInstanceMockMvc.perform(put("/api/instances")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -383,7 +542,7 @@ public class InstanceResourceIntTest {
         assertThat(testInstance.getKeywords()).isEqualTo(UPDATED_KEYWORDS);
         assertThat(testInstance.getStatus()).isEqualTo(UPDATED_STATUS);
         assertThat(testInstance.getOrganizationId()).isEqualTo(UPDATED_ORGANIZATION_ID);
-        assertThat(testInstance.getUnlocode()).isEqualTo(UPDATED_UNLOCODE);
+//        assertThat(testInstance.getUnlocode()).isEqualTo(UPDATED_UNLOCODE);
         assertThat(testInstance.getEndpointUri()).isEqualTo(UPDATED_ENDPOINT_URI);
         assertThat(testInstance.getEndpointType()).isEqualTo(UPDATED_ENDPOINT_TYPE);
 
@@ -397,13 +556,12 @@ public class InstanceResourceIntTest {
         assertThat(instanceEs.getKeywords()).isEqualTo(UPDATED_KEYWORDS);
         assertThat(instanceEs.getStatus()).isEqualTo(UPDATED_STATUS);
         assertThat(instanceEs.getOrganizationId()).isEqualTo(UPDATED_ORGANIZATION_ID);
-        assertThat(instanceEs.getUnlocode()).isEqualTo(UPDATED_UNLOCODE);
+//        assertThat(instanceEs.getUnlocode()).isEqualTo(UPDATED_UNLOCODE);
         assertThat(instanceEs.getEndpointUri()).isEqualTo(UPDATED_ENDPOINT_URI);
         assertThat(instanceEs.getEndpointType()).isEqualTo(UPDATED_ENDPOINT_TYPE);
     }
 
-    // TODO This test can't work. XML is required argument.
-    //@Test
+    @Test
     @Transactional
     public void deleteInstance() throws Exception {
         // Initialize the database
@@ -417,7 +575,8 @@ public class InstanceResourceIntTest {
                 .andExpect(status().isOk());
 
         // Validate ElasticSearch is empty
-        boolean instanceExistsInEs = instanceSearchRepository.existsById(instance.getId());
+        //boolean instanceExistsInEs = instanceSearchRepository.existsById(instance.getId());
+        boolean instanceExistsInEs = instanceSearchRepository.findById(instance.getId()).isPresent();
         assertThat(instanceExistsInEs).isFalse();
 
         // Validate the database is empty
@@ -425,17 +584,18 @@ public class InstanceResourceIntTest {
         assertThat(instances).hasSize(databaseSizeBeforeDelete - 1);
     }
 
-    // TODO This test can't work. XML is required argument.
-    //@Test
+    @Test
     @Transactional
     public void searchInstance() throws Exception {
         // Initialize the database
         instanceService.save(instance);
+        // saveGeometry have to be called
+        instanceService.saveGeometry(instance); 
 
         // Search the instance
         restInstanceMockMvc.perform(get("/api/_search/instances?query=id:" + instance.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(instance.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
             .andExpect(jsonPath("$.[*].version").value(hasItem(DEFAULT_VERSION.toString())))
@@ -445,7 +605,7 @@ public class InstanceResourceIntTest {
             .andExpect(jsonPath("$.[*].keywords").value(hasItem(DEFAULT_KEYWORDS.toString())))
             .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS.toString())))
             .andExpect(jsonPath("$.[*].organizationId").value(hasItem(DEFAULT_ORGANIZATION_ID.toString())))
-            .andExpect(jsonPath("$.[*].unlocode").value(hasItem(DEFAULT_UNLOCODE.toString())))
+//            .andExpect(jsonPath("$.[*].unlocode").value(hasItem(DEFAULT_UNLOCODE.toString())))
             .andExpect(jsonPath("$.[*].endpointUri").value(hasItem(DEFAULT_ENDPOINT_URI.toString())))
             .andExpect(jsonPath("$.[*].endpointType").value(hasItem(DEFAULT_ENDPOINT_TYPE.toString())));
     }
