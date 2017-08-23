@@ -49,7 +49,7 @@ public class ServiceSpecificationResourceImpl implements ServiceSpecificationRes
         if (specificationDTO.id != null) {
             throw new IllegalArgumentException("A new specification cannot already have an ID");
         }
-        
+
         Specification specification = specificationConverter.convertReverse(specificationDTO);
         if (specification == null || specification.getSpecAsXml() == null || specification.getSpecAsXml().getContent() == null) {
         	throw new XmlValidateException("Specification must have a valid XML body");

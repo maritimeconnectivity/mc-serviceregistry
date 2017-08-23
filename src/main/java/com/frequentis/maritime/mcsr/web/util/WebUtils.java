@@ -9,20 +9,20 @@ public final class WebUtils {
 	private WebUtils() {
 		// Nothing
 	}
-	
+
 	/**
 	 * Extract organization id from token.
-	 * 
+	 *
 	 * @param token
 	 * @return OrganizationId if can be extracted or empty String.
 	 */
 	public static String extractOrganizationIdFromToken(String token) {
 		return extractOrganizationIdFromToken(token, null);
 	}
-	
+
 	/**
 	 * Extract organization id from token.
-	 * 
+	 *
 	 * @param token
 	 * @return OrganizationId if can be extracted or empty String.
 	 */
@@ -37,6 +37,6 @@ public final class WebUtils {
 		}
 	}
 
-	
-	
+
+
 }

@@ -20,7 +20,7 @@ public class SpecificationDescriptorDTO {
     public String status;
     @XmlElement(required = true)
     public String organizationId;
-    
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -86,6 +86,6 @@ public class SpecificationDescriptorDTO {
 			return false;
 		return true;
 	}
-    
-    
+
+
 }

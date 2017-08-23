@@ -15,7 +15,7 @@ public class DesignConverter extends AbstractBidirectionalConverter<Design, Desi
 
 	@Inject
 	private DocDTOConverter docConverter;
-	
+
 	@Inject
 	private XmlDTOConverter xmlConverter;
 

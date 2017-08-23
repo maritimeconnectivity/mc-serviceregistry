@@ -17,12 +17,12 @@ public abstract class AbstractConverter<F, T> implements Converter<F, T> {
     public Collection<T> convert(Collection<F> from) {
     	return convertCollection(from);
     }
-    
+
     @Override
     public List<T> convert(List<F> from) {
     	return convertCollection(from);
     }
-    
+
     private ArrayList<T> convertCollection(Collection<F> from) {
     	if(from == null) {
     		return null;
@@ -31,9 +31,9 @@ public abstract class AbstractConverter<F, T> implements Converter<F, T> {
         for(F f : from) {
             o.add(convert(f));
         }
-        return o;    	
+        return o;
     }
-    
+
     /**
      * Mapping from <em>f</em> public getter to the <em>t</em> public fields.
      * @param f
@@ -52,8 +52,8 @@ public abstract class AbstractConverter<F, T> implements Converter<F, T> {
     		try {
     			Field field = tClass.getField(fieldName);
 				ReflectionUtils.setField(field, t, m.invoke(f));
-			} catch (IllegalAccessException | 
-					IllegalArgumentException | 
+			} catch (IllegalAccessException |
+					IllegalArgumentException |
 					InvocationTargetException |
 					NoSuchFieldException |
 					SecurityException e) {
@@ -62,7 +62,7 @@ public abstract class AbstractConverter<F, T> implements Converter<F, T> {
 			}
     	}
     }
-    
+
     /**
      * Mapping from <em>f</em> public values to the <em>t</em> public setters.
      * @param f
@@ -80,14 +80,14 @@ public abstract class AbstractConverter<F, T> implements Converter<F, T> {
     		try {
     			Method m = tClass.getMethod(setterName, field.getType());
     			m.invoke(t, field.get(f));
-    		} catch (NoSuchMethodException | SecurityException | NullPointerException | 
+    		} catch (NoSuchMethodException | SecurityException | NullPointerException |
     				IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
     			// Nothing
     		}
     	}
-    	
+
     }
-    
+
     protected static <T> List<T> castToList(Collection<T> col) {
     	if(col == null) {
     		return null;
@@ -97,7 +97,7 @@ public abstract class AbstractConverter<F, T> implements Converter<F, T> {
     	}
     	return new ArrayList<T>(col);
     }
-    
+
     protected static <T> Set<T> castToSet(Collection<T> col) {
     	if(col == null) {
     		return null;
@@ -107,6 +107,6 @@ public abstract class AbstractConverter<F, T> implements Converter<F, T> {
     	}
     	return new HashSet<T>(col);
     }
-    
+
 
 }

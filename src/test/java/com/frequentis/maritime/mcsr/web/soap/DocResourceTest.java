@@ -58,26 +58,26 @@ public class DocResourceTest {
 	@Autowired
 	@Qualifier("technicalInstanceResource")
 	private Endpoint instanceResource;
-	
+
 	@Autowired
 	private DocResource internal;
-	
+
 	@LocalServerPort
 	private int port;
-	
+
 	private DocResource client;
-	
-	
+
+
 	@Before
 	public void setUp() throws MalformedURLException {
 		URL wsdlUrl = new URL("http://localhost:" + port + "/services/DocResource?wsdl");
 		Service s = Service.create(wsdlUrl, new QName("http://soap.web.mcsr.maritime.frequentis.com/", "DocService"));
-		
+
 		client = s.getPort(DocResource.class);
 		SoapTestUtils.addHttpBasicSecurity(client);
-		
+
 	}
-	
+
 	private DocDTO createDocument() {
 		DocDTO doc = new DocDTO();
 		doc.name = RandomStringUtils.randomAlphanumeric(15);
@@ -85,7 +85,7 @@ public class DocResourceTest {
 		doc.filecontent = RandomStringUtils.randomAlphanumeric(1024).getBytes();
 		doc.filecontentContentType = "text/plain";
 		doc.mimetype = "text/plain";
-		
+
 		return doc;
 	}
 
@@ -93,16 +93,16 @@ public class DocResourceTest {
 	public void create() {
 		// Given
 		DocDTO newDoc = createDocument();
-		
+
 		// When
 		DocDescriptorDTO savedDocument = client.createDoc(newDoc);
-		
+
 		// Then
 		assertNotNull(savedDocument);
 		assertEquals(newDoc.name, savedDocument.name);
 		assertEquals(newDoc.comment, savedDocument.comment);
 		assertEquals(newDoc.mimetype, savedDocument.mimetype);
-		
+
 	}
 
 	@Test
@@ -113,10 +113,10 @@ public class DocResourceTest {
 		for(int i = 0; i < 3; i++) {
 			internal.createDoc(createDocument());
 		}
-		
+
 		// When
 		DocDTO storedDocument = client.getDoc(doc.id);
-		
+
 		// Then
 		assertEquals(newDoc.name, storedDocument.name);
 		assertEquals(newDoc.comment, storedDocument.comment);
@@ -124,7 +124,7 @@ public class DocResourceTest {
 		assertEquals(newDoc.mimetype, storedDocument.mimetype);
 		assertEquals(newDoc.filecontentContentType, storedDocument.filecontentContentType);
 	}
-	
+
 	@Test
 	public void getAllDocuments() {
 		// Given
@@ -133,7 +133,7 @@ public class DocResourceTest {
 		for(int i = 0; i < instanceCount; i++) {
 			docs[i] = internal.createDoc(createDocument());
 		}
-		
+
 		// When
 		int page = 0;
 		List<DocDescriptorDTO> storedDocs = new ArrayList<DocDescriptorDTO>();
@@ -144,29 +144,29 @@ public class DocResourceTest {
 				storedDocs.addAll(resultPage.content);
 			}
 		} while (resultPage != null && resultPage.page < resultPage.pageCount);
-		
+
 		// Then
 		for(int i = 0; i < instanceCount; i++) {
 			assertThat(storedDocs, hasItem(hasDoc(docs[i])));
 		}
 	}
-	
+
 	@Test
 	public void rmeoveDocument() {
 		// Given
 		long docCountBefore = internal.getAllDocs(0).itemTotalCount;
 		DocDescriptorDTO doc = internal.createDoc(createDocument());
-		
+
 		// When
 		client.deleteDoc(doc.id);
-		
+
 		// Then
 		long docCountAfter = internal.getAllDocs(0).itemTotalCount;
 		DocDTO docNull = internal.getDoc(doc.id);
 		assertEquals(docCountBefore, docCountAfter);
 		assertNull(docNull);
 	}
-	
+
 	@Test
 	public void searchDocument() {
 		// Given
@@ -174,45 +174,45 @@ public class DocResourceTest {
 		String randomPrefix = RandomStringUtils.randomAlphanumeric(RANDOM_NAME_LENGTH);
 		template.name = randomPrefix + "_" + RandomStringUtils.randomAlphanumeric(RANDOM_NAME_LENGTH);
 		DocDescriptorDTO rightDoc = internal.createDoc(template);
-		
+
 		template.name = randomPrefix + "_" + RandomStringUtils.randomAlphanumeric(RANDOM_NAME_LENGTH);
 		DocDescriptorDTO rightDoc2 = internal.createDoc(template);
 		// some other docs
 		for(int i = 0; i < 5; i++) {
 			internal.createDoc(createDocument());
 		}
-		
+
 		// When
 		PageDTO<DocDescriptorDTO> resultPage = client.searchDocs("name:" + randomPrefix + "*", 0);
-		
+
 		// Then
 		assertNotNull(resultPage);
 		assertEquals(2, resultPage.itemTotalCount);
 		assertThat(resultPage.content, hasItem(hasDoc(rightDoc)));
-		
+
 	}
-	
+
 	@Test
 	public void updateDocument() {
 		// Given
 		DocDTO doc = createDocument();
 		DocDescriptorDTO docBefore = internal.createDoc(doc);
-		
+
 		// When
 		doc.id = docBefore.id;
 		doc.name = RandomStringUtils.randomAlphabetic(RANDOM_NAME_LENGTH);
 		client.updateDoc(doc);
-		
+
 		// Then
 		DocDTO docAfter = internal.getDoc(docBefore.id);
 		assertEquals(doc.name, docAfter.name);
 	}
-	
+
 	private static Matcher<DocDescriptorDTO> hasDoc(DocDescriptorDTO doc) {
 		return new BaseMatcher<DocDescriptorDTO>() {
 
 			private DocDescriptorDTO actDoc;
-			
+
 			@Override
 			public boolean matches(Object item) {
 				DocDescriptorDTO d = (DocDescriptorDTO) item;
@@ -232,7 +232,7 @@ public class DocResourceTest {
 			@Override
 			public void describeTo(Description description) {
 				description.appendValue("Document " + actDoc.name + " should be " + doc.name);
-				
+
 			}
 		};
 

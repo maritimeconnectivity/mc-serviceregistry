@@ -56,46 +56,46 @@ public class XmlResourceTest {
 	@Autowired
 	@Qualifier("technicalInstanceResource")
 	private Endpoint instanceResource;
-	
+
 	@Autowired
 	private XmlResource internal;
-	
+
 	@LocalServerPort
 	private int port;
-	
+
 	private XmlResource client;
-	
+
 	static List<String> xmls;
-	
+
 	@BeforeClass
 	public static void loadResources() throws IOException {
 		DefaultResourceLoader rl = new DefaultResourceLoader();
 		String [] xmlNames = {"AddressForPersonLookupServiceDesignREST", "AddressForPersonLookupServiceInstance", "AddressForPersonLookupServiceSpecification"};
 		xmls = new ArrayList<String>(xmlNames.length);
-		
+
 		Resource resource;
 		for(String xml : xmlNames) {
 			resource = rl.getResource("classpath:dataload/xml/" + xml + ".xml");
 			xmls.add(new String(Files.readAllBytes(resource.getFile().toPath())));
 		}
 	}
-	
+
 	@Before
 	public void setUp() throws MalformedURLException {
 		URL wsdlUrl = new URL("http://localhost:" + port + "/services/XmlResource?wsdl");
 		Service s = Service.create(wsdlUrl, new QName("http://soap.web.mcsr.maritime.frequentis.com/", "XmlResourceImplService"));
-		
+
 		client = s.getPort(XmlResource.class);
 		SoapTestUtils.addHttpBasicSecurity(client);
 	}
-	
+
 	private XmlDTO createXml() {
 		XmlDTO xml = new XmlDTO();
 		xml.name = RandomStringUtils.randomAlphabetic(RANDOM_NAME_LENGTH);
 		xml.comment = RandomStringUtils.randomAlphabetic(RANDOM_NAME_LENGTH);;
 		xml.contentContentType = "application/xml";
 		xml.content = xmls.get((int)(Math.random() * xmls.size()));
-		
+
 		return xml;
 	}
 
@@ -103,16 +103,16 @@ public class XmlResourceTest {
 	public void create() throws ProcessingException {
 		// Given
 		XmlDTO newXml = createXml();
-		
+
 		// When
 		XmlDescriptorDTO savedDocument = client.createXml(newXml);
-		
+
 		// Then
 		assertNotNull(savedDocument);
 		assertEquals(newXml.name, savedDocument.name);
 		assertEquals(newXml.comment, savedDocument.comment);
 	}
-	
+
 	@Test
 	public void getXml() throws ProcessingException {
 		// Given
@@ -122,19 +122,19 @@ public class XmlResourceTest {
 		for(int i = 0; i < 3; i++) {
 			internal.createXml(createXml());
 		}
-		
+
 		// When
 		XmlDTO resultXml = client.getXml(newXml.id);
-		
+
 		// Then
 		assertNotNull(resultXml);
 		assertEquals(newXml.name, resultXml.name);
 		assertEquals(newXml.comment, resultXml.comment);
 		assertEquals(newXml.contentContentType, resultXml.contentContentType);
 		assertEquals(newXml.content, resultXml.content);
-		
+
 	}
-	
+
 	@Test
 	public void getAllXmls() throws ProcessingException {
 		// Given
@@ -143,7 +143,7 @@ public class XmlResourceTest {
 		for(int i = 0; i < instanceCount; i++) {
 			xmls[i] = internal.createXml(createXml());
 		}
-		
+
 		// When
 		List<XmlDescriptorDTO> storedXmls = new ArrayList<>();
 		int page = 0;
@@ -154,7 +154,7 @@ public class XmlResourceTest {
 				storedXmls.addAll(resultPage.content);
 			}
 		} while (resultPage.content != null && resultPage.page < resultPage.pageCount);
-		
+
 		// Then
 		assertNotNull(resultPage.content);
 		assertEquals(resultPage.itemTotalCount, storedXmls.size());
@@ -162,7 +162,7 @@ public class XmlResourceTest {
 			assertThat(storedXmls, hasItem(hasXml(xml)));
 		}
 	}
-	
+
 	@Test
 	public void searchXml() throws ProcessingException {
 		// Given
@@ -175,16 +175,16 @@ public class XmlResourceTest {
 		for(int i = 0; i < 4; i++) {
 			internal.createXml(createXml());
 		}
-		
+
 		// When
 		PageDTO<XmlDescriptorDTO> resultPage = client.searchXmls("name:" + prefix + "*", 0);
-		
+
 		// Then
 		assertNotNull(resultPage.content);
 		assertEquals(2, resultPage.itemTotalCount);
 		assertThat(resultPage.content, hasItem(hasXml(template)));
 	}
-	
+
 	@Test
 	public void updateXml() throws ProcessingException {
 		// Given
@@ -193,35 +193,35 @@ public class XmlResourceTest {
 		XmlDTO newXml = createXml();
 		newXml.name = oldName;
 		newXml.id = internal.createXml(newXml).id;
-		
+
 		// When
 		newXml.name = newName;
 		client.updateXml(newXml);
-		
+
 		// Then
 		XmlDTO storedXml = internal.getXml(newXml.id);
 		assertEquals(newName, storedXml.name);
 	}
-	
+
 	@Test
 	public void deleteXml() throws ProcessingException {
 		// Given
 		XmlDescriptorDTO newXml = internal.createXml(createXml());
-		
+
 		// When
 		client.deleteXml(newXml.id);
-		
+
 		// Then
 		XmlDTO result = internal.getXml(newXml.id);
 		assertNull(result);
 	}
-	
-	
+
+
 	private static Matcher<XmlDescriptorDTO> hasXml(XmlDescriptorDTO doc) {
 		return new BaseMatcher<XmlDescriptorDTO>() {
 
 			private XmlDescriptorDTO actDoc;
-			
+
 			@Override
 			public boolean matches(Object item) {
 				XmlDescriptorDTO d = (XmlDescriptorDTO) item;
@@ -238,7 +238,7 @@ public class XmlResourceTest {
 			@Override
 			public void describeTo(Description description) {
 				description.appendValue("Xml " + actDoc.name + " should be " + doc.name);
-				
+
 			}
 		};
 

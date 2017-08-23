@@ -31,7 +31,7 @@ public class ServiceDesignReference {
     private String id;
     @XmlElement(namespace = "http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceInstanceSchema.xsd")
     private String version;
-    
+
     public String getId() {
         return id;
     }
@@ -44,5 +44,5 @@ public class ServiceDesignReference {
     public void setVersion(String version) {
         this.version = version;
     }
-    
+
 }

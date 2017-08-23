@@ -50,7 +50,7 @@ public interface ServiceSpecificationResource {
     @WebMethod
     @WebResult(name = "specifications")
     public PageDTO<SpecificationDescriptorDTO> searchSpecifications(
-            @WebParam(name = "searchData") @XmlElement(required = true) String query, 
+            @WebParam(name = "searchData") @XmlElement(required = true) String query,
             @WebParam(name = "page") @XmlElement(required = false, defaultValue = "0") int page);
 
     @WebMethod

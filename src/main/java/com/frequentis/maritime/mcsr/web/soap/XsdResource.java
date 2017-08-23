@@ -74,6 +74,6 @@ public interface XsdResource {
      * @return the result of the search
      */
 	@WebMethod
-    public PageDTO<XsdDescriptorDTO> searchXsds(@Valid @WebParam(name = "query") @XmlElement(required = true) String query, 
+    public PageDTO<XsdDescriptorDTO> searchXsds(@Valid @WebParam(name = "query") @XmlElement(required = true) String query,
     		@Valid @WebParam(name = "page") @XmlElement(required = true) int page);
 }

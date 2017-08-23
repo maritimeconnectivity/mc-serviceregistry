@@ -46,9 +46,9 @@ import com.frequentis.maritime.mcsr.xmls.InstanceXML;
 
 public class XMLInstanceBuilder {
     private static final Logger log = LoggerFactory.getLogger(XMLInstanceBuilder.class);
-    
+
     private static final String XSI_SCHEMA_LOCATION = "http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceInstanceSchema.xsd ServiceInstanceSchema.xsd";
-    
+
     private Transformer tr;
     private InstanceXML iv;
 
@@ -65,7 +65,7 @@ public class XMLInstanceBuilder {
             log.error(e.getMessage(), e);
         }
     }
-    
+
     public Document buildXml() {
         JAXBContext jaxContext;
         try {
@@ -74,7 +74,7 @@ public class XMLInstanceBuilder {
             marshaller.setProperty(Marshaller.JAXB_ENCODING, StandardCharsets.UTF_8.name());
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, XSI_SCHEMA_LOCATION);
-            
+
             Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
             marshaller.marshal(this.iv, doc);
             return doc;
@@ -83,31 +83,31 @@ public class XMLInstanceBuilder {
             return null;
         }
     }
-    
+
     public String buildXmlString() throws TransformerException {
         Document doc = buildXml();
-        
+
         DOMSource domSource = new DOMSource(doc);
         StringWriter sw = new StringWriter();
         tr.transform(domSource, new StreamResult(sw));
-        
+
         return sw.getBuffer().toString();
-        
+
     }
-    
+
     public InstanceXML getBuilderXml() {
         return this.iv;
     }
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
 
 }

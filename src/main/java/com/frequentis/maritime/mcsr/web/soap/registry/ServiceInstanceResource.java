@@ -37,7 +37,7 @@ import com.frequentis.maritime.mcsr.web.soap.errors.XmlValidateException;
 public interface ServiceInstanceResource {
     /**
      * Create a new instance.
-     * 
+     *
      * Atributes:
      * 	<ul>
      *  	<li>name</li>
@@ -54,7 +54,7 @@ public interface ServiceInstanceResource {
      *  	<li>unlocode</li>
      *  </ul>
      * are parsed from XML.
-     * 
+     *
      *
      * @param instance the instance to create
      * @param bearerToken
@@ -64,8 +64,8 @@ public interface ServiceInstanceResource {
      * @throws InstanceAlreadyExistException
      */
     public InstanceDTO createInstance(
-    		@WebParam(name = "instance") @XmlElement(required = true) InstanceParameterDTO instance, 
-    		@WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken) 
+    		@WebParam(name = "instance") @XmlElement(required = true) InstanceParameterDTO instance,
+    		@WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken)
     				throws AccessDeniedException, XmlValidateException, InstanceAlreadyExistException, ProcessingException;
 
     /**
@@ -75,12 +75,12 @@ public interface ServiceInstanceResource {
      * @return the ResponseEntity with status 200 (OK) and with body the updated instance,
      * or with status 400 (Bad Request) if the instance is not valid,
      * or with status 500 (Internal Server Error) if the instance couldnt be updated
-     * @throws Exception 
+     * @throws Exception
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     public InstanceDTO updateInstance(
-    		@WebParam(name = "instance") @XmlElement(required = true) InstanceParameterDTO instance, 
-    		@WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken) 
+    		@WebParam(name = "instance") @XmlElement(required = true) InstanceParameterDTO instance,
+    		@WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken)
     				throws AccessDeniedException, XmlValidateException, InstanceAlreadyExistException, ProcessingException;
 
     /**
@@ -91,7 +91,7 @@ public interface ServiceInstanceResource {
      * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
      */
     public PageDTO<InstanceDTO> getAllInstances(
-    		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc, 
+    		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc,
     		@WebParam(name = "page") @XmlElement(required = true) int page);
     /**
      * GET  /serviceInstance/:id/:version : get the "id" instance with version "version".
@@ -100,8 +100,8 @@ public interface ServiceInstanceResource {
      * @return the ResponseEntity with status 200 (OK) and with body the instance, or with status 404 (Not Found)
      */
     public InstanceDTO getInstance(
-    		@WebParam(name = "id") @XmlElement(required = true) String id, 
-    		@WebParam(name = "version") @XmlElement(required = true) String version, 
+    		@WebParam(name = "id") @XmlElement(required = true) String id,
+    		@WebParam(name = "version") @XmlElement(required = true) String version,
     		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc);
 
     /**
@@ -111,8 +111,8 @@ public interface ServiceInstanceResource {
      * @return the result of the search
      */
     public PageDTO<InstanceDTO> getAllInstancesById(
-    		@WebParam(name = "id") @XmlElement(required = true) String id, 
-    		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc, 
+    		@WebParam(name = "id") @XmlElement(required = true) String id,
+    		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc,
     		@WebParam(name = "page") @XmlElement(required = true) int page);
 
     /**
@@ -121,11 +121,11 @@ public interface ServiceInstanceResource {
      * @param id the domain id of the instance to delete
      * @param version the version of the instance to delete
      * @return the ResponseEntity with status 200 (OK)
-     * @throws Exception 
+     * @throws Exception
      */
     public void deleteInstance(
-    		@WebParam(name = "id") @XmlElement(required = true) String id, 
-    		@WebParam(name = "version") @XmlElement(required = true) String version, 
+    		@WebParam(name = "id") @XmlElement(required = true) String id,
+    		@WebParam(name = "version") @XmlElement(required = true) String version,
     		@WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken) throws AccessDeniedException;
 
     /**
@@ -136,8 +136,8 @@ public interface ServiceInstanceResource {
      * @return the result of the search
      */
     public PageDTO<InstanceDTO> searchInstances(
-    		@WebParam(name = "query") @XmlElement(required = true) String query, 
-    		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc, 
+    		@WebParam(name = "query") @XmlElement(required = true) String query,
+    		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc,
     		@WebParam(name = "page") @XmlElement(required = true) int page);
 
     /**
@@ -148,8 +148,8 @@ public interface ServiceInstanceResource {
      * @return the result of the search
      */
     public PageDTO<InstanceDTO> searchInstancesByKeywords(
-    		@WebParam(name = "query") @XmlElement(required = true) String query, 
-    		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc, 
+    		@WebParam(name = "query") @XmlElement(required = true) String query,
+    		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc,
     		@WebParam(name = "page") @XmlElement(required = true) int page);
 
     /**
@@ -160,8 +160,8 @@ public interface ServiceInstanceResource {
      * @return the result of the search
      */
     public PageDTO<InstanceDTO> searchInstancesByUnlocode(
-    		@WebParam(name = "query") @XmlElement(required = true) String query, 
-    		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc, 
+    		@WebParam(name = "query") @XmlElement(required = true) String query,
+    		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc,
     		@WebParam(name = "page") @XmlElement(required = true) int page);
 
     /**
@@ -172,18 +172,18 @@ public interface ServiceInstanceResource {
      * @param longitude the longitude of the search position
      * @param query if is {@value null} then match all
      * @return the result of the search
-     * @throws ProcessingException 
-     * @throws Exception 
-     * @throws NumberFormatException 
+     * @throws ProcessingException
+     * @throws Exception
+     * @throws NumberFormatException
      */
     public PageDTO<InstanceDTO> searchInstancesByLocation(
-    		@WebParam(name = "latitude") @XmlElement(required = true) String latitude, 
-    		@WebParam(name = "longitude") @XmlElement(required = true) String longitude, 
-    		@WebParam(name = "query") @XmlElement(required = true) String query, 
-    		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc, 
+    		@WebParam(name = "latitude") @XmlElement(required = true) String latitude,
+    		@WebParam(name = "longitude") @XmlElement(required = true) String longitude,
+    		@WebParam(name = "query") @XmlElement(required = true) String query,
+    		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc,
     		@WebParam(name = "page") @XmlElement(required = true) int page)
     				throws AccessDeniedException, ProcessingException;
- 
+
     /**
      * SEARCH  /_searchGeometryGeoJSON/serviceInstance?geometry=:geometry : search for the instance corresponding
      * to the supplied position
@@ -191,12 +191,12 @@ public interface ServiceInstanceResource {
      * @param geometry the search geometry in geojson format
      * @param query additional query filters in elasticsearch queryString syntax
      * @return the result of the search
-     * @throws Exception 
+     * @throws Exception
      */
     public PageDTO<InstanceDTO> searchInstancesByGeometryGeojson(
-    		@WebParam(name = "geometry") @XmlElement(required = true) String geometry, 
-    		@WebParam(name = "query") @XmlElement(required = true) String query, 
-    		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc, 
+    		@WebParam(name = "geometry") @XmlElement(required = true) String geometry,
+    		@WebParam(name = "query") @XmlElement(required = true) String query,
+    		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc,
     		@WebParam(name = "page") @XmlElement(required = true) int page) throws Exception;
 
     /**
@@ -206,12 +206,12 @@ public interface ServiceInstanceResource {
      * @param geometry the search geometry in WKT format
      * @param query additional query filters in elasticsearch queryString syntax
      * @return the result of the search
-     * @throws Exception 
+     * @throws Exception
      */
     public PageDTO<InstanceDTO> searchInstancesByGeometryWKT(
     		@WebParam(name = "geometry") @XmlElement(required = true) String geometry,
-    		@WebParam(name = "query") @XmlElement(required = true) String query, 
-    		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc, 
+    		@WebParam(name = "query") @XmlElement(required = true) String query,
+    		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc,
     		@WebParam(name = "page") @XmlElement(required = true) int page) throws Exception;
 
     /**
@@ -221,12 +221,12 @@ public interface ServiceInstanceResource {
      * @param version the id of the instance to deprecate/activate/etc.
      * @param status the new status
      * @return the ResponseEntity with status 200 (OK)
-     * @throws Exception 
+     * @throws Exception
      */
     public void updateInstanceStatus(
-    		@WebParam(name = "id") @XmlElement(required = true) String id, 
-    		@WebParam(name = "version") @XmlElement(required = true) String version, 
-    		@WebParam(name = "status") @XmlElement(required = true) String status, 
+    		@WebParam(name = "id") @XmlElement(required = true) String id,
+    		@WebParam(name = "version") @XmlElement(required = true) String version,
+    		@WebParam(name = "status") @XmlElement(required = true) String status,
     		@WebParam(name = "bearerToken") @XmlElement(required = true)  String bearerToken) throws Exception;
 
 

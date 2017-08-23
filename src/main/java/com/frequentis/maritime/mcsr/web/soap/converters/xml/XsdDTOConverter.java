@@ -32,7 +32,7 @@ public class XsdDTOConverter extends AbstractBidirectionalConverter<Xsd, XsdDTO>
 		d.setContent(f.content);
 		d.setContentContentType(f.contentContentType);
 		d.setName(f.name);
-		
+
 		return d;
 	}
 

@@ -8,7 +8,7 @@ public interface Converter<F,T> {
     public T convert(F from);
 
     public Collection<T> convert(Collection<F> from);
-    
-    public List<T> convert(List<F> from); 
+
+    public List<T> convert(List<F> from);
 
 }

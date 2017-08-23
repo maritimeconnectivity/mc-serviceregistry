@@ -34,7 +34,7 @@ public class SpecificationTemplateSetDescriptorConverter extends AbstractConvert
 		}
 		SpecificationTemplateSetDescriptorDTO t = new SpecificationTemplateSetDescriptorDTO();
 		mapGeterWithSameName(f, t);
-		
+
 		return t;
 	}
 

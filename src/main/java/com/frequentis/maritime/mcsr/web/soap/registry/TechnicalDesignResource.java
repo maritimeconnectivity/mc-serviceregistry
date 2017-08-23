@@ -31,11 +31,11 @@ import com.frequentis.maritime.mcsr.web.soap.errors.AccessDeniedException;
 import com.frequentis.maritime.mcsr.web.soap.errors.XmlValidateException;
 
 /**
- * 
+ *
  * @author Lukas Vorisek
  *
  */
-@WebService(targetNamespace = "com.frequentis.maritime.mcsr.web.soap.registry.TechnicalDesignResource", 
+@WebService(targetNamespace = "com.frequentis.maritime.mcsr.web.soap.registry.TechnicalDesignResource",
 	name = "TechnicalDesignResource")
 public interface TechnicalDesignResource {
 
@@ -44,12 +44,12 @@ public interface TechnicalDesignResource {
      * Create a new design.
      *
      * @param design the design to create
-     * @return the ResponseEntity with status 201 (Created) and with body the new design, or with status 400 (Bad Request) 
+     * @return the ResponseEntity with status 201 (Created) and with body the new design, or with status 400 (Bad Request)
      * if the design has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
 	@WebMethod
-    public DesignDescriptorDTO createDesign(@WebParam(name = "design") @XmlElement(required = true) DesignDTO design, 
+    public DesignDescriptorDTO createDesign(@WebParam(name = "design") @XmlElement(required = true) DesignDTO design,
     		@WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken) throws Exception, XmlValidateException;
 
     /**
@@ -62,7 +62,7 @@ public interface TechnicalDesignResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     public DesignDescriptorDTO updateDesign(
-    		@WebParam(name = "design") @XmlElement(required = true) DesignDTO design, 
+    		@WebParam(name = "design") @XmlElement(required = true) DesignDTO design,
     		@WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken
     		) throws Exception, URISyntaxException;
 
@@ -84,7 +84,7 @@ public interface TechnicalDesignResource {
      * @return the ResponseEntity with status 200 (OK) and with body the design, or with status 404 (Not Found)
      */
     public DesignDTO getDesign(
-    		@WebParam(name="id") @XmlElement(required = true) String id, 
+    		@WebParam(name="id") @XmlElement(required = true) String id,
     		@WebParam(name="version") @XmlElement(required = false, defaultValue = "latest") String version);
 
     /**
@@ -94,7 +94,7 @@ public interface TechnicalDesignResource {
      * @return the result of the search
      */
     public PageDTO<DesignDescriptorDTO> getAllDesignsById(
-    		@WebParam(name="id") @XmlElement(required = true) String id, 
+    		@WebParam(name="id") @XmlElement(required = true) String id,
     		@WebParam(name="page") @XmlElement(required = false, defaultValue = "0") int page);
 
     /**
@@ -104,20 +104,20 @@ public interface TechnicalDesignResource {
      * @return the result of the search
      */
     public PageDTO<DesignDescriptorDTO> getAllDesignsBySpecificationId(
-    		@WebParam(name="id") @XmlElement(required = true) String id, 
+    		@WebParam(name="id") @XmlElement(required = true) String id,
     		@WebParam(name="page") @XmlElement(required = false, defaultValue = "0") int page);
-    
+
     /**
      * Delete the "id" design of version "version".
      *
      * @param id the id of the design to delete
      * @param version the version of the design to delete
      * @return the ResponseEntity with status 200 (OK)
-     * @throws AccessDeniedException 
+     * @throws AccessDeniedException
      */
     public void deleteDesign(
-    		@WebParam(name="id") @XmlElement(required = true) String id, 
-    		@WebParam(name="version") @XmlElement(required = true) String version, 
+    		@WebParam(name="id") @XmlElement(required = true) String id,
+    		@WebParam(name="version") @XmlElement(required = true) String version,
     		@WebParam(name="bearerToken") @XmlElement(required = true) String bearerToken) throws AccessDeniedException;
 
     /**
@@ -140,10 +140,10 @@ public interface TechnicalDesignResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     public void updateDesignStatus(
-    		@WebParam(name="id") @XmlElement(required = true) String id, 
-    		@WebParam(name="version") @XmlElement(required = true) String version, 
-    		@WebParam(name="status") @XmlElement(required = true) String status, 
-    		@WebParam(name="bearerToken") @XmlElement(required = true) String bearerToken) 
+    		@WebParam(name="id") @XmlElement(required = true) String id,
+    		@WebParam(name="version") @XmlElement(required = true) String version,
+    		@WebParam(name="status") @XmlElement(required = true) String status,
+    		@WebParam(name="bearerToken") @XmlElement(required = true) String bearerToken)
     		throws Exception, AccessDeniedException;
 
 

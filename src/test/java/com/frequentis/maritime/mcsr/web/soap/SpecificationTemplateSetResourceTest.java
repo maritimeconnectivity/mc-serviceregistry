@@ -57,51 +57,51 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class SpecificationTemplateSetResourceTest {
 	Logger log = LoggerFactory.getLogger(SpecificationTemplateSetResourceTest.class);
 	private static final int RANDOM_NAME_LENGTH = 12;
-	
+
 	@Autowired
 	private SpecificationTemplateSetResource internal;
-	
+
 	@Autowired
 	DocService docService;
-	
+
 	@Autowired
 	SpecificationTemplateService specificationTemplateService;
-	
+
 	@LocalServerPort
 	private int port;
-	
+
 	private SpecificationTemplateSetResource client;
-	
+
 	static List<String> xmls;
 	static List<DocReference> docs = new ArrayList<DocReference>();
 	static List<SpecificationTemplateReference> templates = new ArrayList<SpecificationTemplateReference>();
-	
+
 	@BeforeClass
 	public static void loadResources() throws IOException {
 		DefaultResourceLoader rl = new DefaultResourceLoader();
 		String [] xmlNames = {"AddressForPersonLookupServiceDesignREST", "AddressForPersonLookupServiceInstance", "AddressForPersonLookupServiceSpecification"};
 		xmls = new ArrayList<String>(xmlNames.length);
-		
+
 		Resource resource;
 		for(String xml : xmlNames) {
 			resource = rl.getResource("classpath:dataload/xml/" + xml + ".xml");
 			xmls.add(new String(Files.readAllBytes(resource.getFile().toPath())));
 		}
-		
+
 	}
 
 	@Before
 	public void setUp() throws MalformedURLException {
 		URL wsdlUrl = new URL("http://localhost:" + port + "/services/SpecificationTemplateSetResource?wsdl");
 		Service s = Service.create(wsdlUrl, new QName("http://soap.web.mcsr.maritime.frequentis.com/", "SpecificationTemplateSetResourceImplService"));
-		
+
 		client = s.getPort(SpecificationTemplateSetResource.class);
 		SoapTestUtils.addHttpBasicSecurity(client);
-		
+
 		generateRandomDocs();
 		generateRandomTemplates();
 	}
-	
+
 	private void generateRandomDocs() {
 		if(!docs.isEmpty()) {
 			return;
@@ -114,15 +114,15 @@ public class SpecificationTemplateSetResourceTest {
 			d.setMimetype("text/plain");
 			d.setFilecontentContentType("text/plain");
 			d.setFilecontent(RandomStringUtils.randomAlphanumeric(1024).getBytes());
-			
+
 			docService.save(d);
 			DocReference dr = new DocReference();
 			dr.id = d.getId();
 			docs.add(dr);
 		}
-		
+
 	}
-	
+
 	private void generateRandomTemplates() {
 		if(!templates.isEmpty()) {
 			return;
@@ -134,29 +134,29 @@ public class SpecificationTemplateSetResourceTest {
 			d.setComment(rn);
 			d.setType(SpecificationTemplateType.DESIGN);
 			d.setVersion(randomVersion());
-			
+
 			specificationTemplateService.save(d);
 			SpecificationTemplateReference dr = new SpecificationTemplateReference();
 			dr.id = d.getId();
 			templates.add(dr);
 		}
-		
+
 	}
-	
+
 	private SpecificationTemplateSetParameter createSpecificationTemplateSetParameter() {
 		SpecificationTemplateSetParameter xml = new SpecificationTemplateSetParameter();
 		xml.name = RandomStringUtils.randomAlphabetic(RANDOM_NAME_LENGTH);
 		xml.comment = RandomStringUtils.randomAlphabetic(RANDOM_NAME_LENGTH);;
 		xml.version = randomVersion();
-	
+
 		xml.docs.add(randomDoc());
 		xml.docs.add(randomDoc());
-		
+
 		xml.templates.add(randomTemplate());
-		
+
 		return xml;
 	}
-	
+
 	private SpecificationTemplateReference randomTemplate() {
 		return templates.get((int) (Math.random() * templates.size()));
 	}
@@ -164,7 +164,7 @@ public class SpecificationTemplateSetResourceTest {
 	private DocReference randomDoc() {
 		return docs.get((int) (Math.random() * docs.size()));
 	}
-	
+
 	private String randomVersion() {
 		StringBuilder sb = new StringBuilder();
 		for(int i = 0; i < 3; i++) {
@@ -175,7 +175,7 @@ public class SpecificationTemplateSetResourceTest {
 		}
 		return sb.toString();
 	}
-	
+
 	private int randomVersionNumber() {
 		return (int) (Math.random() * 10);
 	}
@@ -184,16 +184,16 @@ public class SpecificationTemplateSetResourceTest {
 	public void create() throws ProcessingException {
 		// Given
 		SpecificationTemplateSetParameter newXml = createSpecificationTemplateSetParameter();
-		
+
 		// When
 		SpecificationTemplateSetDescriptorDTO savedDocument = client.createSpecificationTemplateSet(newXml);
-		
+
 		// Then
 		assertNotNull(savedDocument);
 		assertEquals(newXml.name, savedDocument.name);
 		assertEquals(newXml.comment, savedDocument.comment);
 	}
-	
+
 	@Test
 	public void getXml() throws ProcessingException {
 		// Given
@@ -203,17 +203,17 @@ public class SpecificationTemplateSetResourceTest {
 		for(int i = 0; i < 3; i++) {
 			internal.createSpecificationTemplateSet(createSpecificationTemplateSetParameter());
 		}
-		
+
 		// When
 		SpecificationTemplateSetDTO resultXml = client.getSpecificationTemplateSet(newXml.id);
-		
+
 		// Then
 		assertNotNull(resultXml);
 		assertEquals(newXml.name, resultXml.name);
 		assertEquals(newXml.comment, resultXml.comment);
-		
+
 	}
-	
+
 	@Test
 	public void getAllXmls() throws ProcessingException {
 		// Given
@@ -222,7 +222,7 @@ public class SpecificationTemplateSetResourceTest {
 		for(int i = 0; i < instanceCount; i++) {
 			xmls[i] = internal.createSpecificationTemplateSet(createSpecificationTemplateSetParameter());
 		}
-		
+
 		// When
 		List<SpecificationTemplateSetDescriptorDTO> storedXmls = new ArrayList<>();
 		int page = 0;
@@ -233,7 +233,7 @@ public class SpecificationTemplateSetResourceTest {
 				storedXmls.addAll(resultPage.content);
 			}
 		} while (resultPage.content != null && resultPage.page < resultPage.pageCount);
-		
+
 		// Then
 		assertNotNull(resultPage.content);
 		assertEquals(resultPage.itemTotalCount, storedXmls.size());
@@ -241,7 +241,7 @@ public class SpecificationTemplateSetResourceTest {
 			assertThat(storedXmls, hasItem(hasSpecificationTemplateSet(xml)));
 		}
 	}
-	
+
 	@Test
 	public void searchXml() throws ProcessingException {
 		// Given
@@ -254,15 +254,15 @@ public class SpecificationTemplateSetResourceTest {
 		for(int i = 0; i < 4; i++) {
 			internal.createSpecificationTemplateSet(createSpecificationTemplateSetParameter());
 		}
-		
+
 		// When
 		PageDTO<SpecificationTemplateSetDescriptorDTO> resultPage = client.searchSpecificationTemplateSets("name:" + prefix + "*", 0);
-		
+
 		// Then
 		assertNotNull(resultPage.content);
 		assertEquals(2, resultPage.itemTotalCount);
 	}
-	
+
 	@Test
 	public void updateXml() throws ProcessingException {
 		// Given
@@ -271,35 +271,35 @@ public class SpecificationTemplateSetResourceTest {
 		SpecificationTemplateSetParameter newXml = createSpecificationTemplateSetParameter();
 		newXml.name = oldName;
 		newXml.id = internal.createSpecificationTemplateSet(newXml).id;
-		
+
 		// When
 		newXml.name = newName;
 		client.updateSpecificationTemplateSet(newXml);
-		
+
 		// Then
 		SpecificationTemplateSetDescriptorDTO storedXml = internal. getSpecificationTemplateSet(newXml.id);
 		assertEquals(newName, storedXml.name);
 	}
-	
+
 	@Test
 	public void deleteXml() throws ProcessingException {
 		// Given
 		SpecificationTemplateSetDescriptorDTO newXml = internal.createSpecificationTemplateSet(createSpecificationTemplateSetParameter());
-		
+
 		// When
 		client.deleteSpecificationTemplateSet(newXml.id);
-		
+
 		// Then
 		SpecificationTemplateSetDescriptorDTO result = internal.getSpecificationTemplateSet(newXml.id);
 		assertNull(result);
 	}
-	
-	
+
+
 	private static Matcher<SpecificationTemplateSetDescriptorDTO> hasSpecificationTemplateSet(SpecificationTemplateSetDescriptorDTO doc) {
 		return new BaseMatcher<SpecificationTemplateSetDescriptorDTO>() {
 
 			private SpecificationTemplateSetDescriptorDTO actDoc;
-			
+
 			@Override
 			public boolean matches(Object item) {
 				SpecificationTemplateSetDescriptorDTO d = (SpecificationTemplateSetDescriptorDTO) item;
@@ -316,7 +316,7 @@ public class SpecificationTemplateSetResourceTest {
 			@Override
 			public void describeTo(Description description) {
 				description.appendValue("SpecificationTemplateSet " + actDoc.name + " should be " + doc.name);
-				
+
 			}
 		};
 

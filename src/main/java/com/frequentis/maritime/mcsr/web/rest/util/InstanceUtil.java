@@ -228,13 +228,13 @@ public class InstanceUtil {
             }
         }
     }
-    
+
     public static boolean checkOrganizationId(Instance instance, String organizationId) {
         if (instance.getOrganizationId() != null && instance.getOrganizationId().length() > 0 && !organizationId.equals(instance.getOrganizationId())) {
             return false;
         }
 		return true;
-    	
+
     }
 
 

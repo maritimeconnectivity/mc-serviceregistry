@@ -41,12 +41,12 @@ public class DocDTOConverter extends AbstractBidirectionalConverter<Doc, DocDTO>
 		d.setFilecontent(f.filecontent);
 		d.setFilecontentContentType(f.filecontentContentType);
 		d.setMimetype(f.mimetype);
-		
+
 		return d;
 	}
 
 
-    
+
 
 
 }

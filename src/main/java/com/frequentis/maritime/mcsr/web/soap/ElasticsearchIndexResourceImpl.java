@@ -36,10 +36,10 @@ import org.springframework.stereotype.Component;
 @Secured("ROLE_USER")
 public class ElasticsearchIndexResourceImpl implements ElasticsearchIndexResource {
 	private final static Logger log = LoggerFactory.getLogger(ElasticsearchIndexResourceImpl.class);
-	
+
 	@Autowired
 	ElasticsearchIndexService elasticsearchIndexService;
-	
+
 	@Override
 	public void reindexAll() throws ProcessingException {
         log.info("REST request to reindex Elasticsearch by user : {}", SecurityUtils.getCurrentUserLogin());

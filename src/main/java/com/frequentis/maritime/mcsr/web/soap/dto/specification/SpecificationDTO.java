@@ -16,5 +16,5 @@ public class SpecificationDTO extends SpecificationDescriptorDTO {
     public DocDTO docs;
     @XmlElement(required = true)
     public SpecificationTemplateDTO implementedSpecificationVersion;
-    
+
 }

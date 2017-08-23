@@ -31,10 +31,10 @@ public class SpecificationTemplateSetConverter extends AbstractConverter<Specifi
 
 	@Autowired
 	DocDTOConverter docConverter;
-	
+
 	@Autowired
 	SpecificationTemplateDTOConverter templatesConverter;
-	
+
 	@Override
 	public SpecificationTemplateSetDTO convert(SpecificationTemplateSet f) {
 		if(f == null) {
@@ -44,7 +44,7 @@ public class SpecificationTemplateSetConverter extends AbstractConverter<Specifi
 		mapGeterWithSameName(f, t);
 		t.docs = castToSet(docConverter.convert(f.getDocs()));
 		t.templates = castToSet(templatesConverter.convert(f.getTemplates()));
-		
+
 		return t;
 	}
 

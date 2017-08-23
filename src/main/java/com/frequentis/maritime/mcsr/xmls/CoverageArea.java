@@ -32,7 +32,7 @@ public class CoverageArea {
     private String description;
     @XmlElement(namespace = "http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceInstanceSchema.xsd")
     private String geometryAsWKT;
-    
+
     public String getName() {
         return name;
     }
@@ -51,5 +51,5 @@ public class CoverageArea {
     public void setGeometryAsWKT(String geometryAsWKT) {
         this.geometryAsWKT = geometryAsWKT;
     }
-    
+
 }

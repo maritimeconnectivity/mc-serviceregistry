@@ -34,41 +34,41 @@ public class CoversAreaType {
             @XmlElement(name = "coversArea", namespace = "http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceInstanceSchema.xsd", type = CoverageArea.class)
     })
     private List<?> area;
-    
+
     public boolean isCoversArea() {
         return !area.isEmpty() && area.get(0) instanceof CoverageArea;
     }
-    
+
     public boolean isUnLoCode() {
         return !area.isEmpty() && area.get(0) instanceof String;
     }
-    
+
     @SuppressWarnings("unchecked")
     public List<CoverageArea> getCoversArea() {
         if(isCoversArea()) {
             return (List<CoverageArea>) area;
         }
-        
+
         return null;
     }
-    
+
     public void setCoversArea(List<CoverageArea> coversArea) {
         this.area = coversArea;
     }
-    
+
     public String getUnLoCode() {
         if(isUnLoCode()) {
             return (String) area.get(0);
         }
-        
+
         return null;
     }
-    
+
     @SuppressWarnings("unchecked")
     public void setUnLoCode(String unLoCode) {
         this.area = new ArrayList<String>();
         ((ArrayList<String>) this.area).add(unLoCode);
     }
-    
-    
+
+
 }

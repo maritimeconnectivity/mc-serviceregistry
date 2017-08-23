@@ -75,6 +75,6 @@ public interface XmlResource {
      */
 	@WebMethod
     public PageDTO<XmlDescriptorDTO> searchXmls(
-    		@WebParam(name = "query") @XmlElement(required = true) String query,  
+    		@WebParam(name = "query") @XmlElement(required = true) String query,
     		@WebParam(name = "page") @XmlElement(required = true) int page) throws ProcessingException;
 }

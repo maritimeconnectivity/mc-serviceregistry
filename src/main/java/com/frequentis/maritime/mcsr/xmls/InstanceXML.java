@@ -29,8 +29,8 @@ public class InstanceXML {
     public enum Status {
         provisional, relased, deprecated, deleted;
     }
-    
-    
+
+
     @XmlElement(namespace = "http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceInstanceSchema.xsd")
     private String id;
     @XmlElement(namespace = "http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceInstanceSchema.xsd")
@@ -63,7 +63,7 @@ public class InstanceXML {
     private VendorInfo producedBy = new VendorInfo();
     @XmlElement(namespace = "http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceInstanceSchema.xsd")
     private VendorInfo providedBy = new VendorInfo();
-    
+
     public String getId() {
         return id;
     }
@@ -160,5 +160,5 @@ public class InstanceXML {
     public void setProvidedBy(VendorInfo providedBy) {
         this.providedBy = providedBy;
     }
-    
+
 }

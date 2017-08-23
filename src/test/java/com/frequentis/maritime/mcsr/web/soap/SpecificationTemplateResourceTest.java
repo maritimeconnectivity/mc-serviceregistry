@@ -54,39 +54,39 @@ public class SpecificationTemplateResourceTest {
 	Logger log = LoggerFactory.getLogger(SpecificationTemplateResourceTest.class);
 	private static final int RANDOM_NAME_LENGTH = 12;
 
-	
+
 	@Autowired
 	private SpecificationTemplateResource internal;
-	
+
 	@Autowired
 	private DocService docService;
-	
+
 	@Autowired
 	private XsdService xsdService;
-	
+
 	@LocalServerPort
 	private int port;
-	
+
 	private SpecificationTemplateResource client;
-	
+
 	static List<String> xmls;
-	
+
 	private List<DocReference> docs = new ArrayList<>();
 	private List<XsdReference> xsds = new ArrayList<>();
-	
+
 	@Before
 	public void setUp() throws MalformedURLException {
 		URL wsdlUrl = new URL("http://localhost:" + port + "/services/SpecificationTemplateResource?wsdl");
 		Service s = Service.create(wsdlUrl, new QName("http://soap.web.mcsr.maritime.frequentis.com/", "SpecificationTemplateResourceImplService"));
-		
+
 		client = s.getPort(SpecificationTemplateResource.class);
 		SoapTestUtils.addHttpBasicSecurity(client);
-		
+
 		// PrepareDocs
 		prepareDocs();
 		prepareXsds();
 	}
-	
+
 	private void prepareDocs() {
 		// TODO Auto-generated method stub
 		for(int i = 0; i < 6; i++) {
@@ -97,14 +97,14 @@ public class SpecificationTemplateResourceTest {
 			d.setFilecontent(RandomStringUtils.randomAlphabetic(1024).getBytes());
 			d.setFilecontentContentType("text/plain");
 			d.setMimetype("text/plain");
-			
+
 			docService.save(d);
 			DocReference dRef = new DocReference();
 			dRef.id = d.getId();
 			docs.add(dRef);
 		}
 	}
-	
+
 	private void prepareXsds() {
 		// TODO Auto-generated method stub
 		for(int i = 0; i < 6; i++) {
@@ -114,18 +114,18 @@ public class SpecificationTemplateResourceTest {
 			d.setComment(dr);
 			d.setContent(RandomStringUtils.randomAlphabetic(1024).getBytes());
 			d.setContentContentType("text/plain");
-			
+
 			xsdService.save(d);
 			XsdReference dRef = new XsdReference();
 			dRef.id = d.getId();
 			xsds.add(dRef);
 		}
 	}
-	
+
 	private DocReference randomDoc() {
 		return this.docs.get((int) (Math.random() * this.docs.size()));
 	}
-	
+
 	private XsdReference randomXsd() {
 		return this.xsds.get((int) (Math.random() * this.xsds.size()));
 	}
@@ -141,7 +141,7 @@ public class SpecificationTemplateResourceTest {
 		specificationTemplate.xsds = new ArrayList<>(Arrays.asList(randomXsd(), randomXsd()));
 		SpecificationTemplateType [] types = SpecificationTemplateType.values();
 		specificationTemplate.type = types[(int) (Math.random() * types.length)];
-		
+
 		return specificationTemplate;
 	}
 
@@ -149,16 +149,16 @@ public class SpecificationTemplateResourceTest {
 	public void create() throws ProcessingException {
 		// Given
 		SpecificationTemplateParameterDTO newXsd = createSpecificationTempalte();
-		
+
 		// When
 		SpecificationTemplateDescriptorDTO savedDocument = internal.createSpecificationTemplate(newXsd);
-		
+
 		// Then
 		assertNotNull(savedDocument);
 		assertEquals(newXsd.name, savedDocument.name);
 		assertEquals(newXsd.comment, savedDocument.comment);
 	}
-	
+
 	@Test
 	public void getSpecificationTemplate() throws ProcessingException {
 		// Given
@@ -168,19 +168,19 @@ public class SpecificationTemplateResourceTest {
 		for(int i = 0; i < 3; i++) {
 			internal.createSpecificationTemplate(createSpecificationTempalte());
 		}
-		
+
 		// When
 		SpecificationTemplateDTO resultXsd = client.getSpecificationTemplate(newXsd.id);
-		
+
 		// Then
 		assertNotNull(resultXsd);
 		assertEquals(newXsd.name, resultXsd.name);
 		assertEquals(newXsd.comment, resultXsd.comment);
 		assertEquals(newXsd.docs.size(), resultXsd.docs.size());
 		assertEquals(newXsd.guidelineDoc.id, resultXsd.guidelineDoc.id);
-		
+
 	}
-	
+
 	@Test
 	public void getAllXsds() throws ProcessingException {
 		// Given
@@ -189,7 +189,7 @@ public class SpecificationTemplateResourceTest {
 		for(int i = 0; i < instanceCount; i++) {
 			xmls[i] = internal.createSpecificationTemplate(createSpecificationTempalte());
 		}
-		
+
 		// When
 		List<SpecificationTemplateDescriptorDTO> storedXmls = new ArrayList<>();
 		int page = 0;
@@ -200,7 +200,7 @@ public class SpecificationTemplateResourceTest {
 				storedXmls.addAll(resultPage.content);
 			}
 		} while (resultPage.content != null && resultPage.page < resultPage.pageCount);
-		
+
 		// Then
 		assertNotNull(resultPage.content);
 		assertEquals(resultPage.itemTotalCount, storedXmls.size());
@@ -208,7 +208,7 @@ public class SpecificationTemplateResourceTest {
 			assertThat(storedXmls, hasItem(hasTemplate(xml)));
 		}
 	}
-	
+
 	@Test
 	public void searchXml() throws ProcessingException {
 		// Given
@@ -221,15 +221,15 @@ public class SpecificationTemplateResourceTest {
 		for(int i = 0; i < 4; i++) {
 			internal.createSpecificationTemplate(createSpecificationTempalte());
 		}
-		
+
 		// When
 		PageDTO<SpecificationTemplateDescriptorDTO> resultPage = client.searchSpecificationTemplates("name:" + prefix + "*", 0);
-		
+
 		// Then
 		assertNotNull(resultPage.content);
 		assertEquals(2, resultPage.itemTotalCount);
 	}
-	
+
 	@Test
 	public void updateXsd() throws ProcessingException {
 		// Given
@@ -238,34 +238,34 @@ public class SpecificationTemplateResourceTest {
 		SpecificationTemplateParameterDTO newXsd = createSpecificationTempalte();
 		newXsd.name = oldName;
 		newXsd.id = internal.createSpecificationTemplate(newXsd).id;
-		
+
 		// When
 		newXsd.name = newName;
 		client.updateSpecificationTemplate(newXsd);
-		
+
 		// Then
 		SpecificationTemplateDTO storedXml = internal.getSpecificationTemplate(newXsd.id);
 		assertEquals(newName, storedXml.name);
 	}
-	
+
 	@Test
 	public void deleteSpecificationTemplate() throws ProcessingException {
 		// Given
 		SpecificationTemplateDescriptorDTO newTemplate = internal.createSpecificationTemplate(createSpecificationTempalte());
-		
+
 		// When
 		client.deleteSpecificationTemplate(newTemplate.id);
-		
+
 		// Then
 		SpecificationTemplateDTO result = internal.getSpecificationTemplate(newTemplate.id);
 		assertNull(result);
 	}
-	
+
 	private static Matcher<SpecificationTemplateDescriptorDTO> hasTemplate(SpecificationTemplateDescriptorDTO doc) {
 		return new BaseMatcher<SpecificationTemplateDescriptorDTO>() {
 
 			private SpecificationTemplateDescriptorDTO actDoc;
-			
+
 			@Override
 			public boolean matches(Object item) {
 				SpecificationTemplateDescriptorDTO d = (SpecificationTemplateDescriptorDTO) item;
@@ -282,18 +282,18 @@ public class SpecificationTemplateResourceTest {
 			@Override
 			public void describeTo(Description description) {
 				description.appendValue("SpecificationTemplateDescriptor " + actDoc.name + " should be " + doc.name);
-				
+
 			}
 		};
 
 	}
-	
-	
+
+
 	private static Matcher<SpecificationTemplateParameterDTO> hasTemplate(SpecificationTemplateParameterDTO doc) {
 		return new BaseMatcher<SpecificationTemplateParameterDTO>() {
 
 			private SpecificationTemplateDescriptorDTO actDoc;
-			
+
 			@Override
 			public boolean matches(Object item) {
 				SpecificationTemplateDescriptorDTO d = (SpecificationTemplateDescriptorDTO) item;
@@ -310,7 +310,7 @@ public class SpecificationTemplateResourceTest {
 			@Override
 			public void describeTo(Description description) {
 				description.appendValue("SpecificationTemplateDescriptor " + actDoc.name + " should be " + doc.name);
-				
+
 			}
 		};
 

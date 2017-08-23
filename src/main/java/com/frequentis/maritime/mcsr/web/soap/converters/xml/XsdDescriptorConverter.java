@@ -31,7 +31,7 @@ public class XsdDescriptorConverter extends AbstractBidirectionalConverter<Xsd, 
 		d.setComment(f.comment);
 		d.setId(f.id);
 		d.setName(f.name);
-		
+
 		return d;
 	}
 

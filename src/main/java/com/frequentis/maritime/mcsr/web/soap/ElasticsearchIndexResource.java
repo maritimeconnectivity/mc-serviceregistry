@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 @Component
 @WebService(name = "ElasticsearchIndexResource")
 public interface ElasticsearchIndexResource {
-	
+
     /**
      * Reindex all Elasticsearch documents
      */

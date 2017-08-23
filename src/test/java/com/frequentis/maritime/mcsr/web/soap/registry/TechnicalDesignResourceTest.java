@@ -49,35 +49,35 @@ public class TechnicalDesignResourceTest {
 	Logger log = LoggerFactory.getLogger(TechnicalDesignResourceTest.class);
 	private static final String TOKEN = "";
 	private static int usedDesignId = 0;
-	
+
 	@Autowired
 	private TechnicalDesignResource designResourceInternal;
-	
+
 	@Autowired
 	ElasticsearchTemplate est;
-	
+
 	@LocalServerPort
 	private int port;
-	
+
 	private TechnicalDesignResource client;
 	private static String xml;
-	
+
 	@BeforeClass
 	public static void loadResources() throws IOException {
 		DefaultResourceLoader rl = new DefaultResourceLoader();
 		Resource resource = rl.getResource("classpath:dataload/xml/AddressForPersonLookupServiceDesignREST.xml");
 		xml = new String(Files.readAllBytes(resource.getFile().toPath()));
 	}
-	
+
 	@Before
 	public void setUp() throws MalformedURLException {
 		URL wsdlUrl = new URL("http://localhost:" + port + "/services/TechnicalDesignResource?wsdl");
 		Service s = Service.create(wsdlUrl, new QName("http://registry.soap.web.mcsr.maritime.frequentis.com/", "TechnicalDesignResourceImplService"));
-		
+
 		client = s.getPort(TechnicalDesignResource.class);
 		SoapTestUtils.addHttpBasicSecurity(client);
 	}
-	
+
 
 	private DesignDTO prepareValidDesignDTO() {
 		DesignDTO designDTO = new DesignDTO();
@@ -92,15 +92,15 @@ public class TechnicalDesignResourceTest {
 		designDTO.comment = "dwaadwadawd";
 		return designDTO;
 	}
-	
+
 	@Test
 	public void createSuccess() throws URISyntaxException, Exception {
 		DesignDTO designDTO = prepareValidDesignDTO();
-		
+
 		DesignDescriptorDTO createdDesign = client.createDesign(designDTO, TOKEN);
 		assertThat(createdDesign.name, is(designDTO.name));
 	}
-	
+
 	@Test
 	public void documentCounts() throws XmlValidateException, Exception {
 		// Given
@@ -109,26 +109,26 @@ public class TechnicalDesignResourceTest {
 		// When
 		designResourceInternal.createDesign(prepareValidDesignDTO(), TOKEN);
 		long cl = client.getAllDesigns(0).itemTotalCount;
-		
+
 		// Then
 		assertEquals(count + 1, cl);
 	}
-	
+
 	@Test
 	public void getDesign() throws XmlValidateException, Exception {
 		// Given
 		DesignDescriptorDTO design = designResourceInternal.createDesign(prepareValidDesignDTO(), TOKEN);
-		
+
 		// When
 		DesignDTO storedDesign = client.getDesign(design.designId, design.version);
-		
+
 		// Then
 		assertEquals(design.id, storedDesign.id);
 		assertEquals(design.version, storedDesign.version);
 		assertEquals(design.comment, storedDesign.comment);
 		assertEquals(design.name, storedDesign.name);
 	}
-	
+
 	@Test
 	public void searchById() throws XmlValidateException, Exception {
 		// Given
@@ -140,28 +140,28 @@ public class TechnicalDesignResourceTest {
 
 		// When
 		PageDTO<DesignDescriptorDTO> searchResult = client.getAllDesignsById(newDesign.designId, 0);
-		
+
 		// Then
 		assertNotNull(searchResult.content);
 		assertEquals("ID must be same", newDesign.id, searchResult.content.get(0).id);
 		assertEquals("NAME must be same", newDesign.name, searchResult.content.get(0).name);
-		
+
 	}
-	
-	@Test 
+
+	@Test
 	public void documentRemove() throws XmlValidateException, Exception {
 		// Given
 		long countBefore = designResourceInternal.getAllDesigns(0).itemTotalCount;
 		DesignDescriptorDTO newDto = designResourceInternal.createDesign(prepareValidDesignDTO(), TOKEN);
-		
+
 		// When
 		client.deleteDesign(newDto.designId, newDto.version, TOKEN);
-		
+
 		// Then
 		long countAfter = designResourceInternal.getAllDesigns(0).itemTotalCount;
 		assertEquals(countBefore, countAfter);
 	}
-	
+
 	@Test
 	public void getAllDocumentVersion() throws XmlValidateException, Exception {
 		// Given
@@ -175,36 +175,36 @@ public class TechnicalDesignResourceTest {
 		version3.designId = version1.designId;
 		version3.version = "1.7.4";
 		designResourceInternal.createDesign(version3, TOKEN);
-		
+
 		// When
 		PageDTO<DesignDescriptorDTO> designDescriptor = client.getAllDesignsById(version1.designId, 0);
 		for(DesignDescriptorDTO dd : designDescriptor.content) {
 			log.error("WHAT? Design {} in version {} and designId {}", dd.id, dd.version, dd.designId);
 		}
-		
+
 		// Then
 		assertEquals(3, designDescriptor.itemTotalCount);
 		assertThat(designDescriptor.content, hasItem(hasVersion("1.6.7")));
 		assertThat(designDescriptor.content, hasItem(hasVersion("1.7.4")));
 		assertThat(designDescriptor.content, hasItem(hasVersion("1.2.3")));
-		
+
 	}
-	
+
 	@Test
 	public void updateStatus() throws XmlValidateException, Exception {
 		// Given
 		DesignDescriptorDTO design = designResourceInternal.createDesign(prepareValidDesignDTO(), TOKEN);
 		String newStatus = "newSamleStatus";
-		
+
 		// When
 		client.updateDesignStatus(design.designId, design.version, newStatus, TOKEN);
-		
+
 		// Then
 		DesignDTO designAfter = client.getDesign(design.designId, design.version);
 		assertEquals(newStatus, designAfter.status);
-		
+
 	}
-	
+
 	@Test
 	public void updateDocument() throws XmlValidateException, Exception {
 		// Given
@@ -213,24 +213,24 @@ public class TechnicalDesignResourceTest {
 		DesignDTO design = prepareValidDesignDTO();
 		design.name = originalName;
 		DesignDescriptorDTO saved = designResourceInternal.createDesign(design, TOKEN);
-		
-		
+
+
 		// When
 		DesignDTO obtainedDesign = designResourceInternal.getDesign(saved.designId, saved.version);
 		obtainedDesign.name = "newName";
 		client.updateDesign(obtainedDesign, TOKEN);
-		
+
 		// Then
 		DesignDTO currentDesign = designResourceInternal.getDesign(design.designId, design.version);
 		assertEquals(newName, currentDesign.name);
 	}
-	
-	
+
+
 	//@Test
 	public void getAllDesignBySpecificationId() {
 	    // TODO There should be some test for getting all designs by specification id
 	}
-	
+
 	@Test
 	public void searchDocument() throws XmlValidateException, Exception {
 		// Given
@@ -242,24 +242,24 @@ public class TechnicalDesignResourceTest {
 			d.status = "customSearchADwdaxawsadwwDAWdwsxcxadwakjhJHKHWDWA" + rand;
 			designResourceInternal.createDesign(d, TOKEN);
 		}
-		
+
 		// When
 		PageDTO<DesignDescriptorDTO> pdd = client.searchDesigns("name:customSearch*", 0);
-		
+
 		// Then
 		assertEquals(5, pdd.itemTotalCount);
 
 	}
-	
+
 	private static Matcher<DesignDescriptorDTO> hasVersion(String version) {
 		return new BaseMatcher<DesignDescriptorDTO>() {
 
 			private String actVersion;
-			
+
 			@Override
 			public boolean matches(Object item) {
 				DesignDescriptorDTO descriptor = (DesignDescriptorDTO) item;
-				actVersion = descriptor.version; 
+				actVersion = descriptor.version;
 				if(descriptor.version == null) {
 					return false;
 				}
@@ -269,7 +269,7 @@ public class TechnicalDesignResourceTest {
 			@Override
 			public void describeTo(Description description) {
 				description.appendValue("version " + actVersion + " but version should be " + version);
-				
+
 			}
 		};
 

@@ -40,7 +40,7 @@ public final class SoapTestUtils {
         ap.setPassword("admin");
         cp.setAuthorization(ap);
     }
-    
+
     /**
      * Add HTTP Basic authentication with user {@code user} and password {@code password}
      * @param client

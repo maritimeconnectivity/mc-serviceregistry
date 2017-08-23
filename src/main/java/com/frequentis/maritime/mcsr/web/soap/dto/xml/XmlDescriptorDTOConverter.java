@@ -15,7 +15,7 @@ public class XmlDescriptorDTOConverter extends AbstractConverter<Xml, XmlDescrip
 		}
 		XmlDescriptorDTO r = new XmlDescriptorDTO();
 		mapGeterWithSameName(f, r);
-		
+
 		return r;
 	}
 

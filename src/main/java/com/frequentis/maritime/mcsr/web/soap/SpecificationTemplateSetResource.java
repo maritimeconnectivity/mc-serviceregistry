@@ -34,7 +34,7 @@ import com.frequentis.maritime.mcsr.web.soap.errors.ProcessingException;
 
 @WebService(name = "SpecificationTemplateSetResource")
 public interface SpecificationTemplateSetResource {
-	
+
     /**
      * POST  /specification-template-sets : Create a new specificationTemplateSet.
      *
@@ -98,7 +98,7 @@ public interface SpecificationTemplateSetResource {
      */
 	@WebMethod
     public PageDTO<SpecificationTemplateSetDescriptorDTO> searchSpecificationTemplateSets(
-    		@WebParam(name = "query") @XmlElement(required = true) String query, 
+    		@WebParam(name = "query") @XmlElement(required = true) String query,
     		@WebParam(name = "page") @XmlElement(required = true) int page);
 
 

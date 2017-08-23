@@ -42,7 +42,7 @@ public class SpecificationDTOConverter extends AbstractBidirectionalConverter<Sp
 
         return t;
     }
-    
+
     public Specification convertReverse(SpecificationDTO f) {
         if(f == null) {
             return null;

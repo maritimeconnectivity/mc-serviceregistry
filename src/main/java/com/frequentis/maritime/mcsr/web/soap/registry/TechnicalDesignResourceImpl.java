@@ -38,13 +38,13 @@ public class TechnicalDesignResourceImpl implements TechnicalDesignResource {
 	private static final Logger log = LoggerFactory.getLogger(TechnicalDesignResourceImpl.class);
 	private static final int ITEMS_PER_PAGE = 10;
 	private static final String SCHEMA_SERVICE_DESIGN = "ServiceDesignSchema.xsd";
-	
+
 	@Inject
     private DesignService designService;
-	
+
 	@Inject
 	private XmlService xmlService;
-	
+
 	@Inject
 	private DesignConverter designConverter;
 	@Inject
@@ -59,15 +59,15 @@ public class TechnicalDesignResourceImpl implements TechnicalDesignResource {
 		log.debug("SOAP request to create design");
 		String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
 		Design design = designConverter.convertReverse(designDto);
-		
-		
+
+
 		if(design.getId() != null) {
 			throw new Exception("A new design cannot already have an ID");
 		}
 		if(design.getDesignAsXml() == null || design.getDesignAsXml().getContent() == null) {
 			throw new Exception("XML must be present!");
 		}
-		
+
 		String xml = design.getDesignAsXml().getContent().toString();
 		log.info("XML: " + xml);
 		try {
@@ -76,7 +76,7 @@ public class TechnicalDesignResourceImpl implements TechnicalDesignResource {
 			throw new XmlValidateException("Design XML validation failed.", e);
 		}
 		xmlService.save(design.getDesignAsXml());
-		
+
 		design.setOrganizationId(organizationId);
 		Design result = designService.save(design);
 		return designDescriptorConverter.convert(result);
@@ -92,17 +92,17 @@ public class TechnicalDesignResourceImpl implements TechnicalDesignResource {
 			return createDesign(designDto, bearerToken);
 		}
 		Design design = designConverter.convertReverse(designDto);
-		
+
 		String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
 		if(!DesignUtils.matchOrganizationId(design, organizationId)) {
 			log.warn("");
 			throw new AccessDeniedException("");
 		}
-		
+
 		String xml = design.getDesignAsXml().getContent().toString();
 		log.info("XML: " + xml);
 		XmlUtil.validateXml(xml, SCHEMA_SERVICE_DESIGN);
-		
+
 		Design result = designService.save(design);
 		return designDescriptorConverter.convert(result);
 	}
@@ -129,7 +129,7 @@ public class TechnicalDesignResourceImpl implements TechnicalDesignResource {
 		} else {
 			design = designService.findByDomainId(id, version);
 		}
-		
+
 		return designConverter.convert(design);
 	}
 
@@ -156,7 +156,7 @@ public class TechnicalDesignResourceImpl implements TechnicalDesignResource {
 
 	/**
 	 * {@inheritDoc}
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	@Override
 	public void deleteDesign(String id, String version, String bearerToken) throws AccessDeniedException {
@@ -166,9 +166,9 @@ public class TechnicalDesignResourceImpl implements TechnicalDesignResource {
 			log.warn("Request for delete nonexisted design wit id {}", id);
 			return;
 		}
-		
+
 		String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
-		
+
 		if(!DesignUtils.matchOrganizationId(design, organizationId)) {
 			log.warn("Cannot delete entity, organization ID "+organizationId+" does not match that of entity: "+design.getOrganizationId());
 			throw new AccessDeniedException("Cannot delete entity, organization ID "+organizationId+" does not match that of entity: "+design.getOrganizationId());
@@ -193,16 +193,16 @@ public class TechnicalDesignResourceImpl implements TechnicalDesignResource {
 	public void updateDesignStatus(String id, String version, String status, String bearerToken) throws Exception, AccessDeniedException {
 		log.debug("SOAP request to update design status to {} by design id {} and version {}", status, id, version);
 		Design design = designService.findByDomainId(id, version);
-		
+
 		String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
 		if(!DesignUtils.matchOrganizationId(design, organizationId)) {
 			log.warn("Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+design.getOrganizationId());
 			throw new AccessDeniedException("Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+design.getOrganizationId());
 		}
-		
+
 		// Ommited - no effect
         // DesignUtils.updateXmlStatusValue(design, status);
-		
+
 		designService.updateStatus(design.getId(), status);
 	}
 

@@ -37,7 +37,7 @@ public class VendorInfo {
     private String contactInfo;
     @XmlElement(namespace = "http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceSpecificationSchema.xsd")
     private String organizationId;
-    
+
     public String getId() {
         return id;
     }
@@ -68,5 +68,5 @@ public class VendorInfo {
     public void setOrganizationId(String organizationId) {
         this.organizationId = organizationId;
     }
-    
+
 }

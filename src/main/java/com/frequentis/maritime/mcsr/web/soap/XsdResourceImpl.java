@@ -27,13 +27,13 @@ public class XsdResourceImpl implements XsdResource {
 	public static final int ITEMS_PER_PAGE = 50;
 
 	Logger log = LoggerFactory.getLogger(XsdResourceImpl.class);
-	
+
 	@Autowired
 	XsdDTOConverter xsdConverter;
-	
+
 	@Autowired
 	XsdDescriptorConverter xsdDCovnerter;
-	
+
 	@Autowired
 	XsdService xsdService;
 
@@ -106,7 +106,7 @@ public class XsdResourceImpl implements XsdResource {
 
         return PageResponse.buildFromPage(pageResponse, xsdDCovnerter);
 	}
-	
+
 
 
 }

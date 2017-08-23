@@ -94,13 +94,13 @@ public class ServiceInstanceResourceTest {
 
 	@Autowired
 	private ServiceInstanceResource instanceInternal;
-	
+
 	@Autowired
 	DocService docService;
-	
+
 	@Autowired
 	XmlService xmlService;
-	
+
 	@Autowired
 	SpecificationTemplateService specTemplateService;
 
@@ -172,12 +172,12 @@ public class ServiceInstanceResourceTest {
 			keywords = sb.toString();
 			// UnloCode
 			unloCode = "CZ";
-			
+
 			instanceAsDoc = createRandomDocReference(name);
 			docs = new ArrayList<DocReference>();
 			docs.add(createRandomDocReference(name + RandomStringUtils.randomAlphanumeric(10)));
 			docs.add(createRandomDocReference(name + RandomStringUtils.randomAlphanumeric(10)));
-			
+
 			SpecificationTemplate st = new SpecificationTemplate();
 			String rsn = RandomStringUtils.randomAlphanumeric(20);
 			st.setName(rsn);
@@ -192,14 +192,14 @@ public class ServiceInstanceResourceTest {
 		@Transactional
 		private DesignReference createRandomDesign(String name2) {
 			Doc doc = docService.save(createRandomDoc(name2 + "dad"));
-			
+
 			Xml xml = new Xml();
 			xml.setName(name2);
 			xml.setComment("dwdw");
 			xml.setContent("daddddwa");
 			xml.setContentContentType("text/plain");
 			xmlService.save(xml);
-			
+
 			Design designDTO = new Design();
 			designDTO.setName("DesignFor" + name2);
 			designDTO.setComment("caw");
@@ -208,7 +208,7 @@ public class ServiceInstanceResourceTest {
 			designDTO.setStatus(STATUSES[0]);
 			designDTO.setVersion("1.0." + (int) (Math.random() * 9));
 			designDTO.setDesignId("dsg:" + randomStringGenerator(30));
-			
+
 			DesignReference dr = new DesignReference();
 			dr.id = designDTO.getId();
 			return dr;
@@ -224,7 +224,7 @@ public class ServiceInstanceResourceTest {
 
 			return nd;
 		}
-		
+
 		public DocReference createRandomDocReference(String fn) {
 			Doc d = createRandomDoc(fn);
 			docService.save(d);
@@ -252,7 +252,7 @@ public class ServiceInstanceResourceTest {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param name
 	 *            override service name from XML
 	 * @return
@@ -317,7 +317,7 @@ public class ServiceInstanceResourceTest {
 		XmlReference xmlRef = new XmlReference();
 		xmlRef.id = instanceAsXml.getId();
 		inst.instanceAsXml = xmlRef;
-		
+
 		inst.instanceAsDoc = values.instanceAsDoc;
 		return inst;
 	}

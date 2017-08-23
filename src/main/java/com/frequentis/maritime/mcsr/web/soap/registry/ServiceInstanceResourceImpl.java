@@ -43,22 +43,22 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 	private static final String SCHEMA_SERVICE_INSTANCE = "ServiceInstanceSchema.xsd";
 	private static final int ITEMS_PER_PAGE = 10;
 	Logger log = LoggerFactory.getLogger(ServiceInstanceResourceImpl.class);
-	
+
 	@Inject
 	InstanceService instanceService;
-	
+
 	@Inject
 	DesignService designService;
-	
+
 	@Inject
 	InstanceDTOConverter instanceDtoConverter;
-	
+
 	@Inject
 	InstanceParameterDTOToInstanceConverter instanceParameterConverter;
-	
+
 
 	@Override
-	public InstanceDTO createInstance(InstanceParameterDTO instanceDto, String bearerToken) 
+	public InstanceDTO createInstance(InstanceParameterDTO instanceDto, String bearerToken)
 			throws AccessDeniedException, InstanceAlreadyExistException, XmlValidateException, ProcessingException {
 		log.debug("SOAP request to create instance");
 		String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
@@ -66,7 +66,7 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 			throw new InstanceAlreadyExistException("A new instance cannot already have an ID");
 		}
 		Instance instance = instanceParameterConverter.convert(instanceDto);
-		
+
 		if(instance.getInstanceAsXml() == null || instance.getInstanceAsXml().getContent() == null) {
 			throw new XmlValidateException("Instance must be created as XML (instanceAsXml must not be null)");
 		}
@@ -82,7 +82,7 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 			}
 		}
 		instance.setOrganizationId(organizationId);
-		
+
 		// Why? It's so ugly (based on REST service implementation)
         if (instance.getDesigns() != null && instance.getDesigns().size() > 0) {
             Design design = instance.getDesigns().iterator().next();
@@ -95,12 +95,12 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
                     Specification specification = design.getSpecifications().iterator().next();
                     if (specification != null) {
                         instance.setSpecificationId(specification.getSpecificationId());
-                        
+
                     }
                 }
             }
         }
-      
+
         Instance result = instanceService.save(instance);
         if(result.getInstanceAsXml() != null && result.getInstanceAsXml().getContent() != null) {
 	        try {
@@ -109,14 +109,14 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 	        	throw new XmlValidateException(e.getMessage(), e);
 	        }
         }
-        
+
         // saveGeometry must be call even thought geometry is null (design decision?)
         try {
 			instanceService.saveGeometry(result);
 		} catch (Exception e) {
 			throw new ProcessingException(e.getMessage());
 		}
-        
+
         return instanceDtoConverter.convert(result);
 	}
 
@@ -128,7 +128,7 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 			return createInstance(instanceDto, bearerToken);
 		}
 		Instance instance = instanceParameterConverter.convert(instanceDto);
-		
+
 		if (instance.getInstanceAsXml() == null || instance.getInstanceAsXml().getContent() == null) {
 			throw new XmlValidateException("Instance must be created as XML (instanceAsXml must not be null)");
 		}
@@ -140,14 +140,14 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 		} catch (Exception e) {
 			throw new XmlValidateException(e.getMessage(), e);
 		}
-		
+
 		String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
 		if (!InstanceUtil.checkOrganizationId(instance, organizationId)) {
 			String msg = "Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+instance.getOrganizationId();
             log.warn(msg);
             throw new AccessDeniedException(msg);
 		}
-		
+
 		// Why? It's so ugly (based on REST service implementation)
         if (instance.getDesigns() != null && instance.getDesigns().size() > 0) {
             Design design = instance.getDesigns().iterator().next();
@@ -161,15 +161,15 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
                 }
             }
         }
-        
+
         Instance result = instanceService.save(instance);
         try {
 	        result = InstanceUtil.parseInstanceGeometryFromXML(result);
-	        instanceService.saveGeometry(result);        
+	        instanceService.saveGeometry(result);
         } catch (Exception e) {
         	throw new XmlValidateException(e.getMessage(), e);
         }
-		
+
         return instanceDtoConverter.convert(result);
 	}
 
@@ -199,7 +199,7 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 			instance.setDocs(null);
 			instance.setInstanceAsDoc(null);
 		}
-		
+
 		return instanceDtoConverter.convert(instance);
 	}
 
@@ -213,7 +213,7 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 				ins.setInstanceAsDoc(null);
 			}
 		}
-		
+
 		return PageResponse.buildFromPage(pageOfInstances, instanceDtoConverter);
 	}
 
@@ -221,14 +221,14 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 	public void deleteInstance(String id, String version, String bearerToken) throws AccessDeniedException {
 		log.debug("SOAP request to delete Instance id {} version {}", id, version);
 		Instance instance = instanceService.findByDomainId(id, version);
-		
+
 		String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
 		if(!InstanceUtil.checkOrganizationId(instance, organizationId)) {
 			String msg = "Cannot delete entity, organization ID "+organizationId+" does not match that of entity: "+instance.getOrganizationId();
 			log.warn(msg);
             throw new AccessDeniedException(msg);
 		}
-		
+
 		instanceService.delete(instance.getId());
 	}
 
@@ -269,7 +269,7 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
                 instance.setInstanceAsDoc(null);
             }
         }
-        
+
         return PageResponse.buildFromPage(pageOfInstances, instanceDtoConverter);
 	}
 
@@ -288,7 +288,7 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
         } catch (Exception e) {
         	throw new ProcessingException(e.getMessage(), e);
         }
-        
+
         return PageResponse.buildFromPage(pageOfInstances, instanceDtoConverter);
 	}
 
@@ -319,7 +319,7 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
                 instance.setInstanceAsDoc(null);
             }
         }
-        
+
 		return PageResponse.buildFromPage(pageOfInstances, instanceDtoConverter);
 	}
 
@@ -334,7 +334,7 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
             throw new AccessDeniedException(msg);
         }
 	}
-	
+
 	private void removeIncludedDoc(Page<Instance> instPage, boolean includeDoc) {
 		if(instPage != null && instPage.getContent() != null && !includeDoc) {
 	          for(Instance instance : instPage.getContent()) {

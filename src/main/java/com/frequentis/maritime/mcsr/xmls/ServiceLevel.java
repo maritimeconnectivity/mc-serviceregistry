@@ -32,7 +32,7 @@ public class ServiceLevel {
     private String name;
     @XmlElement(namespace = "http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceInstanceSchema.xsd")
     private String description;
-    
+
     public float getAvailability() {
         return availability;
     }
@@ -51,5 +51,5 @@ public class ServiceLevel {
     public void setDescription(String description) {
         this.description = description;
     }
-    
+
 }

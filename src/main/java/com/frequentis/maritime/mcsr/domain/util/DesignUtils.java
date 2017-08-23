@@ -13,18 +13,18 @@ import com.frequentis.maritime.mcsr.domain.Xml;
 import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 
 /**
- * 
+ *
  * @author Lukas Vorisek
  *
  */
 public final class DesignUtils {
 
 	private DesignUtils() {
-		
+
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param design
 	 * @param id
 	 * @return {@code true} if organization id match or {@code false}
@@ -32,15 +32,15 @@ public final class DesignUtils {
 	public static boolean matchOrganizationId(Design design, String id) {
 		if(design.getOrganizationId() != null && design.getOrganizationId().length() > 0 && !id.equals(design.getOrganizationId())) {
 			return false;
-		} 
+		}
 		return true;
 	}
-	
+
 	/**
-	 * 
-	 * @param design Design where 
+	 *
+	 * @param design Design where
 	 * @param status
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public static void updateXmlStatusValue(Design design, String status) throws Exception {
 		Xml designXml = design.getDesignAsXml();

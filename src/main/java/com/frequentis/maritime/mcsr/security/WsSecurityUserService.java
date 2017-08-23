@@ -17,7 +17,7 @@ public class WsSecurityUserService implements CallbackHandler {
 	@Override
 	public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
 		log.error("Something for hadnle {}", callbacks);
-		
+
 	}
 
 

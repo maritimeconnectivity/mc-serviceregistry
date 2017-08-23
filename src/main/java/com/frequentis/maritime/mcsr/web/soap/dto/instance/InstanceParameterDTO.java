@@ -12,17 +12,17 @@ import com.frequentis.maritime.mcsr.web.soap.dto.xml.XmlReference;
 @XmlRootElement(name = "Instance")
 public class InstanceParameterDTO {
 	public Long id;
-	
+
 	public XmlReference instanceAsXml;
-	
+
 	public DocReference instanceAsDoc;
-	
+
 	public SpecificationTemplateReference implementedSpecificationVersion;
-	
+
 	public List<DesignReference> designs;
-	
+
 	public List<DocReference> docs;
-	
+
 	public String unlocode;
 
 }

@@ -141,10 +141,10 @@ public class InstanceResourceIntTest {
 
     @Inject
     private InstanceService instanceService;
-    
+
     @Inject
     private XmlService xmlService;
-    
+
     @Inject
     private XmlSearchRepository xmlSearchRepository;
 
@@ -160,7 +160,7 @@ public class InstanceResourceIntTest {
     private MockMvc restInstanceMockMvc;
 
     private Instance instance;
-    
+
     @Inject
     private InstanceResource instanceResource;
 
@@ -190,7 +190,7 @@ public class InstanceResourceIntTest {
         instance.setEndpointType(DEFAULT_ENDPOINT_TYPE);
         instance.setGeometryContentType(DEFAULT_GEOMETRY_CONTENT_TYPE);
         instance.setOrganizationId(DEFAULT_ORGANIZATION_ID);
-        
+
         // All these field are overridden by XML (XML is required)
         instance.setName(DEFAULT_NAME);
         instance.setVersion(DEFAULT_VERSION);
@@ -203,7 +203,7 @@ public class InstanceResourceIntTest {
 
         // Create XML
         xmlSearchRepository.deleteAll();
-        
+
         Xml xml = new Xml();
         xml.setName(DEFAULT_NAME);
         xml.setComment(DEFAULT_COMMENT);
@@ -222,30 +222,30 @@ public class InstanceResourceIntTest {
         x.setVersion(DEFAULT_VERSION);
         x.setMMSI(RandomStringUtils.randomAlphabetic(5));
         x.setRequiresAuthorization("false");
-        
+
         VendorInfo producedBy = x.getProducedBy();
         producedBy.setContactInfo(RandomStringUtils.randomAlphabetic(15));
         producedBy.setName(RandomStringUtils.randomAlphabetic(15));
         producedBy.setId(RandomStringUtils.randomAlphabetic(15));
         producedBy.setOrganizationId(RandomStringUtils.randomAlphabetic(15));
         producedBy.setDescription(RandomStringUtils.randomAlphabetic(15));
-        
+
         VendorInfo providedBy = x.getProvidedBy();
         providedBy.setContactInfo(RandomStringUtils.randomAlphabetic(15));
         providedBy.setName(RandomStringUtils.randomAlphabetic(15));
         providedBy.setId(RandomStringUtils.randomAlphabetic(15));
         providedBy.setOrganizationId(RandomStringUtils.randomAlphabetic(15));
         providedBy.setDescription(RandomStringUtils.randomAlphabetic(15));
-        
+
         ServiceLevel offersServiceLevel = x.getOffersServiceLevel();
         offersServiceLevel.setName(RandomStringUtils.randomAlphabetic(15));
         offersServiceLevel.setAvailability(1);
         offersServiceLevel.setDescription(RandomStringUtils.randomAlphabetic(15));
-        
+
         CoversAreaType conversAreas = x.getCoversAreas();
         // Requires plenty of heap (parsing JSON with unls)
         // conversAreas.setUnLoCode(DEFAULT_UNLOCODE);
-        
+
         List<CoverageArea> coversArea = new ArrayList<>();
         CoverageArea ca = new CoverageArea();
         ca.setName("Bermuda Triangle");
@@ -254,16 +254,16 @@ public class InstanceResourceIntTest {
         coversArea.add(ca);
         conversAreas.setCoversArea(coversArea);
 
-        
+
         ServiceDesignReference implementsServiceDesign = x.getImplementsServiceDesign();
         implementsServiceDesign.setId("awdwad");
         implementsServiceDesign.setVersion("dwadwdwad");
-       
+
         xml.setContent(xmlBuilder.buildXmlString());
         xmlService.save(xml);
-        
+
         // Set XML
-        
+
         instance.setInstanceAsXml(xml);
     }
 
@@ -454,7 +454,7 @@ public class InstanceResourceIntTest {
         updatedInstance.setGeometryContentType(UPDATED_GEOMETRY_CONTENT_TYPE);
         updatedInstance.setOrganizationId(UPDATED_ORGANIZATION_ID);
         updatedInstance.setEndpointType(UPDATED_ENDPOINT_TYPE);
-        
+
         // Required by validation in controller
         updatedInstance.setName(DEFAULT_NAME);
         updatedInstance.setVersion(DEFAULT_VERSION);
@@ -464,7 +464,7 @@ public class InstanceResourceIntTest {
         updatedInstance.setStatus(DEFAULT_STATUS);
         updatedInstance.setUnlocode(DEFAULT_UNLOCODE);
         updatedInstance.setEndpointUri(DEFAULT_ENDPOINT_URI);
-        
+
         Xml xml = new Xml();
         xml.setName(DEFAULT_NAME);
         xml.setComment(DEFAULT_COMMENT);
@@ -483,30 +483,30 @@ public class InstanceResourceIntTest {
         x.setVersion(UPDATED_VERSION);
         x.setMMSI(RandomStringUtils.randomAlphabetic(5));
         x.setRequiresAuthorization("false");
-        
+
         VendorInfo producedBy = x.getProducedBy();
         producedBy.setContactInfo(RandomStringUtils.randomAlphabetic(15));
         producedBy.setName(UPDATED_NAME);
         producedBy.setId(RandomStringUtils.randomAlphabetic(15));
         producedBy.setOrganizationId(RandomStringUtils.randomAlphabetic(15));
         producedBy.setDescription(RandomStringUtils.randomAlphabetic(15));
-        
+
         VendorInfo providedBy = x.getProvidedBy();
         providedBy.setContactInfo(RandomStringUtils.randomAlphabetic(15));
         providedBy.setName(RandomStringUtils.randomAlphabetic(15));
         providedBy.setId(RandomStringUtils.randomAlphabetic(15));
         providedBy.setOrganizationId(RandomStringUtils.randomAlphabetic(15));
         providedBy.setDescription(RandomStringUtils.randomAlphabetic(15));
-        
+
         ServiceLevel offersServiceLevel = x.getOffersServiceLevel();
         offersServiceLevel.setName(RandomStringUtils.randomAlphabetic(15));
         offersServiceLevel.setAvailability(1);
         offersServiceLevel.setDescription(RandomStringUtils.randomAlphabetic(15));
-        
+
         CoversAreaType conversAreas = x.getCoversAreas();
         // Requires plenty of heap (parsing JSON with unls)
         // conversAreas.setUnLoCode(DEFAULT_UNLOCODE);
-        
+
         List<CoverageArea> coversArea = new ArrayList<>();
         CoverageArea ca = new CoverageArea();
         ca.setName("Bermuda Triangle");
@@ -515,14 +515,14 @@ public class InstanceResourceIntTest {
         coversArea.add(ca);
         conversAreas.setCoversArea(coversArea);
 
-        
+
         ServiceDesignReference implementsServiceDesign = x.getImplementsServiceDesign();
         implementsServiceDesign.setId("awdwad");
         implementsServiceDesign.setVersion("dwadwdwad");
-       
+
         xml.setContent(xmlBuilder.buildXmlString());
         xmlService.save(xml);
-        
+
         updatedInstance.setInstanceAsXml(xml);
 
         restInstanceMockMvc.perform(put("/api/instances")
@@ -590,7 +590,7 @@ public class InstanceResourceIntTest {
         // Initialize the database
         instanceService.save(instance);
         // saveGeometry have to be called
-        instanceService.saveGeometry(instance); 
+        instanceService.saveGeometry(instance);
 
         // Search the instance
         restInstanceMockMvc.perform(get("/api/_search/instances?query=id:" + instance.getId()))

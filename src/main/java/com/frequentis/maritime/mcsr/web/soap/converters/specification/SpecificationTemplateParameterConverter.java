@@ -22,10 +22,10 @@ public class SpecificationTemplateParameterConverter extends AbstractConverter<S
 
 	@Autowired
 	DocService docService;
-	
+
 	@Autowired
 	XsdService xsdService;
-	
+
 	@Override
 	public SpecificationTemplate convert(SpecificationTemplateParameterDTO f) {
 		if(f == null) {
@@ -41,17 +41,17 @@ public class SpecificationTemplateParameterConverter extends AbstractConverter<S
 			}
 		}
 		r.setDocs(documents);
-		
+
 		if(f.guidelineDoc != null) {
 			Doc s = docService.findOne(f.guidelineDoc.id);
 			r.setGuidelineDoc(s);
 		}
-		
+
 		if(f.templateDoc != null) {
 			Doc s = docService.findOne(f.templateDoc.id);
 			r.setTemplateDoc(s);
 		}
-		
+
 		Set<Xsd> xsds = new HashSet<Xsd>();
 		if(f.xsds != null) {
 			for(XsdReference xsdRef : f.xsds) {
@@ -59,8 +59,8 @@ public class SpecificationTemplateParameterConverter extends AbstractConverter<S
 			}
 		}
 		r.setXsds(xsds);
-		
-		
+
+
 		return r;
 	}
 

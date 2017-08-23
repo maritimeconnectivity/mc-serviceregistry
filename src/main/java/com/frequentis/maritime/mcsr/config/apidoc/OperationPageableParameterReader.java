@@ -98,5 +98,5 @@ public class OperationPageableParameterReader implements OperationBuilderPlugin 
                 context.getIgnorableParameterTypes());
         return ResolvedTypes.modelRefFactory(modelContext, nameExtractor);
     }
-    
+
 }

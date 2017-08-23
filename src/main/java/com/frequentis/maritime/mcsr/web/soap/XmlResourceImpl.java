@@ -27,15 +27,15 @@ public class XmlResourceImpl implements XmlResource {
 	private static final int ITEMS_PER_PAGE = 10;
 
 	Logger log = LoggerFactory.getLogger(XmlResourceImpl.class);
-	
+
 	@Autowired
 	XmlDTOConverter xmlConverter;
 	@Autowired
 	XmlDescriptorDTOConverter xmlDConverter;
-	
+
 	@Autowired
 	XmlService xmlService;
-	
+
 	/**
 	 * {@inheritDoc}}
 	 */
@@ -82,7 +82,7 @@ public class XmlResourceImpl implements XmlResource {
 	public XmlDTO getXml(Long id) {
         log.debug("SOAP request to get Xml : {}", id);
         Xml xml = xmlService.findOne(id);
-        
+
         return xmlConverter.convert(xml);
 	}
 

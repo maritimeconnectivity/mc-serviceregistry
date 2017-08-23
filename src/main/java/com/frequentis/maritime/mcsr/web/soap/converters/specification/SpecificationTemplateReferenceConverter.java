@@ -13,7 +13,7 @@ public class SpecificationTemplateReferenceConverter extends AbstractConverter<S
 
 	@Autowired
 	SpecificationTemplateRepository specTempRepo;
-	
+
 	@Override
 	public SpecificationTemplate convert(SpecificationTemplateReference from) {
 		if(from == null) {

@@ -13,7 +13,7 @@ public class DocReferenceConverter extends AbstractConverter<DocReference, Doc> 
 
 	@Autowired
 	DocRepository docRepo;
-	
+
 	@Override
 	public Doc convert(DocReference from) {
 		if(from == null) {

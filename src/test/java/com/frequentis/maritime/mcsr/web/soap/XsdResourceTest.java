@@ -50,33 +50,33 @@ public class XsdResourceTest {
 	@Autowired
 	@Qualifier("technicalInstanceResource")
 	private Endpoint instanceResource;
-	
+
 	@Autowired
 	private XsdResource internal;
-	
+
 	@LocalServerPort
 	private int port;
-	
+
 	private XsdResource client;
-	
+
 	static List<String> xmls;
-	
+
 	@Before
 	public void setUp() throws MalformedURLException {
 		URL wsdlUrl = new URL("http://localhost:" + port + "/services/XsdResource?wsdl");
 		Service s = Service.create(wsdlUrl, new QName("http://soap.web.mcsr.maritime.frequentis.com/", "XsdResourceImplService"));
-		
+
 		client = s.getPort(XsdResource.class);
 		SoapTestUtils.addHttpBasicSecurity(client);
 	}
-	
+
 	private XsdDTO createXsd() {
 		XsdDTO xsd = new XsdDTO();
 		xsd.name = RandomStringUtils.randomAlphabetic(RANDOM_NAME_LENGTH);
 		xsd.comment = RandomStringUtils.randomAlphabetic(RANDOM_NAME_LENGTH);;
 		xsd.contentContentType = "application/xml";
 		xsd.content = RandomStringUtils.randomAlphabetic(1024).getBytes();
-		
+
 		return xsd;
 	}
 
@@ -84,16 +84,16 @@ public class XsdResourceTest {
 	public void create() throws ProcessingException {
 		// Given
 		XsdDTO newXsd = createXsd();
-		
+
 		// When
 		XsdDescriptorDTO savedDocument = client.createXsd(newXsd);
-		
+
 		// Then
 		assertNotNull(savedDocument);
 		assertEquals(newXsd.name, savedDocument.name);
 		assertEquals(newXsd.comment, savedDocument.comment);
 	}
-	
+
 	@Test
 	public void getXsd() throws ProcessingException {
 		// Given
@@ -103,19 +103,19 @@ public class XsdResourceTest {
 		for(int i = 0; i < 3; i++) {
 			internal.createXsd(createXsd());
 		}
-		
+
 		// When
 		XsdDTO resultXsd = client.getXsd(newXsd.id);
-		
+
 		// Then
 		assertNotNull(resultXsd);
 		assertEquals(newXsd.name, resultXsd.name);
 		assertEquals(newXsd.comment, resultXsd.comment);
 		assertEquals(newXsd.contentContentType, resultXsd.contentContentType);
 		assertEquals(new String(newXsd.content), new String(resultXsd.content));
-		
+
 	}
-	
+
 	@Test
 	public void getAllXsds() throws ProcessingException {
 		// Given
@@ -124,7 +124,7 @@ public class XsdResourceTest {
 		for(int i = 0; i < instanceCount; i++) {
 			xmls[i] = internal.createXsd(createXsd());
 		}
-		
+
 		// When
 		List<XsdDescriptorDTO> storedXmls = new ArrayList<>();
 		int page = 0;
@@ -135,7 +135,7 @@ public class XsdResourceTest {
 				storedXmls.addAll(resultPage.content);
 			}
 		} while (resultPage.content != null && resultPage.page < resultPage.pageCount);
-		
+
 		// Then
 		assertNotNull(resultPage.content);
 		assertEquals(resultPage.itemTotalCount, storedXmls.size());
@@ -143,7 +143,7 @@ public class XsdResourceTest {
 			assertThat(storedXmls, hasItem(hasXsd(xml)));
 		}
 	}
-	
+
 	@Test
 	public void searchXml() throws ProcessingException {
 		// Given
@@ -156,16 +156,16 @@ public class XsdResourceTest {
 		for(int i = 0; i < 4; i++) {
 			internal.createXsd(createXsd());
 		}
-		
+
 		// When
 		PageDTO<XsdDescriptorDTO> resultPage = client.searchXsds("name:" + prefix + "*", 0);
-		
+
 		// Then
 		assertNotNull(resultPage.content);
 		assertEquals(2, resultPage.itemTotalCount);
 		assertThat(resultPage.content, hasItem(hasXsd(template)));
 	}
-	
+
 	@Test
 	public void updateXsd() throws ProcessingException {
 		// Given
@@ -174,35 +174,35 @@ public class XsdResourceTest {
 		XsdDTO newXsd = createXsd();
 		newXsd.name = oldName;
 		newXsd.id = internal.createXsd(newXsd).id;
-		
+
 		// When
 		newXsd.name = newName;
 		client.updateXsd(newXsd);
-		
+
 		// Then
 		XsdDTO storedXml = internal.getXsd(newXsd.id);
 		assertEquals(newName, storedXml.name);
 	}
-	
+
 	@Test
 	public void deleteXsd() throws ProcessingException {
 		// Given
 		XsdDescriptorDTO newXsd = internal.createXsd(createXsd());
-		
+
 		// When
 		client.deleteXsd(newXsd.id);
-		
+
 		// Then
 		XsdDTO result = internal.getXsd(newXsd.id);
 		assertNull(result);
 	}
-	
-	
+
+
 	private static Matcher<XsdDescriptorDTO> hasXsd(XsdDescriptorDTO doc) {
 		return new BaseMatcher<XsdDescriptorDTO>() {
 
 			private XsdDescriptorDTO actDoc;
-			
+
 			@Override
 			public boolean matches(Object item) {
 				XsdDescriptorDTO d = (XsdDescriptorDTO) item;
@@ -219,7 +219,7 @@ public class XsdResourceTest {
 			@Override
 			public void describeTo(Description description) {
 				description.appendValue("Xsd " + actDoc.name + " should be " + doc.name);
-				
+
 			}
 		};
 

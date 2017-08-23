@@ -16,7 +16,7 @@ public class XmlDTOConverter extends AbstractBidirectionalConverter<Xml, XmlDTO>
 		}
 		XmlDTO r = new XmlDTO();
 		mapGeterWithSameName(f, r);
-		
+
 		return r;
 	}
 
@@ -31,7 +31,7 @@ public class XmlDTOConverter extends AbstractBidirectionalConverter<Xml, XmlDTO>
 		d.setContent(f.content);
 		d.setContentContentType(f.contentContentType);
 		d.setName(f.name);
-		
+
 		return d;
 	}
 

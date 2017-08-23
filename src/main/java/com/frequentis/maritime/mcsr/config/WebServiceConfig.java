@@ -56,27 +56,27 @@ public class WebServiceConfig {
     public Endpoint docResourceEndpoint(DocResource docResource) {
         return publishEndpoint(docResource, "/DocResource");
     }
-    
+
     @Bean
     public Endpoint elasticsearchIndexResourceEndpoint(ElasticsearchIndexResource resource) {
     	return publishEndpoint(resource, "/ElasticsearchIndexResource");
     }
-    
+
     @Bean
     public Endpoint specificationTemplateSetResourceEndpoint(SpecificationTemplateSetResource resource) {
     	return publishEndpoint(resource, "/SpecificationTemplateSetResource");
     }
-    
+
     @Bean
     public Endpoint xmlResourceEndpoint(XmlResource xmlResource) {
     	return publishEndpoint(xmlResource, "/XmlResource");
     }
-    
+
     @Bean
     public Endpoint specificationTemplateResourceEndpoint(SpecificationTemplateResource resource) {
     	return publishEndpoint(resource, "/SpecificationTemplateResource");
     }
-    
+
     @Bean
     public Endpoint xsdResourceEndpoint(XsdResource xsdResource) {
     	return publishEndpoint(xsdResource, "/XsdResource");
@@ -86,12 +86,12 @@ public class WebServiceConfig {
     public Endpoint serviceSpecificationResourceEndpoint(ServiceSpecificationResource resource) {
         return publishEndpoint(resource, "/ServiceSpecification");
     }
-    
+
     @Bean
     public Endpoint technicalDesignResourceEdnpoint(TechnicalDesignResource resource) {
     	return publishEndpoint(resource, "/TechnicalDesignResource");
     }
-    
+
     @Bean
     public Endpoint technicalInstanceResource(ServiceInstanceResource resource) {
     	return publishEndpoint(resource, "/ServiceInstanceResource");

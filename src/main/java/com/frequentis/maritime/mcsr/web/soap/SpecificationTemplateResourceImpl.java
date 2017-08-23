@@ -30,28 +30,28 @@ public class SpecificationTemplateResourceImpl implements SpecificationTemplateR
 	private static final int ITEMS_PER_PAGE = 50;
 
 	Logger log = LoggerFactory.getLogger(SpecificationTemplateResourceImpl.class);
-	
+
 	@Autowired
 	SpecificationTemplateService specificationTemplateService;
-	
+
 	@Autowired
 	SpecificationTemplateParameterConverter spc;
-	
+
 	@Autowired
 	SpecificationTemplateDTOConverter stc;
-	
+
 	@Autowired
 	SpecificationTemplateDescriptorConverter stdc;
 
 	/**
 	 * {@inheritDoc}}
-	 * @throws ProcessingException 
+	 * @throws ProcessingException
 	 */
 	@Override
 	@Transactional
 	public SpecificationTemplateDescriptorDTO createSpecificationTemplate(
 			SpecificationTemplateParameterDTO specificationTemplate) throws ProcessingException {
-		
+
         log.debug("SOAP request to save SpecificationTemplate : {}", specificationTemplate);
         if (specificationTemplate.id != null) {
             throw new ProcessingException("A new specificationTemplate cannot already have an ID");
@@ -63,13 +63,13 @@ public class SpecificationTemplateResourceImpl implements SpecificationTemplateR
 
 	/**
 	 * {@inheritDoc}}
-	 * @throws ProcessingException 
+	 * @throws ProcessingException
 	 */
 	@Override
 	@Transactional
 	public SpecificationTemplateDescriptorDTO updateSpecificationTemplate(
 			SpecificationTemplateParameterDTO specificationTemplate) throws ProcessingException {
-		
+
         log.debug("SOAP request to update SpecificationTemplate : {}", specificationTemplate);
         if (specificationTemplate.id == null) {
             return createSpecificationTemplate(specificationTemplate);
@@ -86,7 +86,7 @@ public class SpecificationTemplateResourceImpl implements SpecificationTemplateR
 	public PageDTO<SpecificationTemplateDescriptorDTO> getAllSpecificationTemplates(int page) {
         log.debug("SOAP request to get a page of SpecificationTemplates");
         Page<SpecificationTemplate> pageResult = specificationTemplateService.findAll(PageRequest.of(page, ITEMS_PER_PAGE));
-        
+
         return PageResponse.buildFromPage(pageResult, stdc);
 	}
 
@@ -117,7 +117,7 @@ public class SpecificationTemplateResourceImpl implements SpecificationTemplateR
 	public PageDTO<SpecificationTemplateDescriptorDTO> searchSpecificationTemplates(String query, int page) {
         log.debug("SOAP request to search for a page of SpecificationTemplates for query {}", query);
         Page<SpecificationTemplate> responsePage = specificationTemplateService.search(query, PageRequest.of(page, ITEMS_PER_PAGE));
-        
+
         return PageResponse.buildFromPage(responsePage, stdc);
 	}
 

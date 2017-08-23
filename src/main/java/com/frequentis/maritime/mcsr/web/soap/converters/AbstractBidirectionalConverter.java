@@ -9,11 +9,11 @@ public abstract class AbstractBidirectionalConverter<F, T> extends AbstractConve
     public Collection<F> convertReverse(Collection<T> from) {
     	return convertCollectionReverse(from);
     }
-    
+
     public List<F> convertReverse(List<T> from) {
     	return convertCollectionReverse(from);
     }
-    
+
     private ArrayList<F> convertCollectionReverse(Collection<T> from) {
     	if(from == null) {
     		return null;
@@ -22,7 +22,7 @@ public abstract class AbstractBidirectionalConverter<F, T> extends AbstractConve
         for(T f : from) {
             o.add(convertReverse(f));
         }
-        return o;    	
+        return o;
     }
 
 }

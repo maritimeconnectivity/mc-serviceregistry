@@ -10,11 +10,11 @@ public class InstanceAlreadyExistException extends Exception implements Serializ
 	public InstanceAlreadyExistException(String message) {
 		super(message);
 	}
-	
+
 	public InstanceAlreadyExistException(String message, Throwable th) {
 		super(message, th);
 	}
-	
+
     public java.lang.String getFaultInfo() {
         return this.getMessage();
     }

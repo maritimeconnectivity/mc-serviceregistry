@@ -33,13 +33,13 @@ public class InstanceParameterDTOToInstanceConverter extends AbstractConverter<I
 
 	@Autowired
 	XmlReferenceConverter xmlConverter;
-	
+
 	@Autowired
 	DocReferenceConverter docConverter;
-	
+
 	@Autowired
 	DesignReferenceConverter designConverter;
-	
+
 	@Autowired
 	SpecificationTemplateReferenceConverter templateConverter;
 

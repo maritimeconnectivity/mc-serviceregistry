@@ -10,11 +10,11 @@ public class ProcessingException extends Exception implements Serializable {
 	public ProcessingException(String message) {
 		super(message);
 	}
-	
+
 	public ProcessingException(String message, Throwable th) {
 		super(message, th);
 	}
-	
+
     public java.lang.String getFaultInfo() {
         return this.getMessage();
     }

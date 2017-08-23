@@ -26,7 +26,7 @@ import com.frequentis.maritime.mcsr.web.soap.dto.doc.DocReference;
 public class SpecificationTemplateSetParameter {
 
 	public Long id;
-	
+
     public String name;
 
     public String version;
@@ -36,5 +36,5 @@ public class SpecificationTemplateSetParameter {
     public Set<SpecificationTemplateReference> templates = new HashSet<>();
 
     public Set<DocReference> docs = new HashSet<>();
-    
+
 }

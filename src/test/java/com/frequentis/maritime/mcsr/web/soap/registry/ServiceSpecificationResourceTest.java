@@ -62,51 +62,51 @@ public class ServiceSpecificationResourceTest {
 	@Autowired
 	@Qualifier("serviceSpecificationResourceEndpoint")
 	private Endpoint designResource;
-	
+
 	@Autowired
 	private ServiceSpecificationResource serviceSpecificationResourceInternal;
-	
+
 	@Autowired
 	private	SpecificationService specService;
 
 	@LocalServerPort
 	private int port;
-	
+
 	private ServiceSpecificationResource client;
 	private static String xml;
-	
-	private static final String[] KEYWORDS = {"new", "neutral", "classical", "elemental", 
-			"specialized", "broken", "fixed", "apropo", "manual", "France", "individual", 
+
+	private static final String[] KEYWORDS = {"new", "neutral", "classical", "elemental",
+			"specialized", "broken", "fixed", "apropo", "manual", "France", "individual",
 			"steam", "stream", "soft", "hard", "critical"};
-	
+
 	private static final String[] STATUSES = {"new", "open", "closed"};
-	
+
 	@Test
 	public void designResourceExist() {
 		Assert.assertNotNull(designResource);
 	}
-	
+
 	@BeforeClass
 	public static void loadResources() throws IOException {
 		DefaultResourceLoader rl = new DefaultResourceLoader();
 		Resource resource = rl.getResource("classpath:dataload/xml/AddressForPersonLookupServiceSpecification.xml");
 		xml = new String(Files.readAllBytes(resource.getFile().toPath()));
 	}
-	
+
 	@Before
 	public void setUp() throws MalformedURLException {
 		URL wsdlUrl = new URL("http://localhost:" + port + "/services/ServiceSpecification?wsdl");
 		Service s = Service.create(wsdlUrl, new QName("http://registry.soap.web.mcsr.maritime.frequentis.com/", "ServiceSpecificationResourceImplService"));
-		
+
 		client = s.getPort(ServiceSpecificationResource.class);
 		SoapTestUtils.addHttpBasicSecurity(client);
 	}
-	
+
 
 	private SpecificationDTO prepareValidSpecificationDTO() {
 		SpecificationDTO spec = new SpecificationDTO();
 		int randNum = (int)(Math.random() * 1_000_000);
-		
+
 		spec.name = "Some Spec " + randNum;
 		spec.name = "Name" + randNum;
 		// Select four random words as keywords
@@ -128,19 +128,19 @@ public class ServiceSpecificationResourceTest {
 		spec.specAsXml.name = "XML for Name " + randNum;
 		spec.specAsXml.comment = "Some XML for some Specification";
 		spec.specificationId = String.valueOf(++specificationId);
-		
+
 		return spec;
 	}
-	
+
 	@Test
 	public void createSuccess() throws URISyntaxException, Exception {
 		// Given
 		SpecificationDTO specificationDTO = prepareValidSpecificationDTO();
 		long countBefore = serviceSpecificationResourceInternal.getAllSpecifications(0).itemTotalCount;
-		
+
 		// When
 		SpecificationDescriptorDTO spec = client.createSpecification(specificationDTO, TOKEN);
-		
+
 		// Then
 		assertEquals(specificationDTO.name, spec.name);
 		assertEquals(specificationDTO.keywords, spec.keywords);
@@ -148,27 +148,27 @@ public class ServiceSpecificationResourceTest {
 		assertEquals(specificationDTO.comment, spec.comment);
 		long countAfter = serviceSpecificationResourceInternal.getAllSpecifications(0).itemTotalCount;
 		assertEquals(countBefore + 1, countAfter);
-		
+
 	}
-	
+
 	@Test
 	public void specificationCount() throws Exception {
 		// Given
 		long countBefore = client.getAllSpecifications(0).itemTotalCount;
 		long plusItems = 0;
-		
+
 		// When
 		for(int i = 0; i < 5; i++) {
 			serviceSpecificationResourceInternal.createSpecification(prepareValidSpecificationDTO(), TOKEN);
 			plusItems++;
 		}
-		
+
 		// Then
 		long countAfter = client.getAllSpecifications(0).itemTotalCount;
 		assertEquals(countBefore + plusItems, countAfter);
 
 	}
-	
+
 	@Test
 	public void getSpecification() throws Exception {
 		// Given
@@ -176,10 +176,10 @@ public class ServiceSpecificationResourceTest {
 		SpecificationDTO otherSpecDTO = prepareValidSpecificationDTO();
 		otherSpecDTO.version = "2.0.0";
 		otherSpecDTO.specificationId = specDTO.specificationId;
-		
+
 		// When
 		serviceSpecificationResourceInternal.createSpecification(specDTO, TOKEN);
-		
+
 		// Then
 		SpecificationDTO saved = client.getSpecification(specDTO.specificationId, specDTO.version);
 		assertNotNull(saved);
@@ -188,9 +188,9 @@ public class ServiceSpecificationResourceTest {
 		assertEquals(specDTO.status, saved.status);
 		assertEquals(specDTO.specificationId, saved.specificationId);
 		assertEquals(specDTO.version, saved.version);
-		
+
 	}
-	
+
 	@Test
 	public void getAllSpecificationsById() throws Exception {
 		// Given
@@ -202,10 +202,10 @@ public class ServiceSpecificationResourceTest {
 			template.name = "Adam v1.0." + i;
 			specifications[i] = serviceSpecificationResourceInternal.createSpecification(template, TOKEN);
 		}
-		
+
 		// When
 		PageDTO<SpecificationDescriptorDTO> resultPage = client.getAllSpecificationsById(template.specificationId, 0);
-		
+
 		// Then
 		assertEquals(countOfSpecifications, resultPage.itemTotalCount);
 		Iterable<SpecificationDescriptorDTO> results = resultPage.content;
@@ -213,36 +213,36 @@ public class ServiceSpecificationResourceTest {
 			assertThat(results, hasItem(hasSpecification(specifications[i])));
 		}
 	}
-	
+
 	@Test
 	public void deleteSpecification() throws Exception {
 		// Given
 		SpecificationDescriptorDTO spec = serviceSpecificationResourceInternal.createSpecification(prepareValidSpecificationDTO(), TOKEN);
-		
-		
+
+
 		// When
 		client.deleteSpecification(spec.specificationId, spec.version, TOKEN);
-		
+
 		// Then
 		SpecificationDescriptorDTO result = serviceSpecificationResourceInternal.getSpecification(spec.specificationId, spec.version);
 		assertNull(result);
-		
+
 	}
-	
+
 	@Test
 	public void updateSpecificationStatus() throws IllegalAccessException, Exception {
 		// Given
 		String newStatus = "provisional";
 		SpecificationDescriptorDTO spec = serviceSpecificationResourceInternal.createSpecification(prepareValidSpecificationDTO(), TOKEN);
-		
+
 		// When
 		client.updateSpecificationStatus(spec.specificationId, spec.version, newStatus, TOKEN);
-		
+
 		// Then
 		SpecificationDescriptorDTO result = serviceSpecificationResourceInternal.getSpecification(spec.specificationId, spec.version);
 		assertEquals(newStatus, result.status);
 	}
-	
+
 	@Test
 	public void updateSpecification() throws Exception {
 		// Given
@@ -250,19 +250,19 @@ public class ServiceSpecificationResourceTest {
 		SpecificationDescriptorDTO specDesc = serviceSpecificationResourceInternal.createSpecification(specDTO, TOKEN);
 		// We need xml id
 		SpecificationDTO updateDTO = serviceSpecificationResourceInternal.getSpecification(specDesc.specificationId, specDesc.version);
-		
+
 		for(int i = 0; i < 4; i++) {
 			// When
 			String newName = "NewName" + Math.random() * 10000;
 			updateDTO.name = newName;
 			client.updateSpecification(updateDTO, TOKEN);
-			
+
 			// Then
 			SpecificationDTO saved = serviceSpecificationResourceInternal.getSpecification(specDTO.specificationId, specDTO.version);
 			assertEquals(newName, updateDTO.name);
 		}
 	}
-	
+
 	@Test
 	public void searchSpecification() throws Exception {
 		// Given
@@ -280,16 +280,16 @@ public class ServiceSpecificationResourceTest {
 			newSpec.name = "searchSpecName_" + (int) (Math.random() * 1000);
 			serviceSpecificationResourceInternal.createSpecification(newSpec, TOKEN);
 		}
-		
+
 		// When
 		PageDTO<?> results = client.searchSpecifications("name:" + searchSpecNamePrefix + "*", 0);
 		PageDTO<?> results2 = client.searchSpecifications("name:" + searchSpecNamePrefix + "*", 1);
-		
+
 		// Then
 		assertEquals(resultCount, results.itemTotalCount);
 		assertEquals(ServiceSpecificationResourceImpl.ITEMS_PER_PAGE, results.content.size());
 		assertEquals(4, results2.content.size());
-		
+
 	}
 
 
@@ -324,7 +324,7 @@ public class ServiceSpecificationResourceTest {
 		return new BaseMatcher<SpecificationDescriptorDTO>() {
 
 			private SpecificationDescriptorDTO actSpec;
-			
+
 			@Override
 			public boolean matches(Object item) {
 				SpecificationDescriptorDTO sp = (SpecificationDescriptorDTO) item;
@@ -343,7 +343,7 @@ public class ServiceSpecificationResourceTest {
 					return;
 				}
 				description.appendValue("specification " + actSpec.name + " is not same as " + spec.name);
-				
+
 			}
 		};
 

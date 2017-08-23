@@ -16,7 +16,7 @@ import com.frequentis.maritime.mcsr.web.soap.errors.ProcessingException;
 
 @WebService(name = "SpecificationTemplate")
 public interface SpecificationTemplateResource {
-	
+
 	/**
      * Create a new specificationTemplate.
      *
@@ -81,6 +81,6 @@ public interface SpecificationTemplateResource {
      */
 	@WebMethod
     public PageDTO<SpecificationTemplateDescriptorDTO> searchSpecificationTemplates(
-    		@WebParam(name = "query") @XmlElement(required = true) String query, 
+    		@WebParam(name = "query") @XmlElement(required = true) String query,
     		@WebParam(name = "page") @XmlElement(required = true) int page);
 }

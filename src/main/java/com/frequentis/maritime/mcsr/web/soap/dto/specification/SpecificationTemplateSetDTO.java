@@ -26,6 +26,6 @@ import com.frequentis.maritime.mcsr.web.soap.dto.doc.DocDTO;
 public class SpecificationTemplateSetDTO extends SpecificationTemplateSetDescriptorDTO {
 
 	    public Set<SpecificationTemplateDTO> templates = new HashSet<>();
-	    
+
 	    public Set<DocDTO> docs = new HashSet<>();
 }

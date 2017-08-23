@@ -31,10 +31,10 @@ public class SpecificationTemplateSetParameterConverter extends AbstractConverte
 
 	@Autowired
 	DocReferenceConverter docConverter;
-	
+
 	@Autowired
 	SpecificationTemplateReferenceConverter templatesConverter;
-	
+
 	@Override
 	public SpecificationTemplateSet convert(SpecificationTemplateSetParameter f) {
 		if(f == null) {
@@ -42,15 +42,15 @@ public class SpecificationTemplateSetParameterConverter extends AbstractConverte
 		}
 		SpecificationTemplateSet t = new SpecificationTemplateSet();
 		mapSetterWithSameName(f, t);
-		
+
 		if(f.docs != null) {
 			t.setDocs(castToSet(docConverter.convert(f.docs)));
 		}
-		
+
 		if(f.templates != null) {
 			t.setTemplates(castToSet(templatesConverter.convert(f.templates)));
 		}
-		
+
 		return t;
 	}
 

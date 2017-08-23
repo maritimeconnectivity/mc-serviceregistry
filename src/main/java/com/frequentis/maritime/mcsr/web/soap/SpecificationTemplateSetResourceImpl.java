@@ -49,27 +49,27 @@ public class SpecificationTemplateSetResourceImpl implements SpecificationTempla
 	private static final Logger log = LoggerFactory.getLogger(SpecificationTemplateSetResourceImpl.class);
 
 	private static final int ITEMS_PER_PAGE = 50;
-	
+
 	@Autowired
 	SpecificationTemplateSetService specificationTemplateSetService;
-	
+
 	@Autowired
 	SpecificationTemplateSetParameterConverter specTempSetParamConverter;
-	
+
 	@Autowired
 	SpecificationTemplateSetDescriptorConverter specTempSetDescriptorConverter;;
-	
+
 	@Autowired
 	SpecificationTemplateSetConverter specTempSetConverter;;
-	
+
 	/**
 	 * {@inheritDoc}
-	 * @throws ProcessingException 
+	 * @throws ProcessingException
 	 */
 	@Override
 	public SpecificationTemplateSetDescriptorDTO createSpecificationTemplateSet(
 	        SpecificationTemplateSetParameter specificationTemplateSet) throws ProcessingException {
-		
+
         log.debug("SOAP request to save SpecificationTemplateSet : {}", specificationTemplateSet);
         if (specificationTemplateSet.id != null) {
         	throw new ProcessingException("A new specificationTemplateSet cannot already have an ID");
@@ -133,7 +133,7 @@ public class SpecificationTemplateSetResourceImpl implements SpecificationTempla
 	public PageDTO<SpecificationTemplateSetDescriptorDTO> searchSpecificationTemplateSets(String query, int page) {
         log.debug("SOAP request to search for a page of SpecificationTemplateSets for query {}", query);
         Page<SpecificationTemplateSet> pageResponse = specificationTemplateSetService.search(query, PageRequest.of(page, ITEMS_PER_PAGE));
-        
+
         return PageResponse.buildFromPage(pageResponse, specTempSetDescriptorConverter);
 	}
 
