@@ -6,6 +6,10 @@ language: java
 
 node_js: "4.4.7"
 
+before_install:
+  - wget https://github.com/hefay/spring-data-elasticsearch/files/spring-data-elasticsearch-3.0.0.BUILD-SNAPSHOT.jar -O /tmp/spring-data-elasticsearch-3.0.0.BUILD-SNAPSHOT.jar
+  - mv /tmp/spring-data-elasticsearch-3.0.0.BUILD-SNAPSHOT.jar lib/spring-data-elasticsearch-3.0.0.BUILD-SNAPSHOT.jar
+
 install:
   - nvm install v4.4.7
   - node -v
