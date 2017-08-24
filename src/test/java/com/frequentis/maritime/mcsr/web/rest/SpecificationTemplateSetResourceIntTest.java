@@ -260,7 +260,9 @@ public class SpecificationTemplateSetResourceIntTest {
                 .andExpect(status().isOk());
 
         // Validate ElasticSearch is empty
-        boolean specificationTemplateSetExistsInEs = specificationTemplateSetSearchRepository.existsById(specificationTemplateSet.getId());
+        // Bug in existById
+        //boolean specificationTemplateSetExistsInEs = specificationTemplateSetSearchRepository.existsById(specificationTemplateSet.getId());
+        boolean specificationTemplateSetExistsInEs = specificationTemplateSetSearchRepository.findById(specificationTemplateSet.getId()).isPresent();
         assertThat(specificationTemplateSetExistsInEs).isFalse();
 
         // Validate the database is empty

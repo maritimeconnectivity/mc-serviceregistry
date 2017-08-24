@@ -53,7 +53,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class SpecificationTemplateResourceTest {
 	Logger log = LoggerFactory.getLogger(SpecificationTemplateResourceTest.class);
 	private static final int RANDOM_NAME_LENGTH = 12;
-
+	private static int specificationVersion = 1;
 
 	@Autowired
 	private SpecificationTemplateResource internal;
@@ -134,7 +134,7 @@ public class SpecificationTemplateResourceTest {
 		SpecificationTemplateParameterDTO specificationTemplate = new SpecificationTemplateParameterDTO();
 		specificationTemplate.name = RandomStringUtils.randomAlphabetic(RANDOM_NAME_LENGTH);
 		specificationTemplate.comment = RandomStringUtils.randomAlphabetic(RANDOM_NAME_LENGTH);;
-		specificationTemplate.version = "1." + (int) (Math.random() * 9) + "." + (int) (Math.random() * 9);
+		specificationTemplate.version = "1." + (specificationVersion++) + "." + (int) (Math.random() * 9);
 		specificationTemplate.guidelineDoc = randomDoc();
 		specificationTemplate.templateDoc = randomDoc();
 		specificationTemplate.docs = new ArrayList<>(Arrays.asList(randomDoc(), randomDoc()));

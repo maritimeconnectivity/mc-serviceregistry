@@ -272,8 +272,7 @@ public class SpecificationTemplateResourceIntTest {
         assertThat(specificationTemplateEs).isEqualToComparingFieldByField(testSpecificationTemplate);
     }
 
-    // TODO doesn't work
-    //@Test
+    @Test
     @Transactional
     public void deleteSpecificationTemplate() throws Exception {
         // Initialize the database
@@ -287,7 +286,9 @@ public class SpecificationTemplateResourceIntTest {
                 .andExpect(status().isOk());
 
         // Validate ElasticSearch is empty
-        boolean specificationTemplateExistsInEs = specificationTemplateSearchRepository.existsById(specificationTemplate.getId());
+        // Bug in existById
+        //boolean specificationTemplateExistsInEs = specificationTemplateSearchRepository.existsById(specificationTemplate.getId());
+        boolean specificationTemplateExistsInEs = specificationTemplateSearchRepository.findById(specificationTemplate.getId()).isPresent();
         assertThat(specificationTemplateExistsInEs).isFalse();
 
         // Validate the database is empty
