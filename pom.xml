@@ -78,15 +78,15 @@
 
     <dependencies>
      <!-- For Log4J 1.x and Log4J 2.x -->    
-        <dependency>
+        <!--<dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-to-slf4j</artifactId>
             <version>2.7</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>log4j-over-slf4j</artifactId>
-            <version>1.7.21</version>
+            <version>1.7.25</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -99,6 +99,16 @@
         <version>2.1.11</version>
         <scope>test</scope>
     </dependency -->
+	<dependency>
+		<groupId>org.apache.lucene</groupId>
+		<artifactId>lucene-codecs</artifactId>
+		<version>6.5.0</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.apache.lucene</groupId>
+	    <artifactId>lucene-core</artifactId>
+	    <version>6.5.0</version>
+	</dependency>
     <dependency>
         <groupId>com.fasterxml.jackson.datatype</groupId>
         <artifactId>jackson-datatype-hibernate5</artifactId>

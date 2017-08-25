@@ -20,7 +20,7 @@ install:
 
 script: 
   - ./mvnw compile
-  - ./mvnw spring-boot:run &
+  - ./mvnw spring-boot:run -Drun.profiles=integration &
   - sleep 30s
   - gulp itest
   - killall mvnw

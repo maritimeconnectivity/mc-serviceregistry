@@ -41,8 +41,8 @@ spring:
             hibernate.cache.region.factory_class: org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
     data:
         elasticsearch:
-            cluster-name: elasticsearch-test
-            cluster-nodes: localhost:9300
+#            cluster-name: elasticsearch-test
+#            cluster-nodes: localhost:9300
             properties:
                 path:
                   logs: target/elasticsearch/log
