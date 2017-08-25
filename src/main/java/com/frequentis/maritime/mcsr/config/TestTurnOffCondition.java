@@ -34,6 +34,6 @@ public class TestTurnOffCondition implements Condition {
 			return true;
 		}
 		List<String> ap = Arrays.asList(activeProfiles);
-		return !ap.contains("integration") && !ap.contains("test");
+		return !ap.contains("integration") && !ap.contains("test") && !ap.contains("travis");
 	}
 }

@@ -36,7 +36,7 @@ public class NodeClientCondition implements Condition {
         if(clusterNodes == null) {
             clusterNodes = "";
         }
-        return env.getProperty("spring.data.elasticsearch.cluster-nodes").equals("");
+        return clusterNodes.equals("");
 
     }
 
