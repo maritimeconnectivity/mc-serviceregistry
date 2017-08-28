@@ -24,4 +24,5 @@ script:
 #  - ./mvnw spring-boot:run -Drun.profiles=integration &
 #  - sleep 30s
 #  - gulp itest
-  - killall mvnw
+#  If there isn't running mvnw killall returns non-zero return code
+#  - killall mvnw
