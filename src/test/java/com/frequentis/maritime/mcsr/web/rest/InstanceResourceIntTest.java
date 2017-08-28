@@ -311,7 +311,8 @@ public class InstanceResourceIntTest {
         assertThat(instanceEs.getEndpointType()).isEqualTo(DEFAULT_ENDPOINT_TYPE);
     }
 
-    @Test
+    // Deprecated this parameter is parsed from XML
+    //@Test
     @Transactional
     public void checkNameIsRequired() throws Exception {
         int databaseSizeBeforeTest = instanceRepository.findAll().size();
@@ -329,7 +330,8 @@ public class InstanceResourceIntTest {
         assertThat(instances).hasSize(databaseSizeBeforeTest);
     }
 
-    @Test
+    // Deprecated this parameter is parsed from XML
+    //@Test
     @Transactional
     public void checkVersionIsRequired() throws Exception {
         int databaseSizeBeforeTest = instanceRepository.findAll().size();
@@ -347,7 +349,8 @@ public class InstanceResourceIntTest {
         assertThat(instances).hasSize(databaseSizeBeforeTest);
     }
 
-    @Test
+    // Deprecated this parameter is parsed from XML
+    //@Test
     @Transactional
     public void checkCommentIsRequired() throws Exception {
         int databaseSizeBeforeTest = instanceRepository.findAll().size();
@@ -365,7 +368,8 @@ public class InstanceResourceIntTest {
         assertThat(instances).hasSize(databaseSizeBeforeTest);
     }
 
-    @Test
+    // Deprecated this parameter is parsed from XML
+    //@Test
     @Transactional
     public void checkInstanceIdIsRequired() throws Exception {
         int databaseSizeBeforeTest = instanceRepository.findAll().size();
