@@ -90,19 +90,23 @@ public class SpecificationTemplateResourceTest {
 	private void prepareDocs() {
 		// TODO Auto-generated method stub
 		for(int i = 0; i < 6; i++) {
-			String dr = RandomStringUtils.randomAlphabetic(RANDOM_NAME_LENGTH);
-			Doc d = new Doc();
-			d.setName(dr);
-			d.setComment(dr);
-			d.setFilecontent(RandomStringUtils.randomAlphabetic(1024).getBytes());
-			d.setFilecontentContentType("text/plain");
-			d.setMimetype("text/plain");
-
-			docService.save(d);
-			DocReference dRef = new DocReference();
-			dRef.id = d.getId();
-			docs.add(dRef);
+		    docs.add(prepareDoc());
 		}
+	}
+	
+	private DocReference prepareDoc() {
+        String dr = RandomStringUtils.randomAlphabetic(RANDOM_NAME_LENGTH);
+        Doc d = new Doc();
+        d.setName(dr);
+        d.setComment(dr);
+        d.setFilecontent(RandomStringUtils.randomAlphabetic(1024).getBytes());
+        d.setFilecontentContentType("text/plain");
+        d.setMimetype("text/plain");
+
+        docService.save(d);
+        DocReference dRef = new DocReference();
+        dRef.id = d.getId();
+        return dRef;
 	}
 
 	private void prepareXsds() {
@@ -163,6 +167,10 @@ public class SpecificationTemplateResourceTest {
 	public void getSpecificationTemplate() throws ProcessingException {
 		// Given
 		SpecificationTemplateParameterDTO newXsd = createSpecificationTempalte();
+		newXsd.docs.clear();
+		newXsd.docs.add(prepareDoc());
+		newXsd.docs.add(prepareDoc());
+		newXsd.docs.add(prepareDoc());
 		newXsd.id = internal.createSpecificationTemplate(newXsd).id;
 		// some other xsds
 		for(int i = 0; i < 3; i++) {
