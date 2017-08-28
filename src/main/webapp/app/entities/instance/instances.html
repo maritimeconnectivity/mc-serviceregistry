@@ -39,7 +39,7 @@
                     <th jh-sort-by="name"><span translate="mcsrApp.instance.name">Name</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="version"><span translate="mcsrApp.instance.version">Version</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="comment"><span translate="mcsrApp.instance.comment">Comment</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="geometry"><span translate="mcsrApp.instance.geometry">Geometry</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <!-- <th jh-sort-by="geometry"><span translate="mcsrApp.instance.geometry">Geometry</span> <span class="glyphicon glyphicon-sort"></span></th> -->
                     <th jh-sort-by="instanceId"><span translate="mcsrApp.instance.instanceId">Instance Id</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="keywords"><span translate="mcsrApp.instance.keywords">Keywords</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="status"><span translate="mcsrApp.instance.status">Status</span> <span class="glyphicon glyphicon-sort"></span></th>
@@ -59,10 +59,10 @@
                     <td>{{instance.name}}</td>
                     <td>{{instance.version}}</td>
                     <td>{{instance.comment}}</td>
-                    <td>
+                    <!-- <td>
                         <a ng-if="instance.geometry" ng-click="vm.openFile(instance.geometryContentType, instance.geometry)" translate="entity.action.open">open</a>
                         <span ng-if="instance.geometry">{{instance.geometryContentType}}, {{vm.byteSize(instance.geometry)}}</span>
-                    </td>
+                    </td> -->
                     <td>{{instance.instanceId}}</td>
                     <td>{{instance.keywords}}</td>
                     <td>{{instance.status}}</td>
@@ -71,7 +71,7 @@
                     <td>{{instance.endpointUri}}</td>
                     <td>{{instance.endpointType}}</td>
                     <td>
-                        <a ui-sref="xml-detail({id:instance.instanceAsXml.id})">{{instance.instanceAsXml.id}}</a>
+                        <a ui-sref="xml-detail({id:instance.instanceAsXml.id})">{{instance.instanceAsXml.name}}</a>
                     </td>
                     <td>
                         <a ui-sref="doc-detail({id:instance.instanceAsDoc.id})">{{instance.instanceAsDoc.name}}</a>

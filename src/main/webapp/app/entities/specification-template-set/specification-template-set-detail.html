@@ -19,7 +19,7 @@
         <dt><span translate="mcsrApp.specificationTemplateSet.templates">Templates</span></dt>
         <dd>
             <span ng-repeat="templates in vm.specificationTemplateSet.templates">
-                <a ui-sref="specification-template-detail({id: templates.id})">{{templates.id}}</a>{{$last ? '' : ', '}}
+                <a ui-sref="specification-template-detail({id: templates.id})">{{templates.name}}</a>{{$last ? '' : ', '}}
             </span>
         </dd>
         <dt><span translate="mcsrApp.specificationTemplateSet.docs">Docs</span></dt>

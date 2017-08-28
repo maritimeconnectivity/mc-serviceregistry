@@ -38,7 +38,7 @@
         </dd>
         <dt><span translate="mcsrApp.specification.specAsXml">Spec As Xml</span></dt>
         <dd>
-            <a ui-sref="xml-detail({id:vm.specification.specAsXml.id})">{{vm.specification.specAsXml.id}}</a>
+            <a ui-sref="xml-detail({id:vm.specification.specAsXml.id})">{{vm.specification.specAsXml.name}}</a>
         </dd>
         <dt><span translate="mcsrApp.specification.specAsDoc">Spec As Doc</span></dt>
         <dd>
@@ -46,7 +46,7 @@
         </dd>
         <dt><span translate="mcsrApp.specification.implementedSpecificationVersion">Implemented Specification Version</span></dt>
         <dd>
-            <a ui-sref="specification-template-detail({id:vm.specification.implementedSpecificationVersion.id})">{{vm.specification.implementedSpecificationVersion.version}}</a>
+            <a ui-sref="specification-template-detail({id:vm.specification.implementedSpecificationVersion.id})">{{vm.specification.implementedSpecificationVersion.name}} ({{vm.specification.implementedSpecificationVersion.version}})</a>
         </dd>
         <dt><span translate="mcsrApp.specification.docs">Docs</span></dt>
         <dd>

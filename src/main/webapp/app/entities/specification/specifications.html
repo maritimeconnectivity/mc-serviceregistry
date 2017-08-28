@@ -39,7 +39,7 @@
                     <th jh-sort-by="name"><span translate="mcsrApp.specification.name">Name</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="version"><span translate="mcsrApp.specification.version">Version</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="comment"><span translate="mcsrApp.specification.comment">Comment</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="organisationId"><span translate="mcsrApp.specification.organisationId">Organisation Id</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <!-- <th jh-sort-by="organisationId"><span translate="mcsrApp.specification.organisationId">Organisation Id</span> <span class="glyphicon glyphicon-sort"></span></th> -->
                     <th jh-sort-by="keywords"><span translate="mcsrApp.specification.keywords">Keywords</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="specificationId"><span translate="mcsrApp.specification.specificationId">Specification Id</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="status"><span translate="mcsrApp.specification.status">Status</span> <span class="glyphicon glyphicon-sort"></span></th>
@@ -56,19 +56,19 @@
                     <td>{{specification.name}}</td>
                     <td>{{specification.version}}</td>
                     <td>{{specification.comment}}</td>
-                    <td>{{specification.organisationId}}</td>
+                    <!-- <td>{{specification.organisationId}}</td> -->
                     <td>{{specification.keywords}}</td>
                     <td>{{specification.specificationId}}</td>
                     <td>{{specification.status}}</td>
                     <td>{{specification.organizationId}}</td>
                     <td>
-                        <a ui-sref="xml-detail({id:specification.specAsXml.id})">{{specification.specAsXml.id}}</a>
+                        <a ui-sref="xml-detail({id:specification.specAsXml.id})">{{specification.specAsXml.name}}</a>
                     </td>
                     <td>
                         <a ui-sref="doc-detail({id:specification.specAsDoc.id})">{{specification.specAsDoc.name}}</a>
                     </td>
                     <td>
-                        <a ui-sref="specification-template-detail({id:specification.implementedSpecificationVersion.id})">{{specification.implementedSpecificationVersion.version}}</a>
+                        <a ui-sref="specification-template-detail({id:specification.implementedSpecificationVersion.id})">{{specification.implementedSpecificationVersion.name}} ({{specification.implementedSpecificationVersion.version}})</a>
                     </td>
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">

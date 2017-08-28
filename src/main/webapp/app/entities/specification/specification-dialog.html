@@ -88,7 +88,7 @@
 
         <div class="form-group">
             <label translate="mcsrApp.specification.specAsXml" for="field_specAsXml">Spec As Xml</label>
-            <select class="form-control" id="field_specAsXml" name="specAsXml" ng-model="vm.specification.specAsXml" ng-options="xml as xml.id for xml in vm.specasxmls | orderBy:'id' track by xml.id">
+            <select class="form-control" id="field_specAsXml" name="specAsXml" ng-model="vm.specification.specAsXml" ng-options="xml as xml.name for xml in vm.specasxmls | orderBy:'id' track by xml.id">
                 <option value=""></option>
             </select>
         </div>
