@@ -16,6 +16,7 @@ import com.frequentis.maritime.mcsr.service.XmlService;
 import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 import com.frequentis.maritime.mcsr.web.soap.PageResponse;
+import com.frequentis.maritime.mcsr.web.soap.SoapHTTPUtil;
 import com.frequentis.maritime.mcsr.web.soap.converters.Converter;
 import com.frequentis.maritime.mcsr.web.soap.converters.specification.SpecificationDTOConverter;
 import com.frequentis.maritime.mcsr.web.soap.converters.specification.SpecificationDescriptorDTOConverter;
@@ -43,8 +44,10 @@ public class ServiceSpecificationResourceImpl implements ServiceSpecificationRes
     SpecificationDescriptorDTOConverter specificationDescriptorConverter;
 
     @Override
-    public SpecificationDescriptorDTO createSpecification(SpecificationDTO specificationDTO, String bearerToken) throws Exception {
+    public SpecificationDescriptorDTO createSpecification(SpecificationDTO specificationDTO) throws Exception {
         log.debug("REST request to save Specification : {}", specificationDTO);
+        String bearerToken = SoapHTTPUtil.currentBearerToken();
+        
         String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
         if (specificationDTO.id != null) {
             throw new IllegalArgumentException("A new specification cannot already have an ID");
@@ -69,10 +72,12 @@ public class ServiceSpecificationResourceImpl implements ServiceSpecificationRes
     }
 
     @Override
-    public SpecificationDescriptorDTO updateSpecification(SpecificationDTO specificationDTO, String bearerToken) throws IllegalAccessException, Exception {
+    public SpecificationDescriptorDTO updateSpecification(SpecificationDTO specificationDTO) throws IllegalAccessException, Exception {
         log.debug("SOAP request to update Specification : {}", specificationDTO);
+        String bearerToken = SoapHTTPUtil.currentBearerToken();
+        
         if (specificationDTO.id == null) {
-            createSpecification(specificationDTO, bearerToken);
+            createSpecification(specificationDTO);
         }
 
         Specification specification = specificationConverter.convertReverse(specificationDTO);
@@ -119,8 +124,10 @@ public class ServiceSpecificationResourceImpl implements ServiceSpecificationRes
     }
 
     @Override
-    public void deleteSpecification(String id, String version, String bearerToken) throws IllegalAccessException {
+    public void deleteSpecification(String id, String version) throws IllegalAccessException {
         log.debug("SOAP request to delete a specification {} of version {}", id, version);
+        String bearerToken = SoapHTTPUtil.currentBearerToken();
+        
         Specification specification = specificationService.findByDomainId(id, version);
 
         String organizationId = "";
@@ -146,8 +153,9 @@ public class ServiceSpecificationResourceImpl implements ServiceSpecificationRes
     }
 
     @Override
-    public void updateSpecificationStatus(String id, String version, String status, String bearerToken) throws IllegalAccessException, ProcessingException {
+    public void updateSpecificationStatus(String id, String version, String status) throws IllegalAccessException, ProcessingException {
         log.debug("SOAP request to update status of Specification {} of version {}", id, version);
+        String bearerToken = SoapHTTPUtil.currentBearerToken();
         Specification specification = specificationService.findByDomainId(id, version);
 
         String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);

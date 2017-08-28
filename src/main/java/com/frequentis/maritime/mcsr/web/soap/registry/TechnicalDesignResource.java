@@ -49,8 +49,8 @@ public interface TechnicalDesignResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
 	@WebMethod
-    public DesignDescriptorDTO createDesign(@WebParam(name = "design") @XmlElement(required = true) DesignDTO design,
-    		@WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken) throws Exception, XmlValidateException;
+    public DesignDescriptorDTO createDesign(@WebParam(name = "design") @XmlElement(required = true) DesignDTO design
+            ) throws Exception, XmlValidateException;
 
     /**
      * Updates an existing design.
@@ -62,8 +62,7 @@ public interface TechnicalDesignResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     public DesignDescriptorDTO updateDesign(
-    		@WebParam(name = "design") @XmlElement(required = true) DesignDTO design,
-    		@WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken
+    		@WebParam(name = "design") @XmlElement(required = true) DesignDTO design
     		) throws Exception, URISyntaxException;
 
     /**
@@ -117,8 +116,7 @@ public interface TechnicalDesignResource {
      */
     public void deleteDesign(
     		@WebParam(name="id") @XmlElement(required = true) String id,
-    		@WebParam(name="version") @XmlElement(required = true) String version,
-    		@WebParam(name="bearerToken") @XmlElement(required = true) String bearerToken) throws AccessDeniedException;
+    		@WebParam(name="version") @XmlElement(required = true) String version) throws AccessDeniedException;
 
     /**
      * Search for the design corresponding
@@ -142,8 +140,7 @@ public interface TechnicalDesignResource {
     public void updateDesignStatus(
     		@WebParam(name="id") @XmlElement(required = true) String id,
     		@WebParam(name="version") @XmlElement(required = true) String version,
-    		@WebParam(name="status") @XmlElement(required = true) String status,
-    		@WebParam(name="bearerToken") @XmlElement(required = true) String bearerToken)
+    		@WebParam(name="status") @XmlElement(required = true) String status)
     		throws Exception, AccessDeniedException;
 
 

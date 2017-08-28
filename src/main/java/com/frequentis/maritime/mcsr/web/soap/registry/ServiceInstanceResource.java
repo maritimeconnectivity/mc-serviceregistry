@@ -57,15 +57,13 @@ public interface ServiceInstanceResource {
      *
      *
      * @param instance the instance to create
-     * @param bearerToken
      * @return the ResponseEntity with status 201 (Created) and with body the new instance, or with status 400 (Bad Request) if the instance has already an ID
      * @throws AccessDeniedException
      * @throws XmlValidateException
      * @throws InstanceAlreadyExistException
      */
     public InstanceDTO createInstance(
-    		@WebParam(name = "instance") @XmlElement(required = true) InstanceParameterDTO instance,
-    		@WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken)
+    		@WebParam(name = "instance") @XmlElement(required = true) InstanceParameterDTO instance)
     				throws AccessDeniedException, XmlValidateException, InstanceAlreadyExistException, ProcessingException;
 
     /**
@@ -79,8 +77,7 @@ public interface ServiceInstanceResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     public InstanceDTO updateInstance(
-    		@WebParam(name = "instance") @XmlElement(required = true) InstanceParameterDTO instance,
-    		@WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken)
+    		@WebParam(name = "instance") @XmlElement(required = true) InstanceParameterDTO instance)
     				throws AccessDeniedException, XmlValidateException, InstanceAlreadyExistException, ProcessingException;
 
     /**
@@ -125,8 +122,7 @@ public interface ServiceInstanceResource {
      */
     public void deleteInstance(
     		@WebParam(name = "id") @XmlElement(required = true) String id,
-    		@WebParam(name = "version") @XmlElement(required = true) String version,
-    		@WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken) throws AccessDeniedException;
+    		@WebParam(name = "version") @XmlElement(required = true) String version) throws AccessDeniedException;
 
     /**
      * SEARCH  /_search/serviceInstance?query=:query : search for the instance corresponding
@@ -226,8 +222,7 @@ public interface ServiceInstanceResource {
     public void updateInstanceStatus(
     		@WebParam(name = "id") @XmlElement(required = true) String id,
     		@WebParam(name = "version") @XmlElement(required = true) String version,
-    		@WebParam(name = "status") @XmlElement(required = true) String status,
-    		@WebParam(name = "bearerToken") @XmlElement(required = true)  String bearerToken) throws Exception;
+    		@WebParam(name = "status") @XmlElement(required = true) String status) throws Exception;
 
 
 

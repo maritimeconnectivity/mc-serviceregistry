@@ -97,7 +97,7 @@ public class TechnicalDesignResourceTest {
 	public void createSuccess() throws URISyntaxException, Exception {
 		DesignDTO designDTO = prepareValidDesignDTO();
 
-		DesignDescriptorDTO createdDesign = client.createDesign(designDTO, TOKEN);
+		DesignDescriptorDTO createdDesign = client.createDesign(designDTO);
 		assertThat(createdDesign.name, is(designDTO.name));
 	}
 
@@ -107,7 +107,7 @@ public class TechnicalDesignResourceTest {
 		long count = designResourceInternal.getAllDesigns(0).itemTotalCount;
 
 		// When
-		designResourceInternal.createDesign(prepareValidDesignDTO(), TOKEN);
+		designResourceInternal.createDesign(prepareValidDesignDTO());
 		long cl = client.getAllDesigns(0).itemTotalCount;
 
 		// Then
@@ -117,7 +117,7 @@ public class TechnicalDesignResourceTest {
 	@Test
 	public void getDesign() throws XmlValidateException, Exception {
 		// Given
-		DesignDescriptorDTO design = designResourceInternal.createDesign(prepareValidDesignDTO(), TOKEN);
+		DesignDescriptorDTO design = designResourceInternal.createDesign(prepareValidDesignDTO());
 
 		// When
 		DesignDTO storedDesign = client.getDesign(design.designId, design.version);
@@ -132,11 +132,11 @@ public class TechnicalDesignResourceTest {
 	@Test
 	public void searchById() throws XmlValidateException, Exception {
 		// Given
-		designResourceInternal.createDesign(prepareValidDesignDTO(), TOKEN);
-		designResourceInternal.createDesign(prepareValidDesignDTO(), TOKEN);
-		designResourceInternal.createDesign(prepareValidDesignDTO(), TOKEN);
-		designResourceInternal.createDesign(prepareValidDesignDTO(), TOKEN);
-		DesignDescriptorDTO newDesign = designResourceInternal.createDesign(prepareValidDesignDTO(), TOKEN);
+		designResourceInternal.createDesign(prepareValidDesignDTO());
+		designResourceInternal.createDesign(prepareValidDesignDTO());
+		designResourceInternal.createDesign(prepareValidDesignDTO());
+		designResourceInternal.createDesign(prepareValidDesignDTO());
+		DesignDescriptorDTO newDesign = designResourceInternal.createDesign(prepareValidDesignDTO());
 
 		// When
 		PageDTO<DesignDescriptorDTO> searchResult = client.getAllDesignsById(newDesign.designId, 0);
@@ -152,10 +152,10 @@ public class TechnicalDesignResourceTest {
 	public void documentRemove() throws XmlValidateException, Exception {
 		// Given
 		long countBefore = designResourceInternal.getAllDesigns(0).itemTotalCount;
-		DesignDescriptorDTO newDto = designResourceInternal.createDesign(prepareValidDesignDTO(), TOKEN);
+		DesignDescriptorDTO newDto = designResourceInternal.createDesign(prepareValidDesignDTO());
 
 		// When
-		client.deleteDesign(newDto.designId, newDto.version, TOKEN);
+		client.deleteDesign(newDto.designId, newDto.version);
 
 		// Then
 		long countAfter = designResourceInternal.getAllDesigns(0).itemTotalCount;
@@ -166,15 +166,15 @@ public class TechnicalDesignResourceTest {
 	public void getAllDocumentVersion() throws XmlValidateException, Exception {
 		// Given
 		DesignDTO version1 = prepareValidDesignDTO();
-		 designResourceInternal.createDesign(version1, TOKEN);
+		 designResourceInternal.createDesign(version1);
 		DesignDTO version2 = prepareValidDesignDTO();
 		version2.designId = version1.designId;
 		version2.version = "1.6.7";
-		designResourceInternal.createDesign(version2, TOKEN);
+		designResourceInternal.createDesign(version2);
 		DesignDTO version3 = prepareValidDesignDTO();
 		version3.designId = version1.designId;
 		version3.version = "1.7.4";
-		designResourceInternal.createDesign(version3, TOKEN);
+		designResourceInternal.createDesign(version3);
 
 		// When
 		PageDTO<DesignDescriptorDTO> designDescriptor = client.getAllDesignsById(version1.designId, 0);
@@ -193,11 +193,11 @@ public class TechnicalDesignResourceTest {
 	@Test
 	public void updateStatus() throws XmlValidateException, Exception {
 		// Given
-		DesignDescriptorDTO design = designResourceInternal.createDesign(prepareValidDesignDTO(), TOKEN);
+		DesignDescriptorDTO design = designResourceInternal.createDesign(prepareValidDesignDTO());
 		String newStatus = "newSamleStatus";
 
 		// When
-		client.updateDesignStatus(design.designId, design.version, newStatus, TOKEN);
+		client.updateDesignStatus(design.designId, design.version, newStatus);
 
 		// Then
 		DesignDTO designAfter = client.getDesign(design.designId, design.version);
@@ -212,13 +212,13 @@ public class TechnicalDesignResourceTest {
 		String newName = "newName";
 		DesignDTO design = prepareValidDesignDTO();
 		design.name = originalName;
-		DesignDescriptorDTO saved = designResourceInternal.createDesign(design, TOKEN);
+		DesignDescriptorDTO saved = designResourceInternal.createDesign(design);
 
 
 		// When
 		DesignDTO obtainedDesign = designResourceInternal.getDesign(saved.designId, saved.version);
 		obtainedDesign.name = "newName";
-		client.updateDesign(obtainedDesign, TOKEN);
+		client.updateDesign(obtainedDesign);
 
 		// Then
 		DesignDTO currentDesign = designResourceInternal.getDesign(design.designId, design.version);
@@ -240,7 +240,7 @@ public class TechnicalDesignResourceTest {
 			d = prepareValidDesignDTO();
 			d.name = "customSearchADwdaxawsadwwDAWdwsxcxadwakjhJHKHWDWA" + rand;
 			d.status = "customSearchADwdaxawsadwwDAWdwsxcxadwakjhJHKHWDWA" + rand;
-			designResourceInternal.createDesign(d, TOKEN);
+			designResourceInternal.createDesign(d);
 		}
 
 		// When

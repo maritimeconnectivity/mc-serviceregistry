@@ -16,13 +16,12 @@ public interface ServiceSpecificationResource {
 
     @WebMethod
     public SpecificationDescriptorDTO createSpecification(
-            @WebParam(name = "specification") @XmlElement(required = true) SpecificationDTO specification,
-            @WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken) throws Exception;
+            @WebParam(name = "specification") @XmlElement(required = true) SpecificationDTO specification) throws Exception;
 
     @WebMethod
     public SpecificationDescriptorDTO updateSpecification(
-            @WebParam(name = "specification") @XmlElement(required = true) SpecificationDTO specification,
-            @WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken) throws IllegalAccessException, Exception;
+            @WebParam(name = "specification") @XmlElement(required = true) SpecificationDTO specification
+            ) throws IllegalAccessException, Exception;
 
     @WebMethod
     @WebResult(name = "specifications")
@@ -44,8 +43,7 @@ public interface ServiceSpecificationResource {
     @WebMethod
     public void deleteSpecification(
             @WebParam(name = "specificationId") @XmlElement(required = true) String id,
-            @WebParam(name = "version") @XmlElement(required = true) String version,
-            @WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken) throws IllegalAccessException;
+            @WebParam(name = "version") @XmlElement(required = true) String version) throws IllegalAccessException;
 
     @WebMethod
     @WebResult(name = "specifications")
@@ -57,7 +55,6 @@ public interface ServiceSpecificationResource {
     public void updateSpecificationStatus(
             @WebParam(name = "specificationId") @XmlElement(required = true) String id,
             @WebParam(name = "version") @XmlElement(required = true) String version,
-            @WebParam(name = "status") @XmlElement(required = true) String status,
-            @WebParam(name = "bearerToken") @XmlElement(required = true) String bearerToken) throws IllegalAccessException, Exception;
+            @WebParam(name = "status") @XmlElement(required = true) String status) throws IllegalAccessException, Exception;
 
 }

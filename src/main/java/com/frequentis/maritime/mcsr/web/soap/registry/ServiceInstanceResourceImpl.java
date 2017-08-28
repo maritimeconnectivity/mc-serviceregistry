@@ -18,6 +18,7 @@ import com.frequentis.maritime.mcsr.service.XmlService;
 import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 import com.frequentis.maritime.mcsr.web.soap.PageResponse;
+import com.frequentis.maritime.mcsr.web.soap.SoapHTTPUtil;
 import com.frequentis.maritime.mcsr.web.soap.converters.Converter;
 import com.frequentis.maritime.mcsr.web.soap.converters.instance.InstanceDTOConverter;
 import com.frequentis.maritime.mcsr.web.soap.converters.instance.InstanceParameterDTOToInstanceConverter;
@@ -58,9 +59,10 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 
 
 	@Override
-	public InstanceDTO createInstance(InstanceParameterDTO instanceDto, String bearerToken)
+	public InstanceDTO createInstance(InstanceParameterDTO instanceDto)
 			throws AccessDeniedException, InstanceAlreadyExistException, XmlValidateException, ProcessingException {
 		log.debug("SOAP request to create instance");
+		String bearerToken = SoapHTTPUtil.currentBearerToken();
 		String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
 		if(instanceDto.id != null) {
 			throw new InstanceAlreadyExistException("A new instance cannot already have an ID");
@@ -121,11 +123,12 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 	}
 
 	@Override
-	public InstanceDTO updateInstance(InstanceParameterDTO instanceDto, String bearerToken)
+	public InstanceDTO updateInstance(InstanceParameterDTO instanceDto)
 			throws AccessDeniedException, XmlValidateException, InstanceAlreadyExistException, ProcessingException {
 		log.debug("SOAP request to update instance");
+		String bearerToken = SoapHTTPUtil.currentBearerToken();
 		if (instanceDto.id == null) {
-			return createInstance(instanceDto, bearerToken);
+			return createInstance(instanceDto);
 		}
 		Instance instance = instanceParameterConverter.convert(instanceDto);
 
@@ -218,8 +221,9 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 	}
 
 	@Override
-	public void deleteInstance(String id, String version, String bearerToken) throws AccessDeniedException {
+	public void deleteInstance(String id, String version) throws AccessDeniedException {
 		log.debug("SOAP request to delete Instance id {} version {}", id, version);
+		String bearerToken = SoapHTTPUtil.currentBearerToken();
 		Instance instance = instanceService.findByDomainId(id, version);
 
 		String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
@@ -324,8 +328,9 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 	}
 
 	@Override
-	public void updateInstanceStatus(String id, String version, String status, String bearerToken) throws AccessDeniedException {
+	public void updateInstanceStatus(String id, String version, String status) throws AccessDeniedException {
         log.debug("SOAP request to update status of Instance {} version {}", id, version);
+        String bearerToken = SoapHTTPUtil.currentBearerToken();
         Instance instance = instanceService.findByDomainId(id, version);
 
         String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);

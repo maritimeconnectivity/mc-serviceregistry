@@ -139,7 +139,7 @@ public class ServiceSpecificationResourceTest {
 		long countBefore = serviceSpecificationResourceInternal.getAllSpecifications(0).itemTotalCount;
 
 		// When
-		SpecificationDescriptorDTO spec = client.createSpecification(specificationDTO, TOKEN);
+		SpecificationDescriptorDTO spec = client.createSpecification(specificationDTO);
 
 		// Then
 		assertEquals(specificationDTO.name, spec.name);
@@ -159,7 +159,7 @@ public class ServiceSpecificationResourceTest {
 
 		// When
 		for(int i = 0; i < 5; i++) {
-			serviceSpecificationResourceInternal.createSpecification(prepareValidSpecificationDTO(), TOKEN);
+			serviceSpecificationResourceInternal.createSpecification(prepareValidSpecificationDTO());
 			plusItems++;
 		}
 
@@ -178,7 +178,7 @@ public class ServiceSpecificationResourceTest {
 		otherSpecDTO.specificationId = specDTO.specificationId;
 
 		// When
-		serviceSpecificationResourceInternal.createSpecification(specDTO, TOKEN);
+		serviceSpecificationResourceInternal.createSpecification(specDTO);
 
 		// Then
 		SpecificationDTO saved = client.getSpecification(specDTO.specificationId, specDTO.version);
@@ -200,7 +200,7 @@ public class ServiceSpecificationResourceTest {
 		for(int i = 0; i < countOfSpecifications; i++) {
 			template.version = "1.0." + i;
 			template.name = "Adam v1.0." + i;
-			specifications[i] = serviceSpecificationResourceInternal.createSpecification(template, TOKEN);
+			specifications[i] = serviceSpecificationResourceInternal.createSpecification(template);
 		}
 
 		// When
@@ -217,11 +217,11 @@ public class ServiceSpecificationResourceTest {
 	@Test
 	public void deleteSpecification() throws Exception {
 		// Given
-		SpecificationDescriptorDTO spec = serviceSpecificationResourceInternal.createSpecification(prepareValidSpecificationDTO(), TOKEN);
+		SpecificationDescriptorDTO spec = serviceSpecificationResourceInternal.createSpecification(prepareValidSpecificationDTO());
 
 
 		// When
-		client.deleteSpecification(spec.specificationId, spec.version, TOKEN);
+		client.deleteSpecification(spec.specificationId, spec.version);
 
 		// Then
 		SpecificationDescriptorDTO result = serviceSpecificationResourceInternal.getSpecification(spec.specificationId, spec.version);
@@ -233,10 +233,10 @@ public class ServiceSpecificationResourceTest {
 	public void updateSpecificationStatus() throws IllegalAccessException, Exception {
 		// Given
 		String newStatus = "provisional";
-		SpecificationDescriptorDTO spec = serviceSpecificationResourceInternal.createSpecification(prepareValidSpecificationDTO(), TOKEN);
+		SpecificationDescriptorDTO spec = serviceSpecificationResourceInternal.createSpecification(prepareValidSpecificationDTO());
 
 		// When
-		client.updateSpecificationStatus(spec.specificationId, spec.version, newStatus, TOKEN);
+		client.updateSpecificationStatus(spec.specificationId, spec.version, newStatus);
 
 		// Then
 		SpecificationDescriptorDTO result = serviceSpecificationResourceInternal.getSpecification(spec.specificationId, spec.version);
@@ -247,7 +247,7 @@ public class ServiceSpecificationResourceTest {
 	public void updateSpecification() throws Exception {
 		// Given
 		SpecificationDTO specDTO = prepareValidSpecificationDTO();
-		SpecificationDescriptorDTO specDesc = serviceSpecificationResourceInternal.createSpecification(specDTO, TOKEN);
+		SpecificationDescriptorDTO specDesc = serviceSpecificationResourceInternal.createSpecification(specDTO);
 		// We need xml id
 		SpecificationDTO updateDTO = serviceSpecificationResourceInternal.getSpecification(specDesc.specificationId, specDesc.version);
 
@@ -255,7 +255,7 @@ public class ServiceSpecificationResourceTest {
 			// When
 			String newName = "NewName" + Math.random() * 10000;
 			updateDTO.name = newName;
-			client.updateSpecification(updateDTO, TOKEN);
+			client.updateSpecification(updateDTO);
 
 			// Then
 			SpecificationDTO saved = serviceSpecificationResourceInternal.getSpecification(specDTO.specificationId, specDTO.version);
@@ -272,13 +272,13 @@ public class ServiceSpecificationResourceTest {
 		for(int i = 0; i < resultCount; i++) {
 			newSpec = prepareValidSpecificationDTO();
 			newSpec.name = searchSpecNamePrefix + (int) (Math.random() * 1000);
-			serviceSpecificationResourceInternal.createSpecification(newSpec, TOKEN);
+			serviceSpecificationResourceInternal.createSpecification(newSpec);
 		}
 		for(int i = 0; i < 12; i++) {
 			// Random name data
 			newSpec = prepareValidSpecificationDTO();
 			newSpec.name = "searchSpecName_" + (int) (Math.random() * 1000);
-			serviceSpecificationResourceInternal.createSpecification(newSpec, TOKEN);
+			serviceSpecificationResourceInternal.createSpecification(newSpec);
 		}
 
 		// When
@@ -300,7 +300,7 @@ public class ServiceSpecificationResourceTest {
 		SpecificationDTO newSpec = prepareValidSpecificationDTO();
 		for(int i = 0; i < instanceCount; i++) {
 			newSpec = prepareValidSpecificationDTO();
-			long id = serviceSpecificationResourceInternal.createSpecification(newSpec, TOKEN).id;
+			long id = serviceSpecificationResourceInternal.createSpecification(newSpec).id;
 			// Workaround for setting organizationId
 			Specification spec = specService.findOne(id);
 			spec.setOrganizationId(ORGANIZATION_ID);
@@ -308,7 +308,7 @@ public class ServiceSpecificationResourceTest {
 
 			// Random name data
 			newSpec = prepareValidSpecificationDTO();
-			serviceSpecificationResourceInternal.createSpecification(newSpec, TOKEN);
+			serviceSpecificationResourceInternal.createSpecification(newSpec);
 		}
 
 		// When

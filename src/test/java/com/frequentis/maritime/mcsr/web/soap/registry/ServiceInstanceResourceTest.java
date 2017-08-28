@@ -330,7 +330,7 @@ public class ServiceInstanceResourceTest {
 		long itemCountBefore = instanceInternal.getAllInstances(false, 0).itemTotalCount;
 
 		// When
-		InstanceDTO saved = client.createInstance(instance, TOKEN);
+		InstanceDTO saved = client.createInstance(instance);
 
 		// Then
 		assertEquals(iv.name, saved.name);
@@ -344,9 +344,9 @@ public class ServiceInstanceResourceTest {
 	public void getInstance() throws ProcessingException, Exception {
 		// Given
 		InstanceValues iv = new InstanceValues();
-		InstanceDTO instance = instanceInternal.createInstance(prepareValidWithXML(iv), TOKEN);
+		InstanceDTO instance = instanceInternal.createInstance(prepareValidWithXML(iv));
 		for (int i = 0; i < 5; i++) {
-			instanceInternal.createInstance(prepareValidWithXML(), TOKEN);
+			instanceInternal.createInstance(prepareValidWithXML());
 		}
 
 		// When
@@ -367,7 +367,7 @@ public class ServiceInstanceResourceTest {
 		long startCount = instanceInternal.getAllInstances(false, 0).itemTotalCount;
 		InstanceDTO[] instances = new InstanceDTO[instanceCount];
 		for (int i = 0; i < instanceCount; i++) {
-			instances[i] = instanceInternal.createInstance(prepareValidWithXML(), TOKEN);
+			instances[i] = instanceInternal.createInstance(prepareValidWithXML());
 		}
 
 		// When
@@ -400,7 +400,7 @@ public class ServiceInstanceResourceTest {
 		for (int i = 0; i < itemCount; i++) {
 			iv.version = versionPrefix + i;
 			template = prepareValidWithXML(iv);
-			instances[i] = instanceInternal.createInstance(template, TOKEN);
+			instances[i] = instanceInternal.createInstance(template);
 			iv = new InstanceValues();
 			iv.instanceId = instances[i].instanceId;
 		}
@@ -418,11 +418,11 @@ public class ServiceInstanceResourceTest {
 	@Test
 	public void deleteInstance() throws ProcessingException, Exception {
 		// Given
-		InstanceDTO inst = instanceInternal.createInstance(prepareValidWithXML(), TOKEN);
+		InstanceDTO inst = instanceInternal.createInstance(prepareValidWithXML());
 		boolean exist = instanceInternal.getInstance(inst.instanceId, inst.version, false) != null;
 
 		// When
-		client.deleteInstance(inst.instanceId, inst.version, TOKEN);
+		client.deleteInstance(inst.instanceId, inst.version);
 
 		// Then
 		boolean existAfter = instanceInternal.getInstance(inst.instanceId, inst.version, false) != null;
@@ -440,8 +440,8 @@ public class ServiceInstanceResourceTest {
 		for (int i = 0; i < instanceCount; i++) {
 			InstanceValues iv = new InstanceValues();
 			iv.name = prefix + i;
-			instances[i] = instanceInternal.createInstance(prepareValidWithXML(iv), TOKEN);
-			instanceInternal.createInstance(prepareValidWithXML(), TOKEN);
+			instances[i] = instanceInternal.createInstance(prepareValidWithXML(iv));
+			instanceInternal.createInstance(prepareValidWithXML());
 		}
 
 		// When
@@ -461,8 +461,8 @@ public class ServiceInstanceResourceTest {
 			InstanceValues iv = new InstanceValues();
 			iv.keywords = "created adam " + customKeyword;
 			InstanceParameterDTO instPar = prepareValidWithXML(iv);
-			instances[i] = instanceInternal.createInstance(instPar, TOKEN);
-			instanceInternal.createInstance(prepareValidWithXML(), TOKEN);
+			instances[i] = instanceInternal.createInstance(instPar);
+			instanceInternal.createInstance(prepareValidWithXML());
 		}
 		// When
 		PageDTO<InstanceDTO> result = client.searchInstancesByKeywords(customKeyword, false, 0);
@@ -478,15 +478,15 @@ public class ServiceInstanceResourceTest {
 		in.unloCode = randomPrefix + "FR";
 		in.name += " FR";
 		InstanceParameterDTO instance = prepareValidWithXML(in);
-		InstanceDTO franceInstance = instanceInternal.createInstance(instance, TOKEN);
+		InstanceDTO franceInstance = instanceInternal.createInstance(instance);
 		InstanceValues oi = new InstanceValues();
 		oi.unloCode = randomPrefix + "DE";
 		oi.name += " DE";
-		instanceInternal.createInstance(prepareValidWithXML(oi), TOKEN);
+		instanceInternal.createInstance(prepareValidWithXML(oi));
 		oi = new InstanceValues();
 		oi.unloCode = randomPrefix + "PE";
 		oi.name += " PE";
-		instanceInternal.createInstance(prepareValidWithXML(oi), TOKEN);
+		instanceInternal.createInstance(prepareValidWithXML(oi));
 
 		// When
 		PageDTO<InstanceDTO> result = client.searchInstancesByUnlocode(randomPrefix + "FR", false, 0);
@@ -503,9 +503,9 @@ public class ServiceInstanceResourceTest {
 		// Given
 		InstanceValues iv = new InstanceValues();
 		InstanceParameterDTO instance = prepareValidWithXML(iv);
-		instanceInternal.createInstance(instance, TOKEN);
+		instanceInternal.createInstance(instance);
 		for (int i = 0; i < 3; i++) {
-			instanceInternal.createInstance(prepareValidWithXML(), TOKEN);
+			instanceInternal.createInstance(prepareValidWithXML());
 		}
 
 		// When
@@ -521,9 +521,9 @@ public class ServiceInstanceResourceTest {
 		// Given
 		InstanceValues iv = new InstanceValues();
 		iv.wktGeometry = "POINT(14.42024230957031 50.08666612902112)";
-		instanceInternal.createInstance(prepareValidWithXML(iv), TOKEN);
+		instanceInternal.createInstance(prepareValidWithXML(iv));
 		for (int i = 0; i < 3; i++) {
-			instanceInternal.createInstance(prepareValidWithXML(), TOKEN);
+			instanceInternal.createInstance(prepareValidWithXML());
 		}
 		String polygon = "{ \"type\": \"Polygon\", \"coordinates\": "
 		        + "[ [ [ 14.379215240478514, 50.07912075533354 ], " + "[ 14.467706680297852, 50.0696460498075 ], "
@@ -551,9 +551,9 @@ public class ServiceInstanceResourceTest {
 		// Given
 		InstanceValues iv = new InstanceValues();
 		iv.wktGeometry = "POINT(14.42024230957031 50.08666612902112)";
-		instanceInternal.createInstance(prepareValidWithXML(iv), TOKEN);
+		instanceInternal.createInstance(prepareValidWithXML(iv));
 		for (int i = 0; i < 3; i++) {
-			instanceInternal.createInstance(prepareValidWithXML(), TOKEN);
+			instanceInternal.createInstance(prepareValidWithXML());
 		}
 		String polygon = "POLYGON((" + "14.415714740753174 50.08683134289367," + "14.42206621170044 50.08995653136852,"
 		        + "14.425349235534668 50.0859088914852," + "14.416379928588867 50.08242544472934,"

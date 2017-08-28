@@ -16,6 +16,7 @@ import com.frequentis.maritime.mcsr.service.DesignService;
 import com.frequentis.maritime.mcsr.service.XmlService;
 import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 import com.frequentis.maritime.mcsr.web.soap.PageResponse;
+import com.frequentis.maritime.mcsr.web.soap.SoapHTTPUtil;
 import com.frequentis.maritime.mcsr.web.soap.converters.design.DesignConverter;
 import com.frequentis.maritime.mcsr.web.soap.converters.design.DesignDescriptorConverter;
 import com.frequentis.maritime.mcsr.web.soap.dto.PageDTO;
@@ -55,8 +56,10 @@ public class TechnicalDesignResourceImpl implements TechnicalDesignResource {
 	 */
 	@Override
 	@Transactional
-	public DesignDescriptorDTO createDesign(DesignDTO designDto, String bearerToken) throws XmlValidateException, Exception {
+	public DesignDescriptorDTO createDesign(DesignDTO designDto) throws XmlValidateException, Exception {
 		log.debug("SOAP request to create design");
+		String bearerToken = SoapHTTPUtil.currentBearerToken();
+		
 		String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
 		Design design = designConverter.convertReverse(designDto);
 
@@ -86,10 +89,12 @@ public class TechnicalDesignResourceImpl implements TechnicalDesignResource {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public DesignDescriptorDTO updateDesign(DesignDTO designDto, String bearerToken) throws Exception, URISyntaxException {
+	public DesignDescriptorDTO updateDesign(DesignDTO designDto) throws Exception, URISyntaxException {
 		log.debug("SOAP request to update Design with id {}", designDto.id);
+		String bearerToken = SoapHTTPUtil.currentBearerToken();
+		
 		if(designDto.id == null) {
-			return createDesign(designDto, bearerToken);
+			return createDesign(designDto);
 		}
 		Design design = designConverter.convertReverse(designDto);
 
@@ -159,8 +164,10 @@ public class TechnicalDesignResourceImpl implements TechnicalDesignResource {
 	 * @throws Exception
 	 */
 	@Override
-	public void deleteDesign(String id, String version, String bearerToken) throws AccessDeniedException {
+	public void deleteDesign(String id, String version) throws AccessDeniedException {
 		log.debug("SOAP request to delete Design by id {} and version {}", id, version);
+		String bearerToken = SoapHTTPUtil.currentBearerToken();
+		
 		Design design = designService.findByDomainId(id, version);
 		if(design == null) {
 			log.warn("Request for delete nonexisted design wit id {}", id);
@@ -190,8 +197,9 @@ public class TechnicalDesignResourceImpl implements TechnicalDesignResource {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void updateDesignStatus(String id, String version, String status, String bearerToken) throws Exception, AccessDeniedException {
+	public void updateDesignStatus(String id, String version, String status) throws Exception, AccessDeniedException {
 		log.debug("SOAP request to update design status to {} by design id {} and version {}", status, id, version);
+		String bearerToken = SoapHTTPUtil.currentBearerToken();
 		Design design = designService.findByDomainId(id, version);
 
 		String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
