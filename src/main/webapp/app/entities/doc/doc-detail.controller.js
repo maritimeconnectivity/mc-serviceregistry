@@ -14,6 +14,7 @@
         vm.previousState = previousState.name;
         vm.byteSize = DataUtils.byteSize;
         vm.openFile = DataUtils.openFile;
+        vm.downloadFile = DataUtils.downloadFile;
 
         var unsubscribe = $rootScope.$on('mcsrApp:docUpdate', function(event, result) {
             vm.doc = result;

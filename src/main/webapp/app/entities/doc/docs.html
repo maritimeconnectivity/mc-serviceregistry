@@ -50,7 +50,7 @@
                     <td>{{doc.comment}}</td>
                     <td>{{doc.mimetype}}</td>
                     <td>
-                        <a ng-if="doc.filecontent" ng-click="vm.openFile(doc.filecontentContentType, doc.filecontent)" translate="entity.action.open">open</a>
+                        <a ng-if="doc.filecontent" ng-click="vm.downloadFile(doc.name, doc.filecontentContentType, doc.filecontent)" translate="entity.action.download">download</a>
                         <span ng-if="doc.filecontent">{{doc.filecontentContentType}}, {{vm.byteSize(doc.filecontent)}}</span>
                     </td>
                     <td class="text-right">

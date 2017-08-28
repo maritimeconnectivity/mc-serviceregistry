@@ -48,7 +48,7 @@
                     <td>{{xml.name}}</td>
                     <td>{{xml.comment}}</td>
                     <td>
-                        <a ng-if="xml.content" ng-click="vm.openFile(xml.contentContentType, vm.Base64.encode(xml.content))" translate="entity.action.open">open</a>
+                        <a ng-if="xml.content" ng-click="vm.downloadFile(xml.name, xml.contentContentType, vm.Base64.encode(xml.content))" translate="entity.action.download">download</a>
                         <span ng-if="xml.content">{{xml.contentContentType}}, {{vm.byteSize(xml.content)}}</span>
                     </td>
                     <td class="text-right">

@@ -48,7 +48,7 @@
                     <td>{{xsd.name}}</td>
                     <td>{{xsd.comment}}</td>
                     <td>
-                        <a ng-if="xsd.content" ng-click="vm.openFile(xsd.contentContentType, xsd.content)" translate="entity.action.open">open</a>
+                        <a ng-if="xsd.content" ng-click="vm.downloadFile(xsd.name, xsd.contentContentType, xsd.content)" translate="entity.action.download">download</a>
                         <span ng-if="xsd.content">{{xsd.contentContentType}}, {{vm.byteSize(xsd.content)}}</span>
                     </td>
                     <td class="text-right">

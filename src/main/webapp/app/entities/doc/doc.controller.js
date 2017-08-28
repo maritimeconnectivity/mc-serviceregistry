@@ -21,6 +21,7 @@
         vm.searchQuery = pagingParams.search;
         vm.currentSearch = pagingParams.search;
         vm.openFile = DataUtils.openFile;
+        vm.downloadFile = DataUtils.downloadFile;
         vm.byteSize = DataUtils.byteSize;
 
         loadAll();

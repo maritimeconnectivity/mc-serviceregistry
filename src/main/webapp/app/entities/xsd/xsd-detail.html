@@ -15,7 +15,7 @@
         <dt><span translate="mcsrApp.xsd.content">Content</span></dt>
         <dd>
             <div ng-if="vm.xsd.content">
-                <a ng-click="vm.openFile(vm.xsd.contentContentType, vm.xsd.content)" translate="entity.action.open">open</a>
+                <a ng-click="vm.downloadFile(vm.xsd.name, vm.xsd.contentContentType, vm.xsd.content)" translate="entity.action.download">download</a>
                 {{vm.xsd.contentContentType}}, {{vm.byteSize(vm.xsd.content)}}
             </div>
         </dd>
