@@ -189,6 +189,7 @@ gulp.task('ngconstant:dev', function () {
     return ngConstant({
         name: 'mcsrApp',
         constants: {
+            APP_NAME: name,
             VERSION: util.parseVersion(),
             DEBUG_INFO_ENABLED: true
         },
@@ -203,6 +204,7 @@ gulp.task('ngconstant:prod', function () {
     return ngConstant({
         name: 'mcsrApp',
         constants: {
+            APP_NAME: name,
             VERSION: util.parseVersion(),
             DEBUG_INFO_ENABLED: false
         },

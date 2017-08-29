@@ -4,33 +4,34 @@ var JasmineReporters = require('jasmine-reporters');
 var prefix = 'src/test/javascript/'.replace(/[^/]+/g,'..');
 
 exports.config = {
-    seleniumServerJar: prefix + 'node_modules/protractor/selenium/selenium-server-standalone-2.52.0.jar',
-    chromeDriver: prefix + 'node_modules/protractor/selenium/chromedriver',
-    allScriptsTimeout: 20000,
-
+    //seleniumAddress: "http://localhost:4444/wd/hub",
+    //seleniumServerJar: prefix + 'node_modules/webdriver-manager/selenium/selenium-server-standalone-3.5.2.jar',
+    geckoDriver: prefix + 'node_modules/webdriver-manager/selenium/geckodriver-v0.17.0',
+    chromeDriver: prefix + 'node_modules/webdriver-manager/selenium/chromedriver_2.31',
+    allScriptsTimeout: 11000,
+    
     suites: {
         account: './e2e/account/*.js',
         admin: './e2e/admin/*.js',
         entity: './e2e/entities/*.js'
     },
 
+    directConnect: true,
     capabilities: {
         'browserName': 'firefox',
-        'phantomjs.binary.path': require('phantomjs-prebuilt').path,
-        'phantomjs.ghostdriver.cli.args': ['--loglevel=DEBUG']
+        'marionette': true,
+        //'phantomjs.binary.path': require('phantomjs-prebuilt').path,
+        //'phantomjs.ghostdriver.cli.args': ['--loglevel=DEBUG']
     },
-
-    directConnect: true,
-
+    
     baseUrl: 'http://localhost:8080/',
 
     framework: 'jasmine2',
-
     jasmineNodeOpts: {
         showColors: true,
         defaultTimeoutInterval: 30000
     },
-
+    
     onPrepare: function() {
         // Disable animations so e2e tests run more quickly
         var disableNgAnimate = function() {
@@ -61,7 +62,8 @@ exports.config = {
         browser.addMockModule('disableNgAnimate', disableNgAnimate);
         browser.addMockModule('disableCssAnimate', disableCssAnimate);
 
-        browser.driver.manage().window().setSize(1280, 1024);
+        // Crash
+        //browser.driver.manage().window().setSize(1280, 1024);
         jasmine.getEnv().addReporter(new JasmineReporters.JUnitXmlReporter({
             savePath: 'target/reports/e2e',
             consolidateAll: false
@@ -70,4 +72,5 @@ exports.config = {
             dest: "target/reports/e2e/screenshots"
         }));
     }
+
 };
