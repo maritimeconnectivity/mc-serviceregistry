@@ -24,8 +24,8 @@ install:
 script: 
   - ./mvnw compile
   - ./mvnw test
-#  - ./mvnw spring-boot:run -Drun.profiles=integration &
-#  - sleep 30s
-#  - gulp itest
+  - ./mvnw spring-boot:run -Drun.profiles=integration &
+  - sleep 30s
+  - gulp itest
 #  If there isn't running mvnw killall returns non-zero return code
-#  - killall mvnw
+  - killall mvnw
