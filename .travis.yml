@@ -4,6 +4,9 @@ jdk:
 
 language: java
 
+addons:
+  firefox: "47.0"
+
 node_js: "4.4.7"
 
 before_install:

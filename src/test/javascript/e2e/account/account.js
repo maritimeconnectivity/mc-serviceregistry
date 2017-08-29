@@ -13,7 +13,9 @@ describe('account', function () {
     });
 
     it('should fail to login with bad password', function () {
-    	console.log(logout.click);
+      element.all(by.css('h1')).first().getAttribute("translate").then(function(val) {
+        console.log(val);
+      });
     	
     	logout.click();
     	

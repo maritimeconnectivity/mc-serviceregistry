@@ -5,9 +5,9 @@ var prefix = 'src/test/javascript/'.replace(/[^/]+/g,'..');
 
 exports.config = {
     //seleniumAddress: "http://localhost:4444/wd/hub",
-    //seleniumServerJar: prefix + 'node_modules/webdriver-manager/selenium/selenium-server-standalone-3.5.2.jar',
-    geckoDriver: prefix + 'node_modules/webdriver-manager/selenium/geckodriver-v0.17.0',
-    chromeDriver: prefix + 'node_modules/webdriver-manager/selenium/chromedriver_2.31',
+    seleniumServerJar: prefix + 'node_modules/protractor/node_modules/webdriver-manager/selenium/selenium-server-standalone-3.5.3.jar',
+    geckoDriver: prefix + 'node_modules/protractor/node_modules/webdriver-manager/selenium/geckodriver-v0.17.0',
+    chromeDriver: prefix + 'node_modules/protractor/node_modules/webdriver-manager/selenium/chromedriver_2.24',
     allScriptsTimeout: 11000,
     
     suites: {
@@ -19,9 +19,9 @@ exports.config = {
     directConnect: true,
     capabilities: {
         'browserName': 'firefox',
-        'marionette': true,
-        //'phantomjs.binary.path': require('phantomjs-prebuilt').path,
-        //'phantomjs.ghostdriver.cli.args': ['--loglevel=DEBUG']
+        'version': '47',
+        'phantomjs.binary.path': require('phantomjs-prebuilt').path,
+        'phantomjs.ghostdriver.cli.args': ['--loglevel=DEBUG']
     },
     
     baseUrl: 'http://localhost:8080/',
