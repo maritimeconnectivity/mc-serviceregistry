@@ -6,8 +6,8 @@ var prefix = 'src/test/javascript/'.replace(/[^/]+/g,'..');
 exports.config = {
     //seleniumAddress: "http://localhost:4444/wd/hub",
     seleniumServerJar: prefix + 'node_modules/protractor/node_modules/webdriver-manager/selenium/selenium-server-standalone-3.5.3.jar',
-    geckoDriver: prefix + 'node_modules/protractor/node_modules/webdriver-manager/selenium/geckodriver-v0.17.0',
-    chromeDriver: prefix + 'node_modules/protractor/node_modules/webdriver-manager/selenium/chromedriver_2.24',
+    geckoDriver: prefix + 'node_modules/protractor/node_modules/webdriver-manager/selenium/geckodriver-v0.18.0',
+    chromeDriver: prefix + 'node_modules/protractor/node_modules/webdriver-manager/selenium/chromedriver_2.31',
     allScriptsTimeout: 11000,
     
     suites: {
