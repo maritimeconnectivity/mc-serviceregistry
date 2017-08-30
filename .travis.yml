@@ -14,7 +14,7 @@ before_install:
   - wget "https://ncloud.neoware.cz/index.php/s/XjkDTkeiOxFVamz/download?path=%2F&files=spring-data-elasticsearch-3.0.0.BUILD-SNAPSHOT.jar" -O lib/spring-data-elasticsearch-3.0.0.BUILD-SNAPSHOT.jar
 
 install:
-  - nvm install v4.4.7
+  - nvm install v7.10.0
   - node -v
   - npm -v
   - npm install
