@@ -66,7 +66,7 @@ public class UserService {
 
     public Optional<User> activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
-        return userRepository.findOneByActivationKey(key)
+        return userRepository.findFirstByActivationKey(key)
             .map(user -> {
                 // activate given user for the registration key.
                 user.setActivated(true);
@@ -81,7 +81,7 @@ public class UserService {
     public Optional<User> completePasswordReset(String newPassword, String key) {
        log.debug("Reset user password for reset key {}", key);
 
-       return userRepository.findOneByResetKey(key)
+       return userRepository.findFirstByResetKey(key)
             .filter(user -> {
                 ZonedDateTime oneDayAgo = ZonedDateTime.now().minusHours(24);
                 return user.getResetDate().isAfter(oneDayAgo);
@@ -96,7 +96,7 @@ public class UserService {
     }
 
     public Optional<User> requestPasswordReset(String mail) {
-        return userRepository.findOneByEmail(mail)
+        return userRepository.findFirstByEmail(mail)
             .filter(User::getActivated)
             .map(user -> {
                 user.setResetKey(RandomUtil.generateResetKey());
@@ -110,7 +110,7 @@ public class UserService {
         String langKey) {
 
         User newUser = new User();
-        Authority authority = authorityRepository.findOne(AuthoritiesConstants.USER);
+        Authority authority = authorityRepository.findById(AuthoritiesConstants.USER).orElse(null);
         Set<Authority> authorities = new HashSet<>();
         String encryptedPassword = passwordEncoder.encode(password);
         newUser.setLogin(login);
@@ -146,7 +146,7 @@ public class UserService {
         if (managedUserDTO.getAuthorities() != null) {
             Set<Authority> authorities = new HashSet<>();
             managedUserDTO.getAuthorities().stream().forEach(
-                authority -> authorities.add(authorityRepository.findOne(authority))
+                authority -> authorities.add(authorityRepository.findById(authority).orElse(null))
             );
             user.setAuthorities(authorities);
         }
@@ -162,7 +162,7 @@ public class UserService {
     }
 
     public void updateUserInformation(String firstName, String lastName, String email, String langKey) {
-        userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).ifPresent(u -> {
+        userRepository.findFirstByLogin(SecurityUtils.getCurrentUserLogin()).ifPresent(u -> {
             u.setFirstName(firstName);
             u.setLastName(lastName);
             u.setEmail(email);
@@ -174,7 +174,7 @@ public class UserService {
     }
 
     public void deleteUserInformation(String login) {
-        userRepository.findOneByLogin(login).ifPresent(u -> {
+        userRepository.findFirstByLogin(login).ifPresent(u -> {
             userRepository.delete(u);
             userSearchRepository.delete(u);
             log.debug("Deleted User: {}", u);
@@ -182,7 +182,7 @@ public class UserService {
     }
 
     public void changePassword(String password) {
-        userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).ifPresent(u -> {
+        userRepository.findFirstByLogin(SecurityUtils.getCurrentUserLogin()).ifPresent(u -> {
             String encryptedPassword = passwordEncoder.encode(password);
             u.setPassword(encryptedPassword);
             userRepository.save(u);
@@ -192,7 +192,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthoritiesByLogin(String login) {
-        return userRepository.findOneByLogin(login).map(u -> {
+        return userRepository.findFirstByLogin(login).map(u -> {
             u.getAuthorities().size();
             return u;
         });
@@ -200,14 +200,14 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public User getUserWithAuthorities(Long id) {
-        User user = userRepository.findOne(id);
+        User user = userRepository.findById(id).orElse(null);
         user.getAuthorities().size(); // eagerly load the association
         return user;
     }
 
     @Transactional(readOnly = true)
     public User getUserWithAuthorities() {
-        User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
+        User user = userRepository.findFirstByLogin(SecurityUtils.getCurrentUserLogin()).orElse(null);
         user.getAuthorities().size(); // eagerly load the association
         return user;
     }

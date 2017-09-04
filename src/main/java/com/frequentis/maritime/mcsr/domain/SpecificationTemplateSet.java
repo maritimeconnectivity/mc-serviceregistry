@@ -17,17 +17,29 @@
  */
 package com.frequentis.maritime.mcsr.domain;
 
-import io.swagger.annotations.ApiModel;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
-import javax.persistence.*;
-import javax.validation.constraints.*;
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Objects;
+import io.swagger.annotations.ApiModel;
 
 /**
  * It defines a list of compatible SpecificationTemplates ofdifferent type.Typically Templates will evolve and be released as package.
@@ -50,13 +62,16 @@ public class SpecificationTemplateSet implements Serializable {
 
     @NotNull
     @Column(name = "name", nullable = false)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String name;
 
     @NotNull
     @Column(name = "version", nullable = false)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String version;
 
     @Column(name = "comment")
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String comment;
 
     @ManyToMany

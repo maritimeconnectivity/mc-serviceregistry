@@ -17,20 +17,29 @@
  */
 package com.frequentis.maritime.mcsr.dataload;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.frequentis.maritime.mcsr.domain.*;
-import com.frequentis.maritime.mcsr.domain.enumeration.SpecificationTemplateType;
-import com.frequentis.maritime.mcsr.web.rest.DocResource;
-import org.springframework.http.HttpEntity;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.frequentis.maritime.mcsr.domain.Design;
+import com.frequentis.maritime.mcsr.domain.Doc;
+import com.frequentis.maritime.mcsr.domain.Instance;
+import com.frequentis.maritime.mcsr.domain.Specification;
+import com.frequentis.maritime.mcsr.domain.SpecificationTemplate;
+import com.frequentis.maritime.mcsr.domain.SpecificationTemplateSet;
+import com.frequentis.maritime.mcsr.domain.Xml;
+import com.frequentis.maritime.mcsr.domain.Xsd;
+import com.frequentis.maritime.mcsr.domain.enumeration.SpecificationTemplateType;
+import com.frequentis.maritime.mcsr.web.rest.DocResource;
+
+import org.springframework.http.HttpEntity;
 
 
 /**

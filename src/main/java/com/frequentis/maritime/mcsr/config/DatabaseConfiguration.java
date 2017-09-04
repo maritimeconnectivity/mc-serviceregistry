@@ -17,17 +17,18 @@
  */
 package com.frequentis.maritime.mcsr.config;
 
-import com.frequentis.maritime.mcsr.config.liquibase.AsyncSpringLiquibase;
+import java.sql.SQLException;
+import java.util.Arrays;
 
-import com.codahale.metrics.MetricRegistry;
-import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
-import com.zaxxer.hikari.HikariDataSource;
-import liquibase.integration.spring.SpringLiquibase;
+import javax.inject.Inject;
+import javax.sql.DataSource;
+
 import org.h2.tools.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
@@ -41,15 +42,16 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import liquibase.integration.spring.SpringLiquibase;
 
-import javax.inject.Inject;
-import javax.sql.DataSource;
-import java.sql.SQLException;
-import java.util.Arrays;
+import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
+import com.frequentis.maritime.mcsr.config.liquibase.AsyncSpringLiquibase;
+import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
 @EnableJpaRepositories("com.frequentis.maritime.mcsr.repository")
-@EnableJpaAuditing(auditorAwareRef = "springSecurityAuditorAware")
+@EnableJpaAuditing(auditorAwareRef = "springSecurityAuditorAware", dateTimeProviderRef = "customDateTimeProvider")
 @EnableTransactionManagement
 @EnableElasticsearchRepositories("com.frequentis.maritime.mcsr.repository.search")
 public class DatabaseConfiguration {
@@ -66,7 +68,7 @@ public class DatabaseConfiguration {
     @ConditionalOnExpression("#{!environment.acceptsProfiles('" + Constants.SPRING_PROFILE_CLOUD + "') && !environment.acceptsProfiles('" + Constants.SPRING_PROFILE_HEROKU + "')}")
     @ConfigurationProperties(prefix = "spring.datasource.hikari")
     public DataSource dataSource(DataSourceProperties dataSourceProperties) {
-        log.debug("Configuring Datasource");
+        log.debug("Configuring Datasource {}", dataSourceProperties.getUrl());
         if (dataSourceProperties.getUrl() == null) {
             log.error("Your database connection pool configuration is incorrect! The application" +
                     " cannot start. Please check your Spring profile, current profiles are: {}",
@@ -123,7 +125,7 @@ public class DatabaseConfiguration {
     }
 
     @Bean
-    public Hibernate4Module hibernate4Module() {
-        return new Hibernate4Module();
+    public Hibernate5Module hibernate4Module() {
+        return new Hibernate5Module();
     }
 }

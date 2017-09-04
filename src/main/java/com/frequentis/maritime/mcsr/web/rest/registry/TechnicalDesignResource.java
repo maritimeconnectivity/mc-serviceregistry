@@ -17,16 +17,16 @@
  */
 package com.frequentis.maritime.mcsr.web.rest.registry;
 
-import com.codahale.metrics.annotation.Timed;
-import com.frequentis.maritime.mcsr.domain.Design;
-import com.frequentis.maritime.mcsr.domain.Xml;
-import com.frequentis.maritime.mcsr.service.DesignService;
-import com.frequentis.maritime.mcsr.web.rest.DesignResource;
-import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
-import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
-import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import javax.inject.Inject;
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -35,17 +35,28 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import com.codahale.metrics.annotation.Timed;
+import com.frequentis.maritime.mcsr.domain.Design;
+import com.frequentis.maritime.mcsr.domain.util.DesignUtils;
+import com.frequentis.maritime.mcsr.service.DesignService;
+import com.frequentis.maritime.mcsr.web.rest.DesignResource;
+import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
+import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
+import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
+import com.frequentis.maritime.mcsr.web.util.WebUtils;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping("/api")
@@ -69,12 +80,7 @@ public class TechnicalDesignResource {
     @Timed
     public ResponseEntity<Design> createDesign(@Valid @RequestBody Design design, @RequestHeader("Authorization") String bearerToken) throws Exception, URISyntaxException {
         log.debug("REST request to save Design : {}", design);
-        String organizationId = "";
-        try {
-            organizationId = HeaderUtil.extractOrganizationIdFromToken(bearerToken);
-        } catch (Exception e) {
-            log.warn("No organizationId could be parsed from the bearer token");
-        }
+        String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
         if (design.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("design", "idexists", "A new design cannot already have an ID")).body(null);
         }
@@ -107,13 +113,8 @@ public class TechnicalDesignResource {
             return createDesign(design, bearerToken);
         }
 
-        String organizationId = "";
-        try {
-            organizationId = HeaderUtil.extractOrganizationIdFromToken(bearerToken);
-        } catch (Exception e) {
-            log.warn("No organizationId could be parsed from the bearer token");
-        }
-        if (design.getOrganizationId() != null && design.getOrganizationId().length() > 0 && !organizationId.equals(design.getOrganizationId())) {
+        String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
+        if (!DesignUtils.matchOrganizationId(design, organizationId)) {
             log.warn("Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+design.getOrganizationId());
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
@@ -225,13 +226,8 @@ public class TechnicalDesignResource {
         log.debug("REST request to delete Design {}", id, version);
         Design design = designService.findByDomainId(id, version);
 
-        String organizationId = "";
-        try {
-            organizationId = HeaderUtil.extractOrganizationIdFromToken(bearerToken);
-        } catch (Exception e) {
-            log.warn("No organizationId could be parsed from the bearer token");
-        }
-        if (design.getOrganizationId() != null && design.getOrganizationId().length() > 0 && !organizationId.equals(design.getOrganizationId())) {
+        String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
+        if (!DesignUtils.matchOrganizationId(design, organizationId)) {
             log.warn("Cannot delete entity, organization ID "+organizationId+" does not match that of entity: "+design.getOrganizationId());
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
@@ -275,23 +271,14 @@ public class TechnicalDesignResource {
         log.debug("REST request to update status of Design {} of version {}", id, version);
         Design design = designService.findByDomainId(id, version);
 
-        String organizationId = "";
-        try {
-            organizationId = HeaderUtil.extractOrganizationIdFromToken(bearerToken);
-        } catch (Exception e) {
-            log.warn("No organizationId could be parsed from the bearer token");
-        }
-        if (design.getOrganizationId() != null && design.getOrganizationId().length() > 0 && !organizationId.equals(design.getOrganizationId())) {
+        String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
+        if (!DesignUtils.matchOrganizationId(design, organizationId)) {
             log.warn("Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+design.getOrganizationId());
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        Xml designXml = design.getDesignAsXml();
-        String xml = designXml.getContent().toString();
-        //Update the status value inside the xml definition
-        String resultXml = XmlUtil.updateXmlNode(status, xml, "/ServiceDesignSchema:serviceDesign/status");
-        designXml.setContent(resultXml);
-        design.setDesignAsXml(designXml);
+        // Ommited - no effect
+        // DesignUtils.updateXmlStatusValue(design, status);
 
         designService.updateStatus(design.getId(), status);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("design", id.toString())).build();

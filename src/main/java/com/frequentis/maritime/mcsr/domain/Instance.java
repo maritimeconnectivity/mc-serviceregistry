@@ -18,23 +18,44 @@
 
 package com.frequentis.maritime.mcsr.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.frequentis.maritime.mcsr.domain.util.JsonNodeConverter;
-import io.swagger.annotations.ApiModel;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldIndex;
-import org.springframework.data.elasticsearch.annotations.FieldType;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.frequentis.maritime.mcsr.domain.util.GeoShapeNodeConverter;
+import com.frequentis.maritime.mcsr.domain.util.JsonNodeConverter;
+import com.frequentis.maritime.mcsr.domain.util.JsonNodeGeoShapeConverter;
+
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.core.geo.GeoShape;
+
+import io.swagger.annotations.ApiModel;
 
 /**
  * Holds a description of an service instance.An instance can be compatible to one or morespecification templates.It has at least a technical representation of thedescriptiion in form of an XML and a filled out templateas e.g. word document.
@@ -57,70 +78,82 @@ public class Instance implements Serializable {
     private Long id;
 
     @NotNull
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String name;
 
     @NotNull
-    @Column(name = "version", nullable = false)
+    @Column(name = "version", nullable = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String version;
 
     @NotNull
-    @Column(name = "comment", nullable = false)
+    @Column(name = "comment", nullable = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String comment;
 
     @Column(name = "geometry", columnDefinition = "LONGTEXT")
-    @Convert(converter = JsonNodeConverter.class)
-    private JsonNode geometry;
+    @Convert(converter = GeoShapeNodeConverter.class)
+    private GeoShape<?> geometry;
 
     @Column(name = "geometry_content_type")
+    @Field(type = FieldType.keyword, index = true)
     private String geometryContentType;
 
     @NotNull
-    @Column(name = "instance_id", nullable = false)
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @Column(name = "instance_id", nullable = true)
+    @JsonProperty("instanceId")
+    @Field(type = FieldType.keyword, index = true)
     private String instanceId;
 
     @Column(name = "keywords")
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String keywords;
 
     @Column(name = "status")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @Field(type = FieldType.keyword, index = true)
     private String status;
 
     @Column(name = "organization_id")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @JsonProperty("organizationId")
+    @Field(type = FieldType.keyword, index = true)
     private String organizationId;
 
     @Column(name = "unlocode")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @Field(type = FieldType.keyword, index = true)
     private String unlocode;
 
     @Column(name = "endpoint_uri")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @JsonProperty("endpointUri")
+    @Field(type = FieldType.keyword, index = true)
     private String endpointUri;
 
     @Column(name = "endpoint_type")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @JsonProperty("endpointType")
+    @Field(type = FieldType.keyword, index = true)
     private String endpointType;
 
     @Column(name = "mmsi")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @Field(type = FieldType.keyword, index = true)
     private String mmsi;
 
     @Column(name = "imo")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @Field(type = FieldType.keyword, index = true)
     private String imo;
 
     @Column(name = "service_type")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @JsonProperty("serviceType")
+    @Field(type = FieldType.keyword, index = true)
     private String serviceType;
 
     @Column(name = "design_id")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @JsonProperty("designId")
+    @Field(type = FieldType.keyword, index = true)
     private String designId;
 
     @Column(name = "specification_id")
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    @JsonProperty("specificationId")
+    @Field(type = FieldType.keyword, index = true)
     private String specificationId;
 
     @OneToOne
@@ -181,12 +214,21 @@ public class Instance implements Serializable {
         this.comment = comment;
     }
 
-    public JsonNode getGeometry() {
+    @Transient
+    public GeoShape<?> getGeometryAsGeoShape() {
         return geometry;
     }
 
-    public void setGeometry(JsonNode geometry) {
+    public JsonNode getGeometry() {
+        return JsonNodeGeoShapeConverter.convertFromGeoShape(getGeometryAsGeoShape());
+    }
+
+    public void setGeometryAsGeoShape(GeoShape<?> geometry) {
         this.geometry = geometry;
+    }
+
+    public void setGeometry(JsonNode geometry) {
+        setGeometryAsGeoShape(JsonNodeGeoShapeConverter.convertToGeoShape(geometry));
     }
 
     public String getGeometryContentType() {

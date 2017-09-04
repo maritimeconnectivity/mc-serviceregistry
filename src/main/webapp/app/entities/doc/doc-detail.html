@@ -19,7 +19,7 @@
         <dt><span translate="mcsrApp.doc.filecontent">Filecontent</span></dt>
         <dd>
             <div ng-if="vm.doc.filecontent">
-                <a ng-click="vm.openFile(vm.doc.filecontentContentType, vm.doc.filecontent)" translate="entity.action.open">open</a>
+                <a ng-click="vm.downloadFile(vm.doc.name, vm.doc.filecontentContentType, vm.doc.filecontent)" translate="entity.action.download">download</a>
                 {{vm.doc.filecontentContentType}}, {{vm.byteSize(vm.doc.filecontent)}}
             </div>
         </dd>

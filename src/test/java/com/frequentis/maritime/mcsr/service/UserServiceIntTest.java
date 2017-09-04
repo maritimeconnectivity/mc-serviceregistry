@@ -17,37 +17,38 @@
  */
 package com.frequentis.maritime.mcsr.service;
 
-import com.frequentis.maritime.mcsr.McsrApp;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Inject;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.frequentis.maritime.mcsr.domain.PersistentToken;
 import com.frequentis.maritime.mcsr.domain.User;
 import com.frequentis.maritime.mcsr.repository.PersistentTokenRepository;
 import com.frequentis.maritime.mcsr.repository.UserRepository;
-import java.time.ZonedDateTime;
 import com.frequentis.maritime.mcsr.service.util.RandomUtil;
-import java.time.LocalDate;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-
-import javax.inject.Inject;
-import java.util.Optional;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.*;
 
 /**
  * Test class for the UserResource REST controller.
  *
  * @see UserService
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = McsrApp.class)
-@WebAppConfiguration
-@IntegrationTest
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles = "integration")
 @Transactional
 public class UserServiceIntTest {
 
@@ -62,7 +63,7 @@ public class UserServiceIntTest {
 
     @Test
     public void testRemoveOldPersistentTokens() {
-        User admin = userRepository.findOneByLogin("admin").get();
+        User admin = userRepository.findFirstByLogin("admin").get();
         int existingCount = persistentTokenRepository.findByUser(admin).size();
         generateUserToken(admin, "1111-1111", LocalDate.now());
         LocalDate now = LocalDate.now();
@@ -86,6 +87,7 @@ public class UserServiceIntTest {
     }
 
     @Test
+    @WithMockUser("test-user")
     public void assertThatOnlyActivatedUserCanRequestPasswordReset() {
         User user = userService.createUserInformation("johndoe", "johndoe", "John", "Doe", "john.doe@localhost", "en-US");
         Optional<User> maybeUser = userService.requestPasswordReset("john.doe@localhost");
@@ -94,6 +96,7 @@ public class UserServiceIntTest {
     }
 
     @Test
+    @WithMockUser("test-user")
     public void assertThatResetKeyMustNotBeOlderThan24Hours() {
         User user = userService.createUserInformation("johndoe", "johndoe", "John", "Doe", "john.doe@localhost", "en-US");
 
@@ -113,6 +116,7 @@ public class UserServiceIntTest {
     }
 
     @Test
+    @WithMockUser("test-user")
     public void assertThatResetKeyMustBeValid() {
         User user = userService.createUserInformation("johndoe", "johndoe", "John", "Doe", "john.doe@localhost", "en-US");
 
@@ -127,6 +131,7 @@ public class UserServiceIntTest {
     }
 
     @Test
+    @WithMockUser("test-user")
     public void assertThatUserCanResetPassword() {
         User user = userService.createUserInformation("johndoe", "johndoe", "John", "Doe", "john.doe@localhost", "en-US");
         String oldPassword = user.getPassword();
@@ -146,6 +151,7 @@ public class UserServiceIntTest {
     }
 
     @Test
+    @WithMockUser("test-user")
     public void testFindNotActivatedUsersByCreationDateBefore() {
         userService.removeNotActivatedUsers();
         ZonedDateTime now = ZonedDateTime.now();
@@ -163,4 +169,5 @@ public class UserServiceIntTest {
         token.setUserAgent("Test agent");
         persistentTokenRepository.saveAndFlush(token);
     }
+
 }

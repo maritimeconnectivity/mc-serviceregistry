@@ -20,6 +20,8 @@ package com.frequentis.maritime.mcsr.config.apidoc;
 import com.frequentis.maritime.mcsr.config.Constants;
 import com.frequentis.maritime.mcsr.config.JHipsterProperties;
 
+import springfox.documentation.service.VendorExtension;
+import java.util.ArrayList;
 import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +70,8 @@ public class SwaggerConfiguration {
             jHipsterProperties.getSwagger().getContactUrl(),
             jHipsterProperties.getSwagger().getContactEmail());
 
+        @SuppressWarnings("rawtypes")
+		ArrayList<VendorExtension> extensions = new ArrayList<>();
         ApiInfo apiInfo = new ApiInfo(
             jHipsterProperties.getSwagger().getTitle(),
             jHipsterProperties.getSwagger().getDescription(),
@@ -75,7 +79,8 @@ public class SwaggerConfiguration {
             jHipsterProperties.getSwagger().getTermsOfServiceUrl(),
             contact,
             jHipsterProperties.getSwagger().getLicense(),
-            jHipsterProperties.getSwagger().getLicenseUrl());
+            jHipsterProperties.getSwagger().getLicenseUrl(),
+            extensions);
 
         Docket docket = new Docket(DocumentationType.SWAGGER_2)
             .apiInfo(apiInfo)

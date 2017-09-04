@@ -30,6 +30,7 @@ import org.springframework.stereotype.Component;
 import springfox.documentation.schema.ModelReference;
 import springfox.documentation.schema.TypeNameExtractor;
 import springfox.documentation.service.Parameter;
+import springfox.documentation.service.ResolvedMethodParameter;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.schema.contexts.ModelContext;
 import springfox.documentation.spi.service.ParameterBuilderPlugin;
@@ -62,7 +63,7 @@ public class PageableParameterBuilderPlugin implements ParameterBuilderPlugin {
 
     private Function<ResolvedType, ? extends ModelReference>
     createModelRefFactory(ParameterContext context) {
-        ModelContext modelContext = inputParam(context.methodParameter().getParameterType(),
+        ModelContext modelContext = inputParam(null, context.resolvedMethodParameter().getParameterType(),
             context.getDocumentationType(),
             context.getAlternateTypeProvider(),
             context.getGenericNamingStrategy(),
@@ -72,8 +73,8 @@ public class PageableParameterBuilderPlugin implements ParameterBuilderPlugin {
 
     @Override
     public void apply(ParameterContext context) {
-        MethodParameter parameter = context.methodParameter();
-        Class<?> type = parameter.getParameterType();
+    ResolvedMethodParameter parameter = context.resolvedMethodParameter();
+        Class<?> type = parameter.getParameterType().getErasedType();
         if (type != null && Pageable.class.isAssignableFrom(type)) {
             Function<ResolvedType, ? extends ModelReference> factory =
                 createModelRefFactory(context);

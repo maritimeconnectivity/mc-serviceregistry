@@ -1,11 +1,14 @@
 dist: trusty
-
 jdk:
   - openjdk8
 
 language: java
 
 node_js: "4.4.7"
+
+before_install:
+  - mkdir lib
+  - wget "https://ncloud.neoware.cz/index.php/s/XjkDTkeiOxFVamz/download?path=%2F&files=spring-data-elasticsearch-3.0.0.BUILD-SNAPSHOT.jar" -O lib/spring-data-elasticsearch-3.0.0.BUILD-SNAPSHOT.jar
 
 install:
   - nvm install v4.4.7
@@ -17,7 +20,9 @@ install:
 
 script: 
   - ./mvnw compile
-  - ./mvnw spring-boot:run &
-  - sleep 30s
-  - gulp itest
-  - killall mvnw
+  - ./mvnw test
+#  - ./mvnw spring-boot:run -Drun.profiles=integration &
+#  - sleep 30s
+#  - gulp itest
+#  If there isn't running mvnw killall returns non-zero return code
+#  - killall mvnw

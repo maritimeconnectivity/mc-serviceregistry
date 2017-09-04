@@ -18,35 +18,56 @@
 
 package com.frequentis.maritime.mcsr.web.rest;
 
-import com.frequentis.maritime.mcsr.McsrApp;
-import com.frequentis.maritime.mcsr.domain.Design;
-import com.frequentis.maritime.mcsr.repository.DesignRepository;
-import com.frequentis.maritime.mcsr.repository.search.DesignSearchRepository;
-import com.frequentis.maritime.mcsr.service.DesignService;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.frequentis.maritime.mcsr.dataload.DataLoader;
+import com.frequentis.maritime.mcsr.dataload.TestDataLoader;
+import com.frequentis.maritime.mcsr.domain.Design;
+import com.frequentis.maritime.mcsr.domain.Xml;
+import com.frequentis.maritime.mcsr.repository.DesignRepository;
+import com.frequentis.maritime.mcsr.repository.search.DesignSearchRepository;
+import com.frequentis.maritime.mcsr.service.DesignService;
 
 
 /**
@@ -54,10 +75,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * @see DesignResource
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = McsrApp.class)
-@WebAppConfiguration
-@IntegrationTest
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles = "integration")
+@WithMockUser("test-user")
 public class DesignResourceIntTest {
 
     private static final String DEFAULT_NAME = "AAAAA";
@@ -88,22 +109,32 @@ public class DesignResourceIntTest {
     @Inject
     private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
 
+    @Inject
+    private ApplicationContext context;
+
+    @Inject
+    private XmlResource xmlResource;
+
+    @Inject
+    Environment environment;
+
     private MockMvc restDesignMockMvc;
 
     private Design design;
 
     @PostConstruct
-    public void setup() {
+    public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
         DesignResource designResource = new DesignResource();
         ReflectionTestUtils.setField(designResource, "designService", designService);
         this.restDesignMockMvc = MockMvcBuilders.standaloneSetup(designResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
+
     }
 
     @Before
-    public void initTest() {
+    public void initTest() throws URISyntaxException {
         designSearchRepository.deleteAll();
         design = new Design();
         design.setName(DEFAULT_NAME);
@@ -138,7 +169,7 @@ public class DesignResourceIntTest {
         assertThat(testDesign.getOrganizationId()).isEqualTo(DEFAULT_ORGANIZATION_ID);
 
         // Validate the Design in ElasticSearch
-        Design designEs = designSearchRepository.findOne(testDesign.getId());
+        Design designEs = designSearchRepository.findById(testDesign.getId()).get();
         assertThat(designEs).isEqualToComparingFieldByField(testDesign);
     }
 
@@ -223,7 +254,7 @@ public class DesignResourceIntTest {
         // Get all the designs
         restDesignMockMvc.perform(get("/api/designs?sort=id,desc"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(design.getId().intValue())))
                 .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
                 .andExpect(jsonPath("$.[*].version").value(hasItem(DEFAULT_VERSION.toString())))
@@ -242,7 +273,7 @@ public class DesignResourceIntTest {
         // Get the design
         restDesignMockMvc.perform(get("/api/designs/{id}", design.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(jsonPath("$.id").value(design.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
             .andExpect(jsonPath("$.version").value(DEFAULT_VERSION.toString()))
@@ -295,7 +326,7 @@ public class DesignResourceIntTest {
         assertThat(testDesign.getOrganizationId()).isEqualTo(UPDATED_ORGANIZATION_ID);
 
         // Validate the Design in ElasticSearch
-        Design designEs = designSearchRepository.findOne(testDesign.getId());
+        Design designEs = designSearchRepository.findById(testDesign.getId()).get();
         assertThat(designEs).isEqualToComparingFieldByField(testDesign);
     }
 
@@ -313,7 +344,9 @@ public class DesignResourceIntTest {
                 .andExpect(status().isOk());
 
         // Validate ElasticSearch is empty
-        boolean designExistsInEs = designSearchRepository.exists(design.getId());
+        // FIXME HOTFIX! There is SD-ES bug DATAES-363
+        //boolean designExistsInEs = designSearchRepository.existsById(design.getId());
+        boolean designExistsInEs = designSearchRepository.findById(design.getId()).isPresent();
         assertThat(designExistsInEs).isFalse();
 
         // Validate the database is empty
@@ -330,7 +363,7 @@ public class DesignResourceIntTest {
         // Search the design
         restDesignMockMvc.perform(get("/api/_search/designs?query=id:" + design.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(jsonPath("$.[*].id").value(hasItem(design.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
             .andExpect(jsonPath("$.[*].version").value(hasItem(DEFAULT_VERSION.toString())))

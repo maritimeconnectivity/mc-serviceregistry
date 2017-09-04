@@ -17,37 +17,43 @@
  */
 package com.frequentis.maritime.mcsr.web.rest;
 
-import com.frequentis.maritime.mcsr.McsrApp;
-import com.frequentis.maritime.mcsr.domain.Doc;
-import com.frequentis.maritime.mcsr.repository.DocRepository;
-import com.frequentis.maritime.mcsr.service.DocService;
-import com.frequentis.maritime.mcsr.repository.search.DocSearchRepository;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.hamcrest.Matchers.hasItem;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Base64Utils;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.frequentis.maritime.mcsr.domain.Doc;
+import com.frequentis.maritime.mcsr.repository.DocRepository;
+import com.frequentis.maritime.mcsr.repository.search.DocSearchRepository;
+import com.frequentis.maritime.mcsr.service.DocService;
 
 
 /**
@@ -55,10 +61,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * @see DocResource
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = McsrApp.class)
-@WebAppConfiguration
-@IntegrationTest
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles = "integration")
+@WithMockUser("test-user")
 public class DocResourceIntTest {
 
     private static final String DEFAULT_NAME = "AAAAA";
@@ -136,7 +142,7 @@ public class DocResourceIntTest {
         assertThat(testDoc.getFilecontentContentType()).isEqualTo(DEFAULT_FILECONTENT_CONTENT_TYPE);
 
         // Validate the Doc in ElasticSearch
-        Doc docEs = docSearchRepository.findOne(testDoc.getId());
+        Doc docEs = docSearchRepository.findById(testDoc.getId()).get();
         assertThat(docEs).isEqualToComparingFieldByField(testDoc);
     }
 
@@ -203,7 +209,7 @@ public class DocResourceIntTest {
         // Get all the docs
         restDocMockMvc.perform(get("/api/docs?sort=id,desc"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(doc.getId().intValue())))
                 .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
                 .andExpect(jsonPath("$.[*].comment").value(hasItem(DEFAULT_COMMENT.toString())))
@@ -221,7 +227,7 @@ public class DocResourceIntTest {
         // Get the doc
         restDocMockMvc.perform(get("/api/docs/{id}", doc.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(jsonPath("$.id").value(doc.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
             .andExpect(jsonPath("$.comment").value(DEFAULT_COMMENT.toString()))
@@ -271,7 +277,7 @@ public class DocResourceIntTest {
         assertThat(testDoc.getFilecontentContentType()).isEqualTo(UPDATED_FILECONTENT_CONTENT_TYPE);
 
         // Validate the Doc in ElasticSearch
-        Doc docEs = docSearchRepository.findOne(testDoc.getId());
+        Doc docEs = docSearchRepository.findById(testDoc.getId()).get();
         assertThat(docEs).isEqualToComparingFieldByField(testDoc);
     }
 
@@ -289,7 +295,10 @@ public class DocResourceIntTest {
                 .andExpect(status().isOk());
 
         // Validate ElasticSearch is empty
-        boolean docExistsInEs = docSearchRepository.exists(doc.getId());
+        // FIXME HOTFIX! There is SD-ES bug DATAES-363
+        //boolean docExistsInEs = docSearchRepository.existsById(doc.getId());
+        boolean docExistsInEs = docSearchRepository.findById(doc.getId()).isPresent();
+
         assertThat(docExistsInEs).isFalse();
 
         // Validate the database is empty
@@ -306,7 +315,7 @@ public class DocResourceIntTest {
         // Search the doc
         restDocMockMvc.perform(get("/api/_search/docs?query=id:" + doc.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(jsonPath("$.[*].id").value(hasItem(doc.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
             .andExpect(jsonPath("$.[*].comment").value(hasItem(DEFAULT_COMMENT.toString())))

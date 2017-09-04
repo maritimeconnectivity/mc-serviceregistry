@@ -94,8 +94,8 @@ public class SpecificationService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Specification : {}", id);
-        specificationRepository.delete(id);
-        specificationSearchRepository.delete(id);
+        specificationRepository.deleteById(id);
+        specificationSearchRepository.deleteById(id);
     }
 
     /**
@@ -186,7 +186,7 @@ public class SpecificationService {
         log.debug("Request to get Specification by domain id {}", domainId);
         Page<Specification> specifications = null;
         try {
-            specifications = specificationSearchRepository.search(queryStringQuery("specification_id=\""+domainId), pageable);
+            specifications = specificationSearchRepository.search(queryStringQuery("specificationId:"+domainId), pageable);
         } catch (Exception e) {
             log.debug("Could not find specification for domain id {}", domainId);
             e.printStackTrace();

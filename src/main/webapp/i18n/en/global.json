@@ -97,7 +97,8 @@
             "edit": "Edit",
             "open": "Open",
             "save": "Save",
-            "view": "View"
+            "view": "View",
+            "download": "Download"
         },
         "detail": {
             "field": "Field",
@@ -128,5 +129,5 @@
         "emailexists": "E-mail is already in use!",
         "idexists": "A new {{ entityName }} cannot already have an ID"
     },
-    "footer": "This is your footer"
+    "footer": "2016 - {{ currentYear }} FREQUENTIS AG"
 }

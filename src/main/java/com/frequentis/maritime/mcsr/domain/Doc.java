@@ -17,18 +17,25 @@
  */
 package com.frequentis.maritime.mcsr.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.annotations.ApiModel;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
+import javax.validation.constraints.NotNull;
+
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.Set;
-import java.util.Objects;
+import io.swagger.annotations.ApiModel;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * A doc represents a human readable document that can be attached to various objects.This could be an office document containing guidelines linked,to a service specification, or a Getting Started PDF attached toan service instance.
@@ -51,21 +58,26 @@ public class Doc implements Serializable {
 
     @NotNull
     @Column(name = "name", nullable = false)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String name;
 
     @Column(name = "comment")
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String comment;
 
     @NotNull
     @Column(name = "mimetype", nullable = false)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String mimetype;
 
     @NotNull
     @Lob
     @Column(name = "filecontent", nullable = false)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private byte[] filecontent;
 
     @Column(name = "filecontent_content_type", nullable = false)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String filecontentContentType;
 
     @ManyToMany(mappedBy = "docs")

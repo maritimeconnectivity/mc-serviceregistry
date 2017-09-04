@@ -13,7 +13,8 @@
             abbreviate: abbreviate,
             byteSize: byteSize,
             openFile: openFile,
-            toBase64: toBase64
+            toBase64: toBase64,
+            downloadFile: downloadFile
         };
 
         return service;
@@ -69,6 +70,30 @@
                 var base64Data = e.target.result.substr(e.target.result.indexOf('base64,') + 'base64,'.length);
                 cb(base64Data);
             };
+        }
+
+        function downloadFile (filename, type, data) {
+            // decode base64 string, remove space for IE compatibility
+            var binary = atob(data.replace(/\s/g, ''));
+            var len = binary.length;
+            var buffer = new ArrayBuffer(len);
+            var view = new Uint8Array(buffer);
+            for (var i = 0; i < len; i++) {
+                view[i] = binary.charCodeAt(i);
+            }
+
+            var blob = new Blob([view], {type: type});
+            if(window.navigator.msSaveOrOpenBlob) {
+                window.navigator.msSaveBlob(blob, filename);
+            }
+            else{
+                var elem = window.document.createElement('a');
+                elem.href = window.URL.createObjectURL(blob);
+                elem.download = filename;
+                document.body.appendChild(elem);
+                elem.click();
+                document.body.removeChild(elem);
+            }
         }
     }
 })();

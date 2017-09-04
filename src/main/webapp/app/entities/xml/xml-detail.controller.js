@@ -14,6 +14,7 @@
         vm.previousState = previousState.name;
         vm.byteSize = DataUtils.byteSize;
         vm.openFile = DataUtils.openFile;
+        vm.downloadFile = DataUtils.downloadFile;
         vm.Base64 = Base64;
 
         var unsubscribe = $rootScope.$on('mcsrApp:xmlUpdate', function(event, result) {

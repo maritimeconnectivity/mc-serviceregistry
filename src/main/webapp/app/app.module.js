@@ -20,10 +20,12 @@
         ])
         .run(run);
 
-    run.$inject = ['stateHandler', 'translationHandler'];
+    run.$inject = ['stateHandler', 'translationHandler', '$rootScope', 'APP_NAME'];
 
-    function run(stateHandler, translationHandler) {
+    function run(stateHandler, translationHandler, $rootScope, APP_NAME) {
         stateHandler.initialize();
         translationHandler.initialize();
+        $rootScope.currentYear = (new Date()).getFullYear();
+        $rootScope.APP_NAME = APP_NAME;
     }
 })();

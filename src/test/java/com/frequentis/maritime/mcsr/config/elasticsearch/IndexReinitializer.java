@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class IndexReinitializer {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
@@ -36,6 +36,7 @@ public class IndexReinitializer {
 
     @PostConstruct
     public void resetIndex() {
+        logger.debug("Start resetIndex");
         long t = currentTimeMillis();
         elasticsearchTemplate.deleteIndex("_all");
         t = currentTimeMillis() - t;

@@ -23,6 +23,7 @@
         vm.openFile = DataUtils.openFile;
         vm.byteSize = DataUtils.byteSize;
         vm.Base64 = Base64;
+        vm.downloadFile = DataUtils.downloadFile;
 
         loadAll();
 

@@ -17,17 +17,34 @@
  */
 package com.frequentis.maritime.mcsr.domain;
 
-import io.swagger.annotations.ApiModel;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
-import javax.persistence.*;
-import javax.validation.constraints.*;
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Objects;
+import io.swagger.annotations.ApiModel;
 
 import com.frequentis.maritime.mcsr.domain.enumeration.SpecificationTemplateType;
 
@@ -52,10 +69,12 @@ public class SpecificationTemplate implements Serializable {
 
     @NotNull
     @Column(name = "name", nullable = false)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String name;
 
     @NotNull
     @Column(name = "version", nullable = false)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String version;
 
     @NotNull
@@ -64,6 +83,7 @@ public class SpecificationTemplate implements Serializable {
     private SpecificationTemplateType type;
 
     @Column(name = "comment")
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String comment;
 
     @ManyToOne
@@ -79,7 +99,7 @@ public class SpecificationTemplate implements Serializable {
                inverseJoinColumns = @JoinColumn(name="docs_id", referencedColumnName="ID"))
     private Set<Doc> docs = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JoinTable(name = "specification_template_xsds",
                joinColumns = @JoinColumn(name="specification_templates_id", referencedColumnName="ID"),

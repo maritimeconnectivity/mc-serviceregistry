@@ -17,7 +17,40 @@
  */
 package com.frequentis.maritime.mcsr.web.rest;
 
-import com.frequentis.maritime.mcsr.McsrApp;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.inject.Inject;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.frequentis.maritime.mcsr.domain.Authority;
 import com.frequentis.maritime.mcsr.domain.User;
 import com.frequentis.maritime.mcsr.repository.AuthorityRepository;
@@ -27,42 +60,15 @@ import com.frequentis.maritime.mcsr.service.MailService;
 import com.frequentis.maritime.mcsr.service.UserService;
 import com.frequentis.maritime.mcsr.web.rest.dto.ManagedUserDTO;
 import com.frequentis.maritime.mcsr.web.rest.dto.UserDTO;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-import java.util.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the AccountResource REST controller.
  *
  * @see UserService
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = McsrApp.class)
-@WebAppConfiguration
-@IntegrationTest
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles = "integration")
 public class AccountResourceIntTest {
 
     @Inject
@@ -87,7 +93,7 @@ public class AccountResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        doNothing().when(mockMailService).sendActivationEmail((User) anyObject(), anyString());
+        doNothing().when(mockMailService).sendActivationEmail((User) any(), anyString());
 
         AccountResource accountResource = new AccountResource();
         ReflectionTestUtils.setField(accountResource, "userRepository", userRepository);
@@ -139,9 +145,9 @@ public class AccountResourceIntTest {
         when(mockUserService.getUserWithAuthorities()).thenReturn(user);
 
         restUserMockMvc.perform(get("/api/account")
-                .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.login").value("test"))
                 .andExpect(jsonPath("$.firstName").value("john"))
                 .andExpect(jsonPath("$.lastName").value("doe"))
@@ -154,12 +160,13 @@ public class AccountResourceIntTest {
         when(mockUserService.getUserWithAuthorities()).thenReturn(null);
 
         restUserMockMvc.perform(get("/api/account")
-                .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isInternalServerError());
     }
 
     @Test
     @Transactional
+    @WithMockUser("test-user")
     public void testRegisterValid() throws Exception {
         ManagedUserDTO validUser = new ManagedUserDTO(
             null,                   // id
@@ -182,12 +189,13 @@ public class AccountResourceIntTest {
                 .content(TestUtil.convertObjectToJsonBytes(validUser)))
             .andExpect(status().isCreated());
 
-        Optional<User> user = userRepository.findOneByLogin("joe");
+        Optional<User> user = userRepository.findFirstByLogin("joe");
         assertThat(user.isPresent()).isTrue();
     }
 
     @Test
     @Transactional
+    @WithMockUser("test-user")
     public void testRegisterInvalidLogin() throws Exception {
         ManagedUserDTO invalidUser = new ManagedUserDTO(
             null,                   // id
@@ -210,12 +218,13 @@ public class AccountResourceIntTest {
                 .content(TestUtil.convertObjectToJsonBytes(invalidUser)))
             .andExpect(status().isBadRequest());
 
-        Optional<User> user = userRepository.findOneByEmail("funky@example.com");
+        Optional<User> user = userRepository.findFirstByEmail("funky@example.com");
         assertThat(user.isPresent()).isFalse();
     }
 
     @Test
     @Transactional
+    @WithMockUser("test-user")
     public void testRegisterInvalidEmail() throws Exception {
         ManagedUserDTO invalidUser = new ManagedUserDTO(
             null,               // id
@@ -238,12 +247,13 @@ public class AccountResourceIntTest {
                 .content(TestUtil.convertObjectToJsonBytes(invalidUser)))
             .andExpect(status().isBadRequest());
 
-        Optional<User> user = userRepository.findOneByLogin("bob");
+        Optional<User> user = userRepository.findFirstByLogin("bob");
         assertThat(user.isPresent()).isFalse();
     }
 
     @Test
     @Transactional
+    @WithMockUser("test-user")
     public void testRegisterInvalidPassword() throws Exception {
         ManagedUserDTO invalidUser = new ManagedUserDTO(
             null,               // id
@@ -266,12 +276,13 @@ public class AccountResourceIntTest {
                 .content(TestUtil.convertObjectToJsonBytes(invalidUser)))
             .andExpect(status().isBadRequest());
 
-        Optional<User> user = userRepository.findOneByLogin("bob");
+        Optional<User> user = userRepository.findFirstByLogin("bob");
         assertThat(user.isPresent()).isFalse();
     }
 
     @Test
     @Transactional
+    @WithMockUser("test-user")
     public void testRegisterDuplicateLogin() throws Exception {
         // Good
         ManagedUserDTO validUser = new ManagedUserDTO(
@@ -307,12 +318,13 @@ public class AccountResourceIntTest {
                 .content(TestUtil.convertObjectToJsonBytes(duplicatedUser)))
             .andExpect(status().is4xxClientError());
 
-        Optional<User> userDup = userRepository.findOneByEmail("alicejr@example.com");
+        Optional<User> userDup = userRepository.findFirstByEmail("alicejr@example.com");
         assertThat(userDup.isPresent()).isFalse();
     }
 
     @Test
     @Transactional
+    @WithMockUser("test-user")
     public void testRegisterDuplicateEmail() throws Exception {
         // Good
         ManagedUserDTO validUser = new ManagedUserDTO(
@@ -348,12 +360,13 @@ public class AccountResourceIntTest {
                 .content(TestUtil.convertObjectToJsonBytes(duplicatedUser)))
             .andExpect(status().is4xxClientError());
 
-        Optional<User> userDup = userRepository.findOneByLogin("johnjr");
+        Optional<User> userDup = userRepository.findFirstByLogin("johnjr");
         assertThat(userDup.isPresent()).isFalse();
     }
 
     @Test
     @Transactional
+    @WithMockUser("test-user")
     public void testRegisterAdminIsIgnored() throws Exception {
         ManagedUserDTO validUser = new ManagedUserDTO(
             null,                   // id
@@ -376,14 +389,15 @@ public class AccountResourceIntTest {
                 .content(TestUtil.convertObjectToJsonBytes(validUser)))
             .andExpect(status().isCreated());
 
-        Optional<User> userDup = userRepository.findOneByLogin("badguy");
+        Optional<User> userDup = userRepository.findFirstByLogin("badguy");
         assertThat(userDup.isPresent()).isTrue();
         assertThat(userDup.get().getAuthorities()).hasSize(1)
-            .containsExactly(authorityRepository.findOne(AuthoritiesConstants.USER));
+            .containsOnly(authorityRepository.findById(AuthoritiesConstants.USER).get());
     }
 
     @Test
     @Transactional
+    @WithMockUser("test-user")
     public void testSaveInvalidLogin() throws Exception {
         UserDTO invalidUser = new UserDTO(
             "funky-log!n",          // login <-- invalid
@@ -401,7 +415,7 @@ public class AccountResourceIntTest {
                 .content(TestUtil.convertObjectToJsonBytes(invalidUser)))
             .andExpect(status().isBadRequest());
 
-        Optional<User> user = userRepository.findOneByEmail("funky@example.com");
+        Optional<User> user = userRepository.findFirstByEmail("funky@example.com");
         assertThat(user.isPresent()).isFalse();
     }
 }

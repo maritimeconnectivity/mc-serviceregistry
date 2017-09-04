@@ -61,28 +61,24 @@
                 </p>
             </div>
         </div>
+        <!-- Parsed from the Authorization
         <div class="form-group">
             <label class="control-label" translate="mcsrApp.design.organisationId" for="field_organisationId">Organisation Id</label>
             <input type="text" class="form-control" name="organisationId" id="field_organisationId"
                     ng-model="vm.design.organisationId"
                      />
         </div>
+        -->
         <div class="form-group">
             <label class="control-label" translate="mcsrApp.design.status" for="field_status">Status</label>
             <input type="text" class="form-control" name="status" id="field_status"
                     ng-model="vm.design.status"
                      />
         </div>
-        <div class="form-group">
-            <label class="control-label" translate="mcsrApp.design.organizationId" for="field_organizationId">Organization Id</label>
-            <input type="text" class="form-control" name="organizationId" id="field_organizationId"
-                    ng-model="vm.design.organizationId"
-                     />
-        </div>
 
         <div class="form-group">
             <label translate="mcsrApp.design.designAsXml" for="field_designAsXml">Design As Xml</label>
-            <select class="form-control" id="field_designAsXml" name="designAsXml" ng-model="vm.design.designAsXml" ng-options="xml as xml.id for xml in vm.designasxmls | orderBy:'id' track by xml.id">
+            <select class="form-control" id="field_designAsXml" name="designAsXml" ng-model="vm.design.designAsXml" ng-options="xml as xml.name for xml in vm.designasxmls | orderBy:'id' track by xml.id">
                 <option value=""></option>
             </select>
         </div>
@@ -94,7 +90,7 @@
         </div>
         <div class="form-group">
             <label translate="mcsrApp.design.implementedSpecificationVersion" for="field_implementedSpecificationVersion">Implemented Specification Version</label>
-            <select class="form-control" id="field_implementedSpecificationVersion" name="implementedSpecificationVersion" ng-model="vm.design.implementedSpecificationVersion" ng-options="specificationTemplate as specificationTemplate.version for specificationTemplate in vm.specificationtemplates track by specificationTemplate.id">
+            <select class="form-control" id="field_implementedSpecificationVersion" name="implementedSpecificationVersion" ng-model="vm.design.implementedSpecificationVersion" ng-options="specificationTemplate as (specificationTemplate.name + ' (' + specificationTemplate.version + ')') for specificationTemplate in vm.specificationtemplates track by specificationTemplate.id">
                 <option value=""></option>
             </select>
         </div>

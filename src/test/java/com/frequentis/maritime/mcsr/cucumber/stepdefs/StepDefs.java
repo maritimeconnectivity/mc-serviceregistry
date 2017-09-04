@@ -17,15 +17,20 @@
  */
 package com.frequentis.maritime.mcsr.cucumber.stepdefs;
 
-import com.frequentis.maritime.mcsr.McsrApp;
-
-import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.boot.test.context.SpringBootContextLoader;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.ResultActions;
 
+import com.frequentis.maritime.mcsr.McsrApp;
+
+@ContextConfiguration(
+        loader = SpringBootContextLoader.class,
+        classes = McsrApp.class
+        )
 @WebAppConfiguration
-@ContextConfiguration(classes = McsrApp.class, loader = SpringApplicationContextLoader.class)
+@ActiveProfiles(profiles = "integration")
 public abstract class StepDefs {
 
     protected ResultActions actions;

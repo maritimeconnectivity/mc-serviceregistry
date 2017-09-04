@@ -41,20 +41,21 @@ public class UserStepDefs extends StepDefs {
 
     @Before
     public void setup() {
+        System.out.println(userResource);
         this.restUserMockMvc = MockMvcBuilders.standaloneSetup(userResource).build();
     }
 
     @When("^I search user '(.*)'$")
     public void i_search_user_admin(String userId) throws Throwable {
         actions = restUserMockMvc.perform(get("/api/users/" + userId)
-                .accept(MediaType.APPLICATION_JSON));
+                .accept(MediaType.APPLICATION_JSON_UTF8));
     }
 
     @Then("^the user is found$")
     public void the_user_is_found() throws Throwable {
         actions
             .andExpect(status().isOk())
-            .andExpect(content().contentType("application/json"));
+            .andExpect(content().contentType("application/json;charset=UTF-8"));
     }
 
     @Then("^his last name is '(.*)'$")

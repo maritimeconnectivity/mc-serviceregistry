@@ -18,14 +18,22 @@
 package com.frequentis.maritime.mcsr.domain;
 
 import io.swagger.annotations.ApiModel;
+import java.io.Serializable;
+import java.util.Objects;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.elasticsearch.annotations.Document;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.io.Serializable;
-import java.util.Objects;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 /**
  * A technical way to describe aspects if a service.The Xml should validate against a XSD from a SpecificationTemplate.
@@ -48,17 +56,21 @@ public class Xml implements Serializable {
 
     @NotNull
     @Column(name = "name", nullable = false)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String name;
 
     @Column(name = "comment")
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String comment;
 
     @NotNull
 //    @Lob
     @Column(name = "content", nullable = false, columnDefinition = "LONGTEXT")
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String content;
 
     @Column(name = "content_content_type", nullable = false)
+    @Field(type = FieldType.text, index = true, fielddata = true)
     private String contentContentType;
 
     public Long getId() {

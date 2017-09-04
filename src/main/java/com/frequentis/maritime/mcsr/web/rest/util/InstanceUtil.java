@@ -24,6 +24,10 @@ import com.frequentis.maritime.mcsr.domain.Instance;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -223,6 +227,14 @@ public class InstanceUtil {
                 log.error("Error parsing UnLoCode mapping file: ", e);
             }
         }
+    }
+
+    public static boolean checkOrganizationId(Instance instance, String organizationId) {
+        if (instance.getOrganizationId() != null && instance.getOrganizationId().length() > 0 && !organizationId.equals(instance.getOrganizationId())) {
+            return false;
+        }
+		return true;
+
     }
 
 

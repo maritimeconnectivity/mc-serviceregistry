@@ -17,20 +17,30 @@
  */
 package com.frequentis.maritime.mcsr.config;
 
+import com.frequentis.maritime.mcsr.repository.PersistentTokenRepository;
 import com.frequentis.maritime.mcsr.security.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.keycloak.adapters.springsecurity.KeycloakSecurityComponents;
 import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
 import org.keycloak.adapters.springsecurity.filter.KeycloakAuthenticationProcessingFilter;
 import org.keycloak.adapters.springsecurity.filter.KeycloakPreAuthActionsFilter;
-import org.springframework.boot.context.embedded.FilterRegistrationBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,15 +48,28 @@ import org.springframework.security.data.repository.query.SecurityEvaluationCont
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.preauth.x509.X509AuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
 import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+
+import java.io.IOException;
 
 import javax.inject.Inject;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 
 @Configuration
 @EnableWebSecurity
+@ComponentScan(basePackageClasses = KeycloakSecurityComponents.class)
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter {
+    private final Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
 
     @Inject
     private JHipsterProperties jHipsterProperties;
@@ -85,6 +108,7 @@ public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter 
 
     @Override
     public void configure(WebSecurity web) throws Exception {
+        log.debug("Configuring WebSecurity");
         web.ignoring()
             .antMatchers(HttpMethod.OPTIONS, "/**")
             .antMatchers("/app/**/*.{js,html}")
@@ -96,6 +120,7 @@ public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter 
             .antMatchers("/h2-console/**");
     }
 
+    @Bean
     @Override
     protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
         return new NullAuthenticatedSessionStrategy();
@@ -117,14 +142,27 @@ public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter 
         return registrationBean;
     }
 
+    protected BasicAuthenticationFilter basicAuthenticationFilter() {
+        try {
+            return new BasicAuthenticationFilter(authenticationManager());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        //super.configure(http);
+        log.debug("Configuring HttpSecurity");
+        log.debug("RememberMe service {}", rememberMeServices);
         http
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .sessionAuthenticationStrategy(sessionAuthenticationStrategy())
         .and()
-            .addFilterBefore(keycloakPreAuthActionsFilter(), LogoutFilter.class)
-            .addFilterBefore(keycloakAuthenticationProcessingFilter(), X509AuthenticationFilter.class)
+            .addFilterBefore(basicAuthenticationFilter(), LogoutFilter.class)
+            .addFilterBefore(new SkippingFilter(keycloakPreAuthActionsFilter()), LogoutFilter.class)
+            .addFilterBefore(new SkippingFilter(keycloakAuthenticationProcessingFilter()), X509AuthenticationFilter.class)
             .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint())
         .and()
 //            .addFilterAfter(new CsrfCookieGeneratorFilter(), CsrfFilter.class)
@@ -177,13 +215,67 @@ public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter 
             .antMatchers(HttpMethod.GET, "/api/**").permitAll()
             .antMatchers("/swagger-resources/configuration/ui").permitAll()
             .antMatchers("/swagger-ui/index.html").permitAll()
-	.and()
-	    .csrf().disable();
+    .and()
+        .csrf().disable();
 
     }
 
     @Bean
     public SecurityEvaluationContextExtension securityEvaluationContextExtension() {
         return new SecurityEvaluationContextExtension();
+    }
+
+
+    /**
+     * SkippingFilter skips holded filter if user is authenticated.
+     *
+     * <p>It used as workaround for Keycloak filter.</p>
+     *
+     */
+    class SkippingFilter implements Filter {
+        private final Logger log = LoggerFactory.getLogger(SkippingFilter.class);
+        private Filter f;
+
+        public SkippingFilter(Filter filter) {
+            f = filter;
+        }
+
+        @Override
+        public void init(FilterConfig filterConfig) throws ServletException {
+            f.init(filterConfig);
+        }
+
+        @Override
+        public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+                throws IOException, ServletException {
+
+            String url = "";
+            String queryString = "";
+            if(request instanceof HttpServletRequest) {
+                url = ((HttpServletRequest)request).getRequestURL().toString();
+                queryString = ((HttpServletRequest)request).getQueryString();
+            }
+
+            log.debug("Check authentication [" + url + "?" + queryString + "]");
+            if (isAuthenticated()) {
+                log.debug("Authenticated - skip filter [" + url + "?" + queryString + "]");
+                chain.doFilter(request, response);
+            } else {
+                log.debug("No authentication - do filter [" + url + "?" + queryString + "]");
+                f.doFilter(request, response, chain);
+            }
+        }
+
+        @Override
+        public void destroy() {
+            f.destroy();
+        }
+
+        private boolean isAuthenticated() {
+            return SecurityContextHolder.getContext() != null
+                    && SecurityContextHolder.getContext().getAuthentication() != null
+                    && SecurityContextHolder.getContext().getAuthentication().isAuthenticated();
+        }
+
     }
 }

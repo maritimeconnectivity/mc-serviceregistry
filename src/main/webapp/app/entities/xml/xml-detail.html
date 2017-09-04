@@ -15,7 +15,7 @@
         <dt><span translate="mcsrApp.xml.content">Content</span></dt>
         <dd>
             <div ng-if="vm.xml.content">
-                <a ng-click="vm.openFile(vm.xml.contentContentType, vm.Base64.encode(vm.xml.content))" translate="entity.action.open">open</a>
+                <a ng-click="vm.downloadFile(vm.xml.name, vm.xml.contentContentType, vm.Base64.encode(vm.xml.content))" translate="entity.action.download">download</a>
                 {{vm.xml.contentContentType}}, {{vm.byteSize(vm.xml.content)}}
             </div>
         </dd>
