@@ -31,7 +31,9 @@
             "instanceAsDoc": "Instance As Doc",
             "implementedSpecificationVersion": "Implemented Specification Version",
             "designs": "Designs",
-            "docs": "Docs"
+            "design": "Design",
+            "docs": "Docs",
+            "compliant": "Compliant"
         }
     }
 }

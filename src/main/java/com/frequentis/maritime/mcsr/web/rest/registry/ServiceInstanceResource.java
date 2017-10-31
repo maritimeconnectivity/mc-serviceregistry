@@ -31,11 +31,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.codahale.metrics.annotation.Timed;
-import com.frequentis.maritime.mcsr.domain.Design;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.frequentis.maritime.mcsr.domain.Instance;
-import com.frequentis.maritime.mcsr.domain.Specification;
 import com.frequentis.maritime.mcsr.domain.Xml;
+import com.frequentis.maritime.mcsr.service.DesignService;
 import com.frequentis.maritime.mcsr.service.InstanceService;
+import com.frequentis.maritime.mcsr.web.exceptions.GeometryParseException;
+import com.frequentis.maritime.mcsr.web.exceptions.XMLValidationException;
 import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
@@ -47,6 +49,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -70,6 +73,9 @@ public class ServiceInstanceResource {
     @Inject
     private InstanceService instanceService;
 
+    @Inject
+    private DesignService designService;
+
     /**
      * POST  /serviceInstance : Create a new instance.
      *
@@ -83,40 +89,57 @@ public class ServiceInstanceResource {
     @Timed
     public ResponseEntity<?> createInstance(@Valid @RequestBody Instance instance, @RequestHeader(value = "Authorization", required=false) String bearerToken) throws Exception, URISyntaxException {
         log.debug("REST request to save Instance : {}", instance);
+        if (instance.getId() != null) {
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("instance", "idexists", "A new instance cannot already have an ID")).body(null);
+        }
+
+        return saveInstance(instance, bearerToken, true);
+    }
+
+    private ResponseEntity<?> saveInstance(Instance instance, String bearerToken, boolean newInstance) throws URISyntaxException {
         String organizationId = "";
         try {
             organizationId = HeaderUtil.extractOrganizationIdFromToken(bearerToken);
         } catch (Exception e) {
             log.warn("No organizationId could be parsed from the bearer token");
         }
-        if (instance.getId() != null) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("instance", "idexists", "A new instance cannot already have an ID")).body(null);
-        }
 
-        String xml = instance.getInstanceAsXml().getContent().toString();
-        log.info("XML:" + xml);
-        XmlUtil.validateXml(xml, "ServiceInstanceSchema.xsd");
-        instance = InstanceUtil.parseInstanceAttributesFromXML(instance);
         instance.setOrganizationId(organizationId);
 
-        if (instance.getDesigns() != null && instance.getDesigns().size() > 0) {
-            Design design = instance.getDesigns().iterator().next();
-            if (design != null) {
-                instance.setDesignId(design.getDesignId());
-                if (design.getSpecifications() != null && design.getSpecifications().size()> 0) {
-                    Specification specification = design.getSpecifications().iterator().next();
-                    if (specification != null) {
-                        instance.setSpecificationId(specification.getSpecificationId());
-                    }
-                }
-            }
+        try {
+            InstanceUtil.prepareInstanceForSave(instance, designService);
+            JsonNode geometry = instance.getGeometry();
+            instanceService.save(instance);
+            instance.setGeometry(geometry);
+            instanceService.saveGeometry(instance);
+
+        } catch (XMLValidationException e) {
+            log.error("Error parsing xml: ", e);
+            return ResponseEntity.badRequest()
+                .headers(HeaderUtil.createFailureAlert("instance", e.getMessage(), e.toString()))
+                .body(instance);
+        } catch (GeometryParseException e) {
+            instanceService.save(instance);
+            log.error("Error parsing geometry: ", e);
+            return ResponseEntity.badRequest()
+                .headers(HeaderUtil.createFailureAlert("instance", e.getMessage(), e.toString()))
+                .body(instance);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .headers(HeaderUtil.createFailureAlert("instance", e.getMessage(), e.toString()))
+                    .body(instance);
         }
-        Instance result = instanceService.save(instance);
-        result = InstanceUtil.parseInstanceGeometryFromXML(result);
-        instanceService.saveGeometry(result);
-        return ResponseEntity.created(new URI("/api/serviceInstance/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert("instance", result.getId().toString()))
-            .body(result);
+
+        BodyBuilder entity = null;
+        if(newInstance) {
+            entity = ResponseEntity.created(new URI("/api/serviceInstance/" + instance.getId()));
+        } else {
+            entity = ResponseEntity.ok();
+        }
+        entity
+            .headers(HeaderUtil.createEntityCreationAlert("instance", instance.getId().toString()))
+            .body(instance);
+        return entity.build();
     }
 
     /**
@@ -134,45 +157,11 @@ public class ServiceInstanceResource {
     @Timed
     public ResponseEntity<?> updateInstance(@Valid @RequestBody Instance instance, @RequestHeader(value = "Authorization", required=false) String bearerToken) throws Exception, URISyntaxException {
         log.debug("REST request to update Instance : {}", instance);
-
-        String xml = instance.getInstanceAsXml().getContent().toString();
-        log.info("XML:" + xml);
-        XmlUtil.validateXml(xml, "ServiceInstanceSchema.xsd");
-        instance = InstanceUtil.parseInstanceAttributesFromXML(instance);
-
         if (instance.getId() == null) {
             return createInstance(instance, bearerToken);
         }
 
-        String organizationId = "";
-        try {
-            organizationId = HeaderUtil.extractOrganizationIdFromToken(bearerToken);
-        } catch (Exception e) {
-            log.warn("No organizationId could be parsed from the bearer token");
-        }
-        if (instance.getOrganizationId() != null && instance.getOrganizationId().length() > 0 && !organizationId.equals(instance.getOrganizationId())) {
-            log.warn("Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+instance.getOrganizationId());
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        if (instance.getDesigns() != null && instance.getDesigns().size() > 0) {
-            Design design = instance.getDesigns().iterator().next();
-            if (design != null) {
-                instance.setDesignId(design.getDesignId());
-                if (design.getSpecifications() != null && design.getSpecifications().size()> 0) {
-                    Specification specification = design.getSpecifications().iterator().next();
-                    if (specification != null) {
-                        instance.setSpecificationId(specification.getSpecificationId());
-                    }
-                }
-            }
-        }
-
-        Instance result = instanceService.save(instance);
-        result = InstanceUtil.parseInstanceGeometryFromXML(result);
-        instanceService.saveGeometry(result);
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert("instance", instance.getId().toString()))
-            .body(result);
+        return saveInstance(instance, bearerToken, false);
     }
 
     /**

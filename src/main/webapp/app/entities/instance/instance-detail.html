@@ -12,6 +12,10 @@
         <dd>
             <span>{{vm.instance.version}}</span>
         </dd>
+        <dt><span translate="mcsrApp.instance.compliant">Compliant</span></dt>
+        <dd>
+            <span><span class="glyphicon glyphicon-{{vm.instance.compliant ? 'ok' : 'remove'}}"></span> {{vm.instance.compliant ? 'YES' : 'NO'}}</span>
+        </dd>
         <dt><span translate="mcsrApp.instance.comment">Comment</span></dt>
         <dd>
             <span>{{vm.instance.comment}}</span>
@@ -63,11 +67,9 @@
         <dd>
             <a ui-sref="specification-template-detail({id:vm.instance.implementedSpecificationVersion.id})">{{vm.instance.implementedSpecificationVersion.version}}</a>
         </dd>
-        <dt><span translate="mcsrApp.instance.designs">Designs</span></dt>
+        <dt><span translate="mcsrApp.instance.design">Implemented design</span></dt>
         <dd>
-            <span ng-repeat="designs in vm.instance.designs">
-                <a ui-sref="design-detail({id: designs.id})">{{designs.name}}</a>{{$last ? '' : ', '}}
-            </span>
+            <a ui-sref="design-detail({id: vm.instance.design.id})" ng-if="vm.instance.design">{{vm.instance.design.name}} (version: {{vm.instance.design.version}})</a>
         </dd>
         <dt><span translate="mcsrApp.instance.docs">Docs</span></dt>
         <dd>

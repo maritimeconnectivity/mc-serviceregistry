@@ -49,12 +49,15 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import io.swagger.annotations.ApiModel;
 /**
- * Holds a logical description of a service.A specification can be compatible to one or morespecification templates.It has at least a technical representation of the servicedescriptiion in form of an XML and a filled out service templateas e.g. word document.
+ * Holds a logical description of a service. A specification can be compatible to one or more
+ * specification templates. It has at least a technical representation of the service
+ * descriptiion in form of an XML and a filled out service templateas e.g. word document.
  *
  */
 @ApiModel(description = ""
-    + "Holds a logical description of a service.A specification can be compatible to one or morespecification templates.It has at least a technical representation of the servicedescriptiion in form of an XML and a filled out service templateas e.g. word document."
-    + "")
+    + "Holds a logical description of a service. A specification can be compatible to one or "
+    + "morespecification templates.It has at least a technical representation of the servicedescriptiion "
+    + "in form of an XML and a filled out service templateas e.g. word document.")
 @Entity
 @Table(name = "specification")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)

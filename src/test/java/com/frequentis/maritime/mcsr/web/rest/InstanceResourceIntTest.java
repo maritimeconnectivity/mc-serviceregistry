@@ -70,8 +70,10 @@ import com.frequentis.maritime.mcsr.repository.InstanceRepository;
 import com.frequentis.maritime.mcsr.repository.XmlRepository;
 import com.frequentis.maritime.mcsr.repository.search.InstanceSearchRepository;
 import com.frequentis.maritime.mcsr.repository.search.XmlSearchRepository;
+import com.frequentis.maritime.mcsr.service.DesignService;
 import com.frequentis.maritime.mcsr.service.InstanceService;
 import com.frequentis.maritime.mcsr.service.XmlService;
+import com.frequentis.maritime.mcsr.web.soap.converters.instance.InstanceDTOConverter;
 import com.frequentis.maritime.mcsr.xmls.CoversAreaType;
 import com.frequentis.maritime.mcsr.xmls.CoverageArea;
 import com.frequentis.maritime.mcsr.xmls.InstanceXML;
@@ -157,6 +159,12 @@ public class InstanceResourceIntTest {
     @Inject
     private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
 
+    @Inject
+    private DesignService designService;
+
+    @Inject
+    private InstanceDTOConverter instanceConverter;
+
     private MockMvc restInstanceMockMvc;
 
     private Instance instance;
@@ -174,6 +182,8 @@ public class InstanceResourceIntTest {
         MockitoAnnotations.initMocks(this);
         InstanceResource instanceResource = new InstanceResource();
         ReflectionTestUtils.setField(instanceResource, "instanceService", instanceService);
+        ReflectionTestUtils.setField(instanceResource, "designService", designService);
+        ReflectionTestUtils.setField(instanceResource, "instanceConverter", instanceConverter);
         this.restInstanceMockMvc = MockMvcBuilders.standaloneSetup(instanceResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();

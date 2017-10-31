@@ -88,6 +88,10 @@ public class InstanceService {
     public Instance save(Instance instance) {
         log.debug("Request to save Instance : {}", instance);
         instance.setGeometry(null);
+
+        // set compliant flag if is instance compliant
+        setCompliantFlag(instance);
+
         Instance result = instanceRepository.save(instance);
         return result;
     }
@@ -103,10 +107,36 @@ public class InstanceService {
             wholeEarth = mapper.readTree(wholeWorldGeoJson);
             geometry = wholeEarth;
         }
+
+        // set compliant flag if is instance compliant
+        setCompliantFlag(instance);
+
         //Save to ES
         instance.setGeometry(geometry);
         instanceSearchRepository.save(instance);
         return instance;
+    }
+
+    /**
+     * Sets compliant flag to service instance to true if service has design and
+     * specification, to false if service has not these documents.
+     *
+     * @param instance
+     */
+    private void setCompliantFlag(Instance instance) {
+        if(instance == null) {
+            return;
+        }
+
+        if(instance.getDesigns() != null
+                && instance.getDesigns().size() > 0
+                && instance.getSpecificationId() != null
+                && !instance.getSpecificationId().isEmpty()) {
+
+            instance.setCompliant(true);
+        } else {
+            instance.setCompliant(false);
+        }
     }
 
 

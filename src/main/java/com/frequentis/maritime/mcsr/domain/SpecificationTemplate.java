@@ -49,12 +49,14 @@ import io.swagger.annotations.ApiModel;
 import com.frequentis.maritime.mcsr.domain.enumeration.SpecificationTemplateType;
 
 /**
- * A SpecificationTemplate contains information on how to define a aspects ofa service.It has a type do differentiate between e.g. logical definitions andconcrete service instances.Templates will evolve, that's why they have a version.
+ * A SpecificationTemplate contains information on how to define a aspects of
+ * a service.It has a type do differentiate between e.g. logical definitions and
+ * concrete service instances.Templates will evolve, that's why they have a version.
  *
  */
 @ApiModel(description = ""
-    + "A SpecificationTemplate contains information on how to define a aspects ofa service.It has a type do differentiate between e.g. logical definitions andconcrete service instances.Templates will evolve, that's why they have a version."
-    + "")
+    + "A SpecificationTemplate contains information on how to define a aspects ofa service.It has a type do differentiate between e.g. "
+    + "logical definitions andconcrete service instances.Templates will evolve, that's why they have a version.")
 @Entity
 @Table(name = "specification_template")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)

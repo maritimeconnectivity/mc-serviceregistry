@@ -48,6 +48,8 @@ public class InstanceDTO {
 
 	public String designId;
 
+	public DesignDTO design;
+
 	public String specificationId;
 
 	public XmlDTO instanceAsXml;
@@ -59,5 +61,13 @@ public class InstanceDTO {
 	public List<DesignDTO> designs;
 
 	public List<DocDTO> docs;
+
+	public Boolean compliant;
+
+    @Override
+    public String toString() {
+        return "InstanceDTO [id=" + id + ", name=" + name + ", version=" + version + ", geometry=" + geometry
+                + ", status=" + status + ", unlocode=" + unlocode + "]";
+    }
 
 }

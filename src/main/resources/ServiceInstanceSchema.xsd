@@ -111,7 +111,7 @@
 					</choice>
 				</complexType>
 			</element>
-			<element name="implementsServiceDesign" type="ServiceInstanceSchema:ServiceDesignReference" minOccurs="1" maxOccurs="1"/>
+			<element name="implementsServiceDesign" type="ServiceInstanceSchema:ServiceDesignReference" minOccurs="0" maxOccurs="1"/>
 			<element name="producedBy" type="ServiceSpecificationSchema:VendorInfo" minOccurs="1" maxOccurs="1"/>
 			<element name="providedBy" type="ServiceSpecificationSchema:VendorInfo" minOccurs="1" maxOccurs="1"/>
 		</all>

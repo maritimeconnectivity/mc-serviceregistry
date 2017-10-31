@@ -28,28 +28,33 @@ import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.frequentis.maritime.mcsr.domain.Instance;
+import com.frequentis.maritime.mcsr.service.DesignService;
+import com.frequentis.maritime.mcsr.service.InstanceService;
+import com.frequentis.maritime.mcsr.web.exceptions.GeometryParseException;
+import com.frequentis.maritime.mcsr.web.exceptions.XMLValidationException;
+import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
+import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
+import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
+import com.frequentis.maritime.mcsr.web.soap.converters.instance.InstanceDTOConverter;
+import com.frequentis.maritime.mcsr.web.soap.dto.instance.InstanceDTO;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.codahale.metrics.annotation.Timed;
-import com.frequentis.maritime.mcsr.domain.Design;
-import com.frequentis.maritime.mcsr.domain.Instance;
-import com.frequentis.maritime.mcsr.domain.Specification;
-import com.frequentis.maritime.mcsr.service.InstanceService;
-import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
-import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
-import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
-import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -65,6 +70,12 @@ public class InstanceResource {
 
     @Inject
     private InstanceService instanceService;
+
+    @Inject
+    private DesignService designService;
+
+    @Inject
+    private InstanceDTOConverter instanceConverter;
 
     /**
      * POST  /instances : Create a new instance.
@@ -82,42 +93,9 @@ public class InstanceResource {
         if (instance.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("instance", "idexists", "A new instance cannot already have an ID")).body(null);
         }
-        try {
-            String xml = instance.getInstanceAsXml().getContent().toString();
-            log.info("XML:" + xml);
-            XmlUtil.validateXml(xml, "ServiceInstanceSchema.xsd");
-            instance = InstanceUtil.parseInstanceAttributesFromXML(instance);
-        } catch (Exception e) {
-            log.error("Error parsing xml: ", e);
-            return ResponseEntity.badRequest()
-                .headers(HeaderUtil.createFailureAlert("instance", e.getMessage(), e.toString()))
-                .body(instance);
-        }
-        if (instance.getDesigns() != null && instance.getDesigns().size() > 0) {
-            Design design = instance.getDesigns().iterator().next();
-            if (design != null) {
-                instance.setDesignId(design.getDesignId());
-                if (design.getSpecifications() != null && design.getSpecifications().size()> 0) {
-                    Specification specification = design.getSpecifications().iterator().next();
-                    if (specification != null) {
-                        instance.setSpecificationId(specification.getSpecificationId());
-                    }
-                }
-            }
-        }
-        Instance result = instanceService.save(instance);
-        try {
-            result = InstanceUtil.parseInstanceGeometryFromXML(result);
-        } catch (Exception e) {
-            log.error("Error parsing geometry: ", e);
-            return ResponseEntity.badRequest()
-                .headers(HeaderUtil.createFailureAlert("instance", e.getMessage(), e.toString()))
-                .body(instance);
-        }
-        instanceService.saveGeometry(result);
-        return ResponseEntity.created(new URI("/api/instances/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert("instance", result.getId().toString()))
-            .body(result);
+
+        return saveInstance(instance, true);
+
     }
 
     /**
@@ -138,47 +116,46 @@ public class InstanceResource {
         if (instance.getId() == null) {
             return createInstance(instance);
         }
+
+        return saveInstance(instance, false);
+    }
+
+    private ResponseEntity<Instance> saveInstance(Instance instance, boolean newInstance) throws URISyntaxException {
         try {
-            instance = InstanceUtil.parseInstanceAttributesFromXML(instance);
-        } catch (Exception e) {
-            log.debug("Error parsing xml: ", e);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if (instance.getDesigns() != null && instance.getDesigns().size() > 0) {
-            Design design = instance.getDesigns().iterator().next();
-            if (design != null) {
-                instance.setDesignId(design.getDesignId());
-                if (design.getSpecifications() != null && design.getSpecifications().size()> 0) {
-                    Specification specification = design.getSpecifications().iterator().next();
-                    if (specification != null) {
-                        instance.setSpecificationId(specification.getSpecificationId());
-                    }
-                }
-            }
-        }
-        try {
-            String xml = instance.getInstanceAsXml().getContent().toString();
-            log.info("XML:" + xml);
-            XmlUtil.validateXml(xml, "ServiceInstanceSchema.xsd");
-            instance = InstanceUtil.parseInstanceAttributesFromXML(instance);
-        } catch (Exception e) {
+            InstanceUtil.prepareInstanceForSave(instance, designService);
+            JsonNode geometry = instance.getGeometry();
+            instanceService.save(instance);
+            instance.setGeometry(geometry);
+            instanceService.saveGeometry(instance);
+
+        } catch (XMLValidationException e) {
             log.error("Error parsing xml: ", e);
+            return ResponseEntity.badRequest()
+                .headers(HeaderUtil.createFailureAlert("instance", e.getMessage(), e.toString()))
+                .body(instance);
+        } catch (GeometryParseException e) {
+            instanceService.save(instance);
+            log.error("Error parsing geometry: ", e);
+            return ResponseEntity.badRequest()
+                .headers(HeaderUtil.createFailureAlert("instance", e.getMessage(), e.toString()))
+                .body(instance);
+        } catch (Exception e) {
             return ResponseEntity.badRequest()
                 .headers(HeaderUtil.createFailureAlert("instance", e.getMessage(), e.toString()))
                 .body(instance);
         }
 
-        Instance result = instanceService.save(instance);
-        try {
-            result = InstanceUtil.parseInstanceGeometryFromXML(result);
-        } catch (Exception e) {
-            log.debug("Error parsing geometry: ", e);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        BodyBuilder entity = null;
+        if(newInstance) {
+            entity = ResponseEntity.created(new URI("/api/instances/" + instance.getId()));
+        } else {
+            entity = ResponseEntity.ok();
         }
-        instanceService.saveGeometry(result);
-        return ResponseEntity.ok()
+        entity
             .headers(HeaderUtil.createEntityUpdateAlert("instance", instance.getId().toString()))
-            .body(result);
+            .body(instance);
+
+        return entity.build();
     }
 
     /**
@@ -210,9 +187,9 @@ public class InstanceResource {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Instance> getInstance(@PathVariable Long id) {
+    public ResponseEntity<InstanceDTO> getInstance(@PathVariable Long id) {
         log.debug("REST request to get Instance : {}", id);
-        Instance instance = instanceService.findOne(id);
+        InstanceDTO instance = instanceConverter.convert(instanceService.findOne(id));
         return Optional.ofNullable(instance)
             .map(result -> new ResponseEntity<>(
                 result,

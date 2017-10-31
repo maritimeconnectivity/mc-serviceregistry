@@ -35,9 +35,9 @@
         <jacoco-maven-plugin.version>0.7.6.201602180812</jacoco-maven-plugin.version>
         <java.version>1.8</java.version>
         <javax.inject.version>1</javax.inject.version>
-        <liquibase-hibernate4.version>3.5</liquibase-hibernate4.version>
+        <liquibase-hibernate5.version>3.6</liquibase-hibernate5.version>
         <liquibase-slf4j.version>1.2.1</liquibase-slf4j.version>
-        <liquibase.version>3.4.2</liquibase.version>
+        <liquibase.version>3.5.3</liquibase.version>
         <logstash-logback-encoder.version>4.6</logstash-logback-encoder.version>
         <mapstruct.version>1.0.0.Final</mapstruct.version>
         <maven-artifact.version>3.3.9</maven-artifact.version>
@@ -109,6 +109,7 @@
 	    <artifactId>lucene-core</artifactId>
 	    <version>6.5.0</version>
 	</dependency>
+  
     <dependency>
         <groupId>com.fasterxml.jackson.datatype</groupId>
         <artifactId>jackson-datatype-hibernate5</artifactId>
@@ -872,7 +873,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- <plugin>
+            <plugin>
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-maven-plugin</artifactId>
                 <version>${liquibase.version}</version>
@@ -884,8 +885,8 @@
                     </dependency>
                     <dependency>
                         <groupId>org.liquibase.ext</groupId>
-                        <artifactId>liquibase-hibernate4</artifactId>
-                        <version>${liquibase-hibernate4.version}</version>
+                        <artifactId>liquibase-hibernate5</artifactId>
+                        <version>${liquibase-hibernate5.version}</version>
                     </dependency>
                     <dependency>
                         <groupId>org.springframework.boot</groupId>
@@ -896,17 +897,20 @@
                 <configuration>
                     <changeLogFile>src/main/resources/config/liquibase/master.xml</changeLogFile>
                     <diffChangeLogFile>src/main/resources/config/liquibase/changelog/${maven.build.timestamp}_changelog.xml</diffChangeLogFile>
-                    <driver>org.h2.Driver</driver>
+                    <!-- <driver>org.h2.Driver</driver>
                     <url>jdbc:h2:file:./target/h2db/db/mcsr</url>
                     <defaultSchemaName />
-                    <username>mcsr</username>
-                    <password />
-                    <referenceUrl>hibernate:spring:com.frequentis.maritime.mcsr.domain?dialect=org.hibernate.dialect.H2Dialect&amp;hibernate.ejb.naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy</referenceUrl>
+                    <username>root</username>
+                    <password /> -->
+                    <url><![CDATA[jdbc:mysql://localhost:3306/maritimeregistry?useUnicode=true&characterEncoding=utf8&useSSL=false]]></url>
+                    <defaultSchemaName />
+                    <username>root</username>
+                    <password>root</password>
+                    <referenceUrl>hibernate:spring:com.frequentis.maritime.mcsr.domain?dialect=org.hibernate.dialect.MySQL5InnoDBDialect&amp;hibernate.ejb.naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy</referenceUrl>
                     <verbose>true</verbose>
                     <logging>debug</logging>
                 </configuration>
             </plugin>
-             -->
             <plugin>
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>

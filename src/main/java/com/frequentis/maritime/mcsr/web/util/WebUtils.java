@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 
 import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
 
+
 public final class WebUtils {
 
 	private WebUtils() {

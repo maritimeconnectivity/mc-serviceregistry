@@ -53,6 +53,7 @@ import com.frequentis.maritime.mcsr.domain.util.JsonNodeGeoShapeConverter;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.GeoShapeField;
 import org.springframework.data.elasticsearch.core.geo.GeoShape;
 
 import io.swagger.annotations.ApiModel;
@@ -181,6 +182,10 @@ public class Instance implements Serializable {
                joinColumns = @JoinColumn(name="instances_id", referencedColumnName="ID"),
                inverseJoinColumns = @JoinColumn(name="docs_id", referencedColumnName="ID"))
     private Set<Doc> docs = new HashSet<>();
+
+    @Column(name = "compliant")
+    @Field(type = FieldType.Boolean, index = true)
+    private boolean compliant;
 
     public Long getId() {
         return id;
@@ -355,6 +360,14 @@ public class Instance implements Serializable {
         this.docs = docs;
     }
 
+    public boolean isCompliant() {
+        return compliant;
+    }
+
+    public void setCompliant(boolean compliant) {
+        this.compliant = compliant;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -398,4 +411,5 @@ public class Instance implements Serializable {
             ", serviceType='" + serviceType + "'" +
             '}';
     }
+
 }

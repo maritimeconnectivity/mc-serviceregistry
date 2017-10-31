@@ -20,13 +20,18 @@ package com.frequentis.maritime.mcsr.web.rest.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.frequentis.maritime.mcsr.domain.Design;
 import com.frequentis.maritime.mcsr.domain.Instance;
+import com.frequentis.maritime.mcsr.domain.Specification;
+import com.frequentis.maritime.mcsr.service.DesignService;
+import com.frequentis.maritime.mcsr.web.exceptions.DesignDocumentDoesNotExistException;
+import com.frequentis.maritime.mcsr.web.exceptions.GeometryParseException;
+import com.frequentis.maritime.mcsr.web.exceptions.XMLValidationException;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.util.Assert;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +47,7 @@ import javax.xml.xpath.XPathFactory;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class InstanceUtil {
     private static final Logger log = LoggerFactory.getLogger(InstanceUtil.class);
@@ -83,6 +89,39 @@ public class InstanceUtil {
             instance.setUnlocode(unLoCode);
         }
         return instance;
+    }
+
+    public static DesignImplementation parseInstanceDesignImplementationFromXML(Instance instance) throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = null;
+        builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new ByteArrayInputStream(instance.getInstanceAsXml().getContent().toString().getBytes(StandardCharsets.UTF_8)));
+        XPathFactory xPathFactory = XPathFactory.newInstance();
+        XPath xPath = xPathFactory.newXPath();
+
+        String implementedServiceDesign = xPath.compile("/*[local-name()='serviceInstance']/*[local-name()='implementsServiceDesign']/*[local-name()='id']").evaluate(doc, XPathConstants.STRING).toString();
+        String implementedServiceDesignVersion = xPath.compile("/*[local-name()='serviceInstance']/*[local-name()='implementsServiceDesign']/*[local-name()='version']").evaluate(doc, XPathConstants.STRING).toString();
+
+        return new DesignImplementation(implementedServiceDesign, implementedServiceDesignVersion);
+    }
+
+    private static class DesignImplementation {
+        private String designId;
+        private String version;
+
+        private DesignImplementation(String designId, String version) {
+            this.designId = designId;
+            this.version = version;
+        }
+
+        public String getDesignId() {
+            return designId;
+        }
+
+        public String getVersion() {
+            return version;
+        }
+
     }
 
     /**
@@ -235,6 +274,66 @@ public class InstanceUtil {
         }
 		return true;
 
+    }
+
+    /**
+     * Prepare instance for save.
+     *
+     * <p>This preparation has two phases:</p>
+     * <ul>
+     *    <li>Validation of XML and parsing basic data (XMLValidationException if fails)</li>
+     *    <li>Parsing GeoData (GeometryParseException if fails)</li>
+     * </ul>
+     *
+     * @param instance
+     * @param designService
+     * @throws XMLValidationException If fails first phase (Validating and parsing XML)
+     * @throws GeometryParseException If fails second phase (Parsing geo data)
+     */
+    public static void prepareInstanceForSave(Instance instance, DesignService designService) throws XMLValidationException, GeometryParseException {
+        Assert.notNull(designService, "Design service can not be null!");
+        if(instance == null) {
+            return;
+        }
+        try {
+        String xml = instance.getInstanceAsXml().getContent().toString();
+        XmlUtil.validateXml(xml, "ServiceInstanceSchema.xsd");
+        instance = parseInstanceAttributesFromXML(instance);
+
+        DesignImplementation document = parseInstanceDesignImplementationFromXML(instance);
+        if(document != null) {
+            Design findByDomainId = designService.findByDomainId(document.getDesignId(), document.getVersion());
+            if(findByDomainId != null) {
+                if(instance.getDesigns().isEmpty()) {
+                    instance.setDesigns(new HashSet<>());
+                }
+                instance.getDesigns().add(findByDomainId);
+            } else {
+                // nothing
+            }
+        }
+
+        if (instance.getDesigns() != null && instance.getDesigns().size() > 0) {
+            Design design = instance.getDesigns().iterator().next();
+            if (design != null) {
+                instance.setDesignId(design.getDesignId());
+                if (design.getSpecifications() != null && design.getSpecifications().size() > 0) {
+                    Specification specification = design.getSpecifications().iterator().next();
+                    if (specification != null) {
+                        instance.setSpecificationId(specification.getSpecificationId());
+                    }
+                }
+            }
+        }
+        } catch (Exception e) {
+            throw new XMLValidationException("ServiceInstance is not valid.", e);
+        }
+
+        try {
+            parseInstanceGeometryFromXML(instance);
+        } catch (Exception e) {
+            throw new GeometryParseException("GeometryParse error.", e);
+        }
     }
 
 
