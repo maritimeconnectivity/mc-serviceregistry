@@ -11,7 +11,7 @@ before_install:
   - wget "https://github.com/hefay/spring-data-elasticsearch/archive/frq.zip" -O tmp_sda/spring-data-frq.zip
   - unzip tmp_sda/spring-data-frq.zip -d tmp_sda
   - cd tmp_sda/spring-data-elasticsearch-frq
-  - mvn clean install
+  - mvn clean install -DskipTests
   - cd ../..
   - rm -rf tmp_sda
 

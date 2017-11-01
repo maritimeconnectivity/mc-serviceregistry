@@ -40,7 +40,7 @@
         </div>
         <div class="form-group">
             <label translate="mcsrApp.instance.implementedSpecificationVersion" for="field_implementedSpecificationVersion">Implemented Specification Version</label>
-            <select class="form-control" id="field_implementedSpecificationVersion" name="implementedSpecificationVersion" ng-model="vm.instance.implementedSpecificationVersion" ng-options="specificationTemplate as specificationTemplate.version for specificationTemplate in vm.specificationtemplates track by specificationTemplate.id">
+            <select class="form-control" id="field_implementedSpecificationVersion" name="implementedSpecificationVersion" ng-model="vm.instance.implementedSpecificationVersion" ng-options="specificationTemplate as (specificationTemplate.name + ' \(version: ' + specificationTemplate.version + '\)') for specificationTemplate in vm.specificationtemplates track by specificationTemplate.id">
                 <option value=""></option>
             </select>
         </div>
