@@ -28,11 +28,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -76,7 +75,7 @@ public class DatabaseConfiguration {
 
             throw new ApplicationContextException("Database connection pool is not configured correctly");
         }
-        HikariDataSource hikariDataSource =  (HikariDataSource) DataSourceBuilder
+        HikariDataSource hikariDataSource =  DataSourceBuilder
                 .create(dataSourceProperties.getClassLoader())
                 .type(HikariDataSource.class)
                 .driverClassName(dataSourceProperties.getDriverClassName())

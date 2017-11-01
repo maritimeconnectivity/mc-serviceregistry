@@ -18,8 +18,10 @@
 package com.frequentis.maritime.mcsr.config;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.node.Node;
 import org.slf4j.Logger;
@@ -29,17 +31,28 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.elasticsearch.client.TransportClientFactoryBean;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.EntityMapper;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 @Configuration
 @AutoConfigureAfter(value = { JacksonConfiguration.class })
+@EnableConfigurationProperties(ElasticsearchProperties.class)
 public class ElasticSearchConfiguration {
     private static final Logger log = LoggerFactory.getLogger(ElasticSearchConfiguration.class);
+
+    private final ElasticsearchProperties properties;
+
+    public ElasticSearchConfiguration(ElasticsearchProperties properties) {
+        this.properties = properties;
+    }
 
     @Bean
     public ElasticsearchTemplate elasticsearchTemplate(Client client, Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder) {
@@ -57,11 +70,29 @@ public class ElasticSearchConfiguration {
             return new Node(settings).start();
     }
 
-    @Bean
+    @Bean(name = "elasticsearchClient")
     @Conditional(NodeClientCondition.class)
-    public Client createTestClient(Node n) {
+    public Client elasticsearchClientTest(Node n) {
         log.info("Creating local Node client for ES");
         return n.client();
+    }
+
+    @Bean(name = "elasticsearchClient")
+    @ConditionalOnMissingBean
+    public Client elasticsearchClient() throws Exception {
+        TransportClientFactoryBean factory = new TransportClientFactoryBean();
+        factory.setClusterNodes(this.properties.getClusterNodes());
+        factory.setProperties(createProperties());
+        factory.afterPropertiesSet();
+        TransportClient client = factory.getObject();
+        return client;
+    }
+
+    private Properties createProperties() {
+        Properties properties = new Properties();
+        properties.put("cluster.name", this.properties.getClusterName());
+        properties.putAll(this.properties.getProperties());
+        return properties;
     }
 
     public class CustomEntityMapper implements EntityMapper {

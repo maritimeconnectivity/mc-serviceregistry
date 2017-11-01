@@ -20,13 +20,14 @@ package com.frequentis.maritime.mcsr;
 import com.frequentis.maritime.mcsr.config.Constants;
 import com.frequentis.maritime.mcsr.config.DefaultProfileUtil;
 import com.frequentis.maritime.mcsr.config.JHipsterProperties;
+import com.frequentis.maritime.mcsr.config.MetricsConfiguration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.actuate.autoconfigure.*;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchAutoConfiguration;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.env.Environment;
@@ -40,7 +41,7 @@ import java.util.Collection;
 
 
 @SpringBootApplication
-@EnableAutoConfiguration(exclude = { MetricFilterAutoConfiguration.class, MetricRepositoryAutoConfiguration.class })
+@EnableAutoConfiguration(exclude = { ElasticsearchAutoConfiguration.class })
 @EnableConfigurationProperties({ JHipsterProperties.class, LiquibaseProperties.class })
 public class McsrApp {
 

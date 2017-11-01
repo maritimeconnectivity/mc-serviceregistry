@@ -7,8 +7,13 @@ language: java
 node_js: "4.4.7"
 
 before_install:
-  - mkdir lib
-  - wget "https://ncloud.neoware.cz/index.php/s/XjkDTkeiOxFVamz/download?path=%2F&files=spring-data-elasticsearch-3.0.0.BUILD-SNAPSHOT.jar" -O lib/spring-data-elasticsearch-3.0.0.BUILD-SNAPSHOT.jar
+  - mkdir tmp_sda
+  - wget "https://github.com/hefay/spring-data-elasticsearch/archive/frq.zip" -O tmp_sda/spring-data-frq.zip
+  - unzip tmp_sda/spring-data-frq.zip -d tmp_sda
+  - cd tmp_sda/spring-data-elasticsearch-frq
+  - mvn clean install
+  - cd ../..
+  - rm -rf tmp_sda
 
 install:
   - nvm install v4.4.7
