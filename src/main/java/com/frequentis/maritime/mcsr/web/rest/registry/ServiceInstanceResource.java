@@ -285,10 +285,10 @@ public class ServiceInstanceResource {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<List<Instance>> searchInstances(@RequestParam String query, @RequestParam(defaultValue = "false") String includeDoc, Pageable pageable)
+    public ResponseEntity<List<Instance>> searchInstances(@RequestParam String query, @RequestParam(defaultValue = "false") String includeDoc, @RequestParam(defaultValue = "false") String includeNonCompliant, Pageable pageable)
         throws Exception, URISyntaxException {
         log.debug("REST request to search for a page of Instances for query {}", query);
-        Page<Instance> page = instanceService.search(query, pageable);
+        Page<Instance> page = instanceService.search(query, Boolean.valueOf(includeNonCompliant), pageable);
         if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
             for(Instance instance:page.getContent()) {
                 instance.setDocs(null);
@@ -310,10 +310,10 @@ public class ServiceInstanceResource {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<List<Instance>> searchInstancesByKeywords(@RequestParam String query, @RequestParam(defaultValue = "false") String includeDoc, Pageable pageable)
+    public ResponseEntity<List<Instance>> searchInstancesByKeywords(@RequestParam String query, @RequestParam(defaultValue = "false") String includeDoc, @RequestParam(defaultValue = "false") String includeNonCompliant, Pageable pageable)
         throws Exception, URISyntaxException {
         log.debug("REST request to search for a page of Instances for keywords {}", query);
-        Page<Instance> page = instanceService.searchKeywords(query, pageable);
+        Page<Instance> page = instanceService.searchKeywords(query, Boolean.valueOf(includeNonCompliant), pageable);
         if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
             for(Instance instance:page.getContent()) {
                 instance.setDocs(null);
@@ -336,10 +336,10 @@ public class ServiceInstanceResource {
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @ApiOperation(value = "searchInstancesByUnlocode", notes = "Returns all service instances matching the specified UnLoCode.")
-    public ResponseEntity<List<Instance>> searchInstancesByUnlocode(@RequestParam String query, @RequestParam(defaultValue = "false") String includeDoc, Pageable pageable)
+    public ResponseEntity<List<Instance>> searchInstancesByUnlocode(@RequestParam String query, @RequestParam(defaultValue = "false") String includeDoc, @RequestParam(defaultValue = "false") String includeNonCompliant, Pageable pageable)
         throws Exception, URISyntaxException {
         log.debug("REST request to search for a page of Instances for unlocode {}", query);
-        Page<Instance> page = instanceService.searchUnlocode(query, pageable);
+        Page<Instance> page = instanceService.searchUnlocode(query, Boolean.valueOf(includeNonCompliant), pageable);
         if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
             for(Instance instance:page.getContent()) {
                 instance.setDocs(null);
@@ -363,10 +363,10 @@ public class ServiceInstanceResource {
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @ApiOperation(value = "searchInstancesByLocation", notes = "Returns all service instances matching the specified Lat/Lon coordinates.")
-    public ResponseEntity<?> searchInstancesByLocation(@RequestParam String latitude, @RequestParam(defaultValue = "false") String includeDoc, @RequestParam String longitude, @RequestParam(defaultValue = "", required=false) String query, Pageable pageable)
+    public ResponseEntity<?> searchInstancesByLocation(@RequestParam String latitude, @RequestParam(defaultValue = "false") String includeDoc, @RequestParam String longitude, @RequestParam(defaultValue = "", required=false) String query, @RequestParam(defaultValue = "false") String includeNonCompliant, Pageable pageable)
         throws Exception, URISyntaxException {
         log.debug("REST request to get Instance by lat {} long {}", latitude, longitude);
-        Page<Instance> page = instanceService.findByLocation(Double.parseDouble(latitude), Double.parseDouble(longitude), query, pageable);
+        Page<Instance> page = instanceService.findByLocation(Double.parseDouble(latitude), Double.parseDouble(longitude), query, Boolean.valueOf(includeNonCompliant), pageable);
         if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
             for(Instance instance:page.getContent()) {
                 instance.setDocs(null);
@@ -391,10 +391,10 @@ public class ServiceInstanceResource {
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @ApiOperation(value = "searchInstancesByGeometryGeojson", notes = "Returns all service instances matching the specified GeoJson shape.")
-    public ResponseEntity<?> searchInstancesByGeometryGeojson(@RequestParam String geometry, @RequestParam(defaultValue = "false") String includeDoc, @RequestParam(defaultValue = "", required=false) String query, Pageable pageable)
+    public ResponseEntity<?> searchInstancesByGeometryGeojson(@RequestParam String geometry, @RequestParam(defaultValue = "false") String includeDoc, @RequestParam(defaultValue = "", required=false) String query, @RequestParam(defaultValue = "false") String includeNonCompliant, Pageable pageable)
         throws Exception, URISyntaxException {
         log.debug("REST request to get Instance by geojson ", geometry);
-        Page<Instance> page = instanceService.findByGeoshape(geometry, query, pageable);
+        Page<Instance> page = instanceService.findByGeoshape(geometry, query, Boolean.valueOf(includeNonCompliant), pageable);
         if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
             for(Instance instance:page.getContent()) {
                 instance.setDocs(null);
@@ -418,13 +418,13 @@ public class ServiceInstanceResource {
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @ApiOperation(value = "searchInstancesByGeometryWKT", notes = "Returns all service instances matching the specified WKT shape.")
-    public ResponseEntity<?> searchInstancesByGeometryWKT(@RequestParam String geometry, @RequestParam(defaultValue = "", required=false) String query, @RequestParam(defaultValue = "false") String includeDoc, Pageable pageable)
+    public ResponseEntity<?> searchInstancesByGeometryWKT(@RequestParam String geometry, @RequestParam(defaultValue = "", required=false) String query, @RequestParam(defaultValue = "false") String includeDoc, @RequestParam(defaultValue = "false") String includeNonCompliant, Pageable pageable)
         throws Exception, URISyntaxException {
         log.debug("REST request to get Instance by wkt ", geometry);
         String geoJson = null;
         geoJson = InstanceUtil.convertWKTtoGeoJson(geometry).toString();
         log.debug("Converted Geojson: " + geoJson);
-        Page<Instance> page = instanceService.findByGeoshape(geoJson, query, pageable);
+        Page<Instance> page = instanceService.findByGeoshape(geoJson, query, Boolean.valueOf(includeNonCompliant), pageable);
         if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
             for(Instance instance:page.getContent()) {
                 instance.setDocs(null);

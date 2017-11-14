@@ -30,5 +30,7 @@ public interface InstanceSearchRepository extends ElasticsearchRepository<Instan
 
     Page<Instance> findByUnlocode(String unlocode, Pageable pageable);
     Page<Instance> findByKeywords(String keywords, Pageable pageable);
+    Page<Instance> findByUnlocodeAndCompliantTrue(String unlocode, Pageable pageable);
+    Page<Instance> findByKeywordsAndCompliantTrue(String keywords, Pageable pageable);
 
 }

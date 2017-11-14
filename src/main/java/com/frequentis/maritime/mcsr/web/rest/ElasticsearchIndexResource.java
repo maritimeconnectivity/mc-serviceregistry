@@ -64,6 +64,6 @@ public class ElasticsearchIndexResource {
     public ResponseEntity<String> reindexAll() throws URISyntaxException {
         log.info("REST request to reindex Elasticsearch by user : {}", SecurityUtils.getCurrentUserLogin());
         elasticsearchIndexService.reindexAll();
-        return new ResponseEntity<>("Request accepted, performing full Elasticsearch reindexing.", HttpStatus.ACCEPTED);
+        return new ResponseEntity<>("{\"response\": \"Request accepted, performing full Elasticsearch reindexing.\"}", HttpStatus.ACCEPTED);
     }
 }
