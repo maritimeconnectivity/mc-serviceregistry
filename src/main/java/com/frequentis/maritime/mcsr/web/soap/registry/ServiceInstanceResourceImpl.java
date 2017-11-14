@@ -168,9 +168,9 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 	}
 
 	@Override
-	public PageDTO<InstanceDTO> searchInstances(String query, boolean includeDoc, int page) {
+	public PageDTO<InstanceDTO> searchInstances(String query, boolean includeDoc, boolean includeNonCompliant, int page) {
 		log.debug("SOAP request to search for a page of Instances for query {}", query);
-        Page<Instance> pageOfInstances = instanceService.search(query, PageRequest.of(page, ITEMS_PER_PAGE));
+        Page<Instance> pageOfInstances = instanceService.search(query, includeNonCompliant, PageRequest.of(page, ITEMS_PER_PAGE));
         if (pageOfInstances != null && pageOfInstances.getContent() != null && !includeDoc) {
             for(Instance instance : pageOfInstances.getContent()) {
                 instance.setDocs(null);
@@ -181,9 +181,9 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 	}
 
 	@Override
-	public PageDTO<InstanceDTO> searchInstancesByKeywords(String query, boolean includeDoc, int page) {
+	public PageDTO<InstanceDTO> searchInstancesByKeywords(String query, boolean includeDoc, boolean includeNonCompliant, int page) {
         log.debug("SOAP request to search for a page of Instances for keywords {}", query);
-        Page<Instance> pageOfInstances = instanceService.searchKeywords(query, PageRequest.of(page, ITEMS_PER_PAGE));
+        Page<Instance> pageOfInstances = instanceService.searchKeywords(query, includeNonCompliant, PageRequest.of(page, ITEMS_PER_PAGE));
         if (pageOfInstances != null && pageOfInstances.getContent() != null && !includeDoc) {
             for(Instance instance:pageOfInstances.getContent()) {
                 instance.setDocs(null);
@@ -195,9 +195,9 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 	}
 
 	@Override
-	public PageDTO<InstanceDTO> searchInstancesByUnlocode(String query, boolean includeDoc, int page) {
+	public PageDTO<InstanceDTO> searchInstancesByUnlocode(String query, boolean includeDoc, boolean includeNonCompliant, int page) {
         log.debug("SOAP request to search for a page of Instances for unlocode {}", query);
-        Page<Instance> pageOfInstances = instanceService.searchUnlocode(query, PageRequest.of(page, ITEMS_PER_PAGE));
+        Page<Instance> pageOfInstances = instanceService.searchUnlocode(query, includeNonCompliant, PageRequest.of(page, ITEMS_PER_PAGE));
         if (pageOfInstances != null && pageOfInstances.getContent() != null && !includeDoc) {
             for(Instance instance:pageOfInstances.getContent()) {
                 instance.setDocs(null);
@@ -209,11 +209,11 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 	}
 
 	@Override
-	public PageDTO<InstanceDTO> searchInstancesByLocation(String latitude, String longitude, String query, boolean includeDoc, int page) throws ProcessingException {
+	public PageDTO<InstanceDTO> searchInstancesByLocation(String latitude, String longitude, String query, boolean includeDoc, boolean includeNonCompliant, int page) throws ProcessingException {
 		Page<Instance> pageOfInstances;
         log.debug("SOAP request to get Instance by lat {} long {}", latitude, longitude);
         try {
-	        pageOfInstances = instanceService.findByLocation(Double.parseDouble(latitude), Double.parseDouble(longitude), query, PageRequest.of(page, ITEMS_PER_PAGE));
+	        pageOfInstances = instanceService.findByLocation(Double.parseDouble(latitude), Double.parseDouble(longitude), query, includeNonCompliant, PageRequest.of(page, ITEMS_PER_PAGE));
 	        if (pageOfInstances != null && pageOfInstances.getContent() != null && !includeDoc) {
 	            for(Instance instance:pageOfInstances.getContent()) {
 	                instance.setDocs(null);
@@ -228,23 +228,23 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 	}
 
 	@Override
-	public PageDTO<InstanceDTO> searchInstancesByGeometryGeojson(String geometry, String query, boolean includeDoc, int page) throws Exception {
+	public PageDTO<InstanceDTO> searchInstancesByGeometryGeojson(String geometry, String query, boolean includeDoc, boolean includeNonCompliant, int page) throws Exception {
         log.debug("SOAP request to get Instance by geojson ", geometry);
-        Page<Instance> pageOfInstances = instanceService.findByGeoshape(geometry, query, PageRequest.of(page, ITEMS_PER_PAGE));
+        Page<Instance> pageOfInstances = instanceService.findByGeoshape(geometry, query, includeNonCompliant, PageRequest.of(page, ITEMS_PER_PAGE));
         removeIncludedDoc(pageOfInstances, includeDoc);
 
         return PageResponse.buildFromPage(pageOfInstances, instanceDtoConverter);
 	}
 
 	@Override
-	public PageDTO<InstanceDTO> searchInstancesByGeometryWKT(String geometry, String query, boolean includeDoc, int page) throws ProcessingException {
+	public PageDTO<InstanceDTO> searchInstancesByGeometryWKT(String geometry, String query, boolean includeDoc, boolean includeNonCompliant, int page) throws ProcessingException {
         log.debug("SOAP request to get Instance by wkt ", geometry);
         String geoJson = null;
         Page<Instance> pageOfInstances;
         try {
 	        geoJson = InstanceUtil.convertWKTtoGeoJson(geometry).toString();
 	        log.debug("Converted Geojson: " + geoJson);
-	        pageOfInstances = instanceService.findByGeoshape(geoJson, query, PageRequest.of(page, ITEMS_PER_PAGE));
+	        pageOfInstances = instanceService.findByGeoshape(geoJson, query, includeNonCompliant, PageRequest.of(page, ITEMS_PER_PAGE));
         } catch (Exception e) {
         	throw new ProcessingException(e.getMessage(), e);
         }
