@@ -178,9 +178,6 @@ public class TechnicalDesignResourceTest {
 
 		// When
 		PageDTO<DesignDescriptorDTO> designDescriptor = client.getAllDesignsById(version1.designId, 0);
-		for(DesignDescriptorDTO dd : designDescriptor.content) {
-			log.error("WHAT? Design {} in version {} and designId {}", dd.id, dd.version, dd.designId);
-		}
 
 		// Then
 		assertEquals(3, designDescriptor.itemTotalCount);

@@ -134,6 +134,7 @@ public interface ServiceInstanceResource {
     public PageDTO<InstanceDTO> searchInstances(
     		@WebParam(name = "query") @XmlElement(required = true) String query,
     		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc,
+    		@WebParam(name = "includeNonCompliant") @XmlElement(required = false) boolean includeNonCompliant,
     		@WebParam(name = "page") @XmlElement(required = true) int page);
 
     /**
@@ -146,6 +147,7 @@ public interface ServiceInstanceResource {
     public PageDTO<InstanceDTO> searchInstancesByKeywords(
     		@WebParam(name = "query") @XmlElement(required = true) String query,
     		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc,
+    		@WebParam(name = "includeNonCompliant") @XmlElement(required = false) boolean includeNonCompliant,
     		@WebParam(name = "page") @XmlElement(required = true) int page);
 
     /**
@@ -158,6 +160,7 @@ public interface ServiceInstanceResource {
     public PageDTO<InstanceDTO> searchInstancesByUnlocode(
     		@WebParam(name = "query") @XmlElement(required = true) String query,
     		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc,
+    		@WebParam(name = "includeNonCompliant") @XmlElement(required = false) boolean includeNonCompliant,
     		@WebParam(name = "page") @XmlElement(required = true) int page);
 
     /**
@@ -177,6 +180,7 @@ public interface ServiceInstanceResource {
     		@WebParam(name = "longitude") @XmlElement(required = true) String longitude,
     		@WebParam(name = "query") @XmlElement(required = true) String query,
     		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc,
+    		@WebParam(name = "includeNonCompliant") @XmlElement(required = false) boolean includeNonCompliant,
     		@WebParam(name = "page") @XmlElement(required = true) int page)
     				throws AccessDeniedException, ProcessingException;
 
@@ -193,6 +197,7 @@ public interface ServiceInstanceResource {
     		@WebParam(name = "geometry") @XmlElement(required = true) String geometry,
     		@WebParam(name = "query") @XmlElement(required = true) String query,
     		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc,
+    		@WebParam(name = "includeNonCompliant") @XmlElement(required = false) boolean includeNonCompliant,
     		@WebParam(name = "page") @XmlElement(required = true) int page) throws Exception;
 
     /**
@@ -208,6 +213,7 @@ public interface ServiceInstanceResource {
     		@WebParam(name = "geometry") @XmlElement(required = true) String geometry,
     		@WebParam(name = "query") @XmlElement(required = true) String query,
     		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc,
+    		@WebParam(name = "includeNonCompliant") @XmlElement(required = false) boolean includeNonCompliant,
     		@WebParam(name = "page") @XmlElement(required = true) int page) throws Exception;
 
     /**
