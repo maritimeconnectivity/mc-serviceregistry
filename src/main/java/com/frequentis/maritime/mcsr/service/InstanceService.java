@@ -33,13 +33,17 @@ import org.elasticsearch.common.geo.builders.ShapeBuilders;
 import org.elasticsearch.common.xcontent.NamedXContentRegistry;
 import org.elasticsearch.common.xcontent.XContentParser;
 import org.elasticsearch.common.xcontent.json.JsonXContent;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryShardContext;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.frequentis.maritime.mcsr.domain.Instance;
 import com.frequentis.maritime.mcsr.repository.InstanceRepository;
 import com.frequentis.maritime.mcsr.repository.search.InstanceSearchRepository;
@@ -52,6 +56,7 @@ import org.springframework.data.elasticsearch.core.geo.GeoShape;
 import org.springframework.data.elasticsearch.core.geo.GeoShapeModule;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 /**
@@ -60,8 +65,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class InstanceService {
-
     private final Logger log = LoggerFactory.getLogger(InstanceService.class);
+    private static final boolean SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT = false;
 
     @Inject
     private InstanceRepository instanceRepository;
@@ -195,12 +200,34 @@ public class InstanceService {
      * Search for the instance corresponding to the query.
      *
      *  @param query the query of the search
+     *  @param pageable
+     *  @return the list of entities
+     */
+    public Page<Instance> search(String query, Pageable pageable) {
+        return search(query, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT, pageable);
+    }
+
+    /**
+     * Search for the instance corresponding to the query.
+     *
+     *  @param query the query of the search
+     *  @param includeNonCompliant include also non-compliant services
+     *  @param pageable
      *  @return the list of entities
      */
     @Transactional(readOnly = true)
-    public Page<Instance> search(String query, Pageable pageable) {
+    public Page<Instance> search(String query, boolean includeNonCompliant, Pageable pageable) {
         log.debug("Request to search for a page of Instances for query {}", query);
-        return instanceSearchRepository.search(queryStringQuery(query), pageable);
+        QueryBuilder qb;
+        if(includeNonCompliant) {
+           qb = queryStringQuery(query);
+        } else {
+            qb = QueryBuilders.boolQuery()
+                .must(queryStringQuery(query))
+                .must(boolQuery().filter(QueryBuilders.termQuery("compliant", true)));
+        }
+
+        return instanceSearchRepository.search(qb, pageable);
     }
 
     /**
@@ -209,10 +236,24 @@ public class InstanceService {
      *  @param keywords the keywords of the search
      *  @return the list of entities
      */
-    @Transactional(readOnly = true)
     public Page<Instance> searchKeywords(String keywords, Pageable pageable) {
+        return searchKeywords(keywords, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT, pageable);
+    }
+
+    /**
+     * Search for the instance by keyword.
+     *
+     *  @param keywords the keywords of the search
+     *  @param includeNonCompliant include also non-compliant services
+     *  @return the list of entities
+     */
+    @Transactional(readOnly = true)
+    public Page<Instance> searchKeywords(String keywords, boolean includeNonCompliant, Pageable pageable) {
         log.debug("Request to search for a page of Instances for keywords  {}", keywords);
-        return instanceSearchRepository.findByKeywords(keywords, pageable);
+        if(includeNonCompliant) {
+            return instanceSearchRepository.findByKeywords(keywords, pageable);
+        }
+        return instanceSearchRepository.findByKeywordsAndCompliantTrue(keywords, pageable);
     }
 
     /**
@@ -221,10 +262,24 @@ public class InstanceService {
      *  @param unlocode the unlocode of the search
      *  @return the list of entities
      */
-    @Transactional(readOnly = true)
     public Page<Instance> searchUnlocode(String unlocode, Pageable pageable) {
+        return searchUnlocode(unlocode, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT, pageable);
+    }
+
+    /**
+     * Search for the instance by unlocode.
+     *
+     *  @param unlocode the unlocode of the search
+     *  @param includeNonCompliant include also non-compliant services
+     *  @return the list of entities
+     */
+    @Transactional(readOnly = true)
+    public Page<Instance> searchUnlocode(String unlocode, boolean includeNonCompliant, Pageable pageable) {
         log.debug("Request to search for a page of Instances for unlocode {}", unlocode);
+        if(includeNonCompliant) {
         return instanceSearchRepository.findByUnlocode(unlocode, pageable);
+        }
+        return instanceSearchRepository.findByUnlocodeAndCompliantTrue(unlocode, pageable);
     }
 
     /**
@@ -234,8 +289,20 @@ public class InstanceService {
      *  @param version the version identifier of the instance
      *  @return the entity
      */
-    @Transactional(readOnly = true)
     public Instance findByDomainId(String domainId, String version) {
+        return findByDomainId(domainId, version, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT);
+    }
+
+    /**
+     *  Get one instance by domain specific id (for example, maritime id) and version.
+     *
+     *  @param domainId the domain specific id of the instance
+     *  @param version the version identifier of the instance
+     *  @param includeNonCompliant include also non-compliant services
+     *  @return the entity
+     */
+    @Transactional(readOnly = true)
+    public Instance findByDomainId(String domainId, String version, boolean includeNonCompliant) {
         log.debug("Request to get Instance by domain id {} and version {}", domainId, version);
         Instance instance = null;
         try {
@@ -256,8 +323,19 @@ public class InstanceService {
      *  @param domainId the domain specific id of the instance
      *  @return the entity
      */
-    @Transactional(readOnly = true)
     public Instance findLatestVersionByDomainId(String domainId) {
+        return findLatestVersionByDomainId(domainId, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT);
+    }
+
+    /**
+     *  Get one instance by domain specific id (for example, maritime id), only return the latest version.
+     *
+     *  @param domainId the domain specific id of the instance
+     *  @param includeNonCompliant include also non-compliant services
+     *  @return the entity
+     */
+    @Transactional(readOnly = true)
+    public Instance findLatestVersionByDomainId(String domainId, boolean includeNonCompliant) {
         log.debug("Request to get Instance by domain id {}", domainId);
         Instance instance = null;
         DefaultArtifactVersion latestVersion = new DefaultArtifactVersion("0.0");
@@ -285,8 +363,19 @@ public class InstanceService {
      *  @param domainId the domain specific id of the instance
      *  @return the list of entities
      */
-    @Transactional(readOnly = true)
     public Page<Instance> findAllByDomainId(String domainId, Pageable pageable) {
+        return findAllByDomainId(domainId, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT, pageable);
+    }
+
+    /**
+     *  Get all matching instances by domain specific id (for example, maritime id)
+     *
+     *  @param domainId the domain specific id of the instance
+     *  @param includeNonCompliant include also non-compliant services
+     *  @return the list of entities
+     */
+    @Transactional(readOnly = true)
+    public Page<Instance> findAllByDomainId(String domainId, boolean includeNonCompliant, Pageable pageable) {
         log.debug("Request to get Instance by domain id {}", QueryParser.escape(domainId));
         Page<Instance> instances = null;
         try {
@@ -305,8 +394,20 @@ public class InstanceService {
      *  @param longitude search longitude
      *  @return the entity
      */
-    @Transactional(readOnly = true)
     public Page<Instance> findByLocation(double latitude, double longitude, String query, Pageable pageable) throws Exception {
+        return findByLocation(latitude, longitude, query, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT, pageable);
+    }
+
+    /**
+     *  Get service instances by location
+     *
+     *  @param latitude search latitude
+     *  @param longitude search longitude
+     *  @param includeNonCompliant include also non-compliant services
+     *  @return the entity
+     */
+    @Transactional(readOnly = true)
+    public Page<Instance> findByLocation(double latitude, double longitude, String query, boolean includeNonCompliant, Pageable pageable) throws Exception {
         log.debug("Request to get Instance by lat {} long {} and query {}", latitude, longitude, query);
         Page<Instance> instances = null;
         Geometry g;
@@ -314,9 +415,12 @@ public class InstanceService {
         if (query == null || query.trim().length() == 0) {
             query = "*";
         }
-        QueryBuilder qb = boolQuery()
+        BoolQueryBuilder qb = boolQuery()
             .must(geoShapeQuery("geometry", sb))
             .must(queryStringQuery(query));
+        if(!includeNonCompliant) {
+            qb.must(boolQuery().filter(QueryBuilders.termQuery("compliant", true)));
+        }
         instances = instanceSearchRepository.search(qb, pageable);
         return instances;
     }
@@ -329,6 +433,18 @@ public class InstanceService {
      */
     @Transactional(readOnly = true)
     public Page<Instance> findByGeoshape(String geoJson, String query, Pageable pageable) throws Exception {
+        return findByGeoshape(geoJson, query, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT, pageable);
+    }
+
+    /**
+     *  Get service instances by geoshape query
+     *
+     *  @param geoJson search geometry in geojson format
+     *  @param includeNonCompliant include also non-compliant services
+     *  @return the entity
+     */
+    @Transactional(readOnly = true)
+    public Page<Instance> findByGeoshape(String geoJson, String query, boolean includeNonCompliant, Pageable pageable) throws Exception {
         log.debug("Request to get Instance by query {} and geojson {}", query, geoJson);
         Page<Instance> instances = null;
 
@@ -343,9 +459,12 @@ public class InstanceService {
         if (query == null || query.trim().length() == 0) {
             query = "*";
         }
-        QueryBuilder qb = boolQuery()
+        BoolQueryBuilder qb = boolQuery()
             .must(geoShapeQuery("geometry", sb))
             .must(queryStringQuery(query));
+        if(!includeNonCompliant) {
+            qb.must(boolQuery().filter(QueryBuilders.termQuery("compliant", true)));
+        }
         instances = instanceSearchRepository.search(qb, pageable);
 
         return instances;
