@@ -28,9 +28,18 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
  */
 public interface InstanceSearchRepository extends ElasticsearchRepository<Instance, Long> {
 
-    Page<Instance> findByUnlocode(String unlocode, Pageable pageable);
     Page<Instance> findByKeywords(String keywords, Pageable pageable);
-    Page<Instance> findByUnlocodeAndCompliantTrue(String unlocode, Pageable pageable);
     Page<Instance> findByKeywordsAndCompliantTrue(String keywords, Pageable pageable);
+    Page<Instance> findByKeywordsAndCompliantTrueAndStatus(String keywords, String status, Pageable pageable);
+    Page<Instance> findByKeywordsAndCompliantTrueAndStatusNot(String keywords, String status, Pageable pageable);
+    Page<Instance> findByKeywordsAndStatus(String keywords, String status, Pageable pageable);
+    Page<Instance> findByKeywordsAndStatusNot(String keywords, String status, Pageable pageable);
+
+    Page<Instance> findByUnlocode(String unlocode, Pageable pageable);
+    Page<Instance> findByUnlocodeAndCompliantTrue(String unlocode, Pageable pageable);
+    Page<Instance> findByUnlocodeAndCompliantTrueAndStatus(String unlocode, String status, Pageable pageable);
+    Page<Instance> findByUnlocodeAndCompliantTrueAndStatusNot(String unlocode, String status, Pageable pageable);
+    Page<Instance> findByUnlocodeAndStatus(String unlocode, String status, Pageable pageable);
+    Page<Instance> findByUnlocodeAndStatusNot(String unlocode, String status, Pageable pageable);
 
 }

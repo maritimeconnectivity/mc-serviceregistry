@@ -227,7 +227,8 @@ public class InstanceResource {
     public ResponseEntity<List<Instance>> searchInstances(@RequestParam String query, Pageable pageable)
         throws URISyntaxException {
         log.debug("REST request to search for a page of Instances for query {}", query);
-        Page<Instance> page = instanceService.search(query, true, pageable);
+        //Page<Instance> page = instanceService.search(query, true, false, pageable);
+        Page<Instance> page = instanceService.searchAll(query, pageable);
         HttpHeaders headers = PaginationUtil.generateSearchPaginationHttpHeaders(query, page, "/api/_search/instances");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

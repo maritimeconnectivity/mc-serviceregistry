@@ -99,7 +99,9 @@ public interface ServiceInstanceResource {
     public InstanceDTO getInstance(
     		@WebParam(name = "id") @XmlElement(required = true) String id,
     		@WebParam(name = "version") @XmlElement(required = true) String version,
-    		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc);
+    		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc,
+    		@WebParam(name = "includeNonCompliant") @XmlElement(required = false) boolean includeNonCompliant,
+            @WebParam(name = "simulated") @XmlElement(required = false) boolean simulated);
 
     /**
      * GET  /serviceInstance/:id : get all instances with id "id" across all versions.
@@ -110,6 +112,8 @@ public interface ServiceInstanceResource {
     public PageDTO<InstanceDTO> getAllInstancesById(
     		@WebParam(name = "id") @XmlElement(required = true) String id,
     		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc,
+    		@WebParam(name = "includeNonCompliant") @XmlElement(required = false) boolean includeNonCompliant,
+            @WebParam(name = "simulated") @XmlElement(required = false) boolean simulated,
     		@WebParam(name = "page") @XmlElement(required = true) int page);
 
     /**
@@ -122,7 +126,9 @@ public interface ServiceInstanceResource {
      */
     public void deleteInstance(
     		@WebParam(name = "id") @XmlElement(required = true) String id,
-    		@WebParam(name = "version") @XmlElement(required = true) String version) throws AccessDeniedException;
+    		@WebParam(name = "version") @XmlElement(required = true) String version,
+    		@WebParam(name = "includeNonCompliant") @XmlElement(required = false) boolean includeNonCompliant,
+            @WebParam(name = "simulated") @XmlElement(required = false) boolean simulated) throws AccessDeniedException;
 
     /**
      * SEARCH  /_search/serviceInstance?query=:query : search for the instance corresponding
@@ -135,6 +141,7 @@ public interface ServiceInstanceResource {
     		@WebParam(name = "query") @XmlElement(required = true) String query,
     		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc,
     		@WebParam(name = "includeNonCompliant") @XmlElement(required = false) boolean includeNonCompliant,
+    		@WebParam(name = "simulated") @XmlElement(required = false) boolean simulated,
     		@WebParam(name = "page") @XmlElement(required = true) int page);
 
     /**
@@ -148,6 +155,7 @@ public interface ServiceInstanceResource {
     		@WebParam(name = "query") @XmlElement(required = true) String query,
     		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc,
     		@WebParam(name = "includeNonCompliant") @XmlElement(required = false) boolean includeNonCompliant,
+    		@WebParam(name = "simulated") @XmlElement(required = false) boolean simulated,
     		@WebParam(name = "page") @XmlElement(required = true) int page);
 
     /**
@@ -161,6 +169,7 @@ public interface ServiceInstanceResource {
     		@WebParam(name = "query") @XmlElement(required = true) String query,
     		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc,
     		@WebParam(name = "includeNonCompliant") @XmlElement(required = false) boolean includeNonCompliant,
+    		@WebParam(name = "simulated") @XmlElement(required = false) boolean simulated,
     		@WebParam(name = "page") @XmlElement(required = true) int page);
 
     /**
@@ -181,6 +190,7 @@ public interface ServiceInstanceResource {
     		@WebParam(name = "query") @XmlElement(required = true) String query,
     		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc,
     		@WebParam(name = "includeNonCompliant") @XmlElement(required = false) boolean includeNonCompliant,
+    		@WebParam(name = "simulated") @XmlElement(required = false) boolean simulated,
     		@WebParam(name = "page") @XmlElement(required = true) int page)
     				throws AccessDeniedException, ProcessingException;
 
@@ -198,6 +208,7 @@ public interface ServiceInstanceResource {
     		@WebParam(name = "query") @XmlElement(required = true) String query,
     		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc,
     		@WebParam(name = "includeNonCompliant") @XmlElement(required = false) boolean includeNonCompliant,
+    		@WebParam(name = "simulated") @XmlElement(required = false) boolean simulated,
     		@WebParam(name = "page") @XmlElement(required = true) int page) throws Exception;
 
     /**
@@ -214,6 +225,7 @@ public interface ServiceInstanceResource {
     		@WebParam(name = "query") @XmlElement(required = true) String query,
     		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc,
     		@WebParam(name = "includeNonCompliant") @XmlElement(required = false) boolean includeNonCompliant,
+    		@WebParam(name = "simulated") @XmlElement(required = false) boolean simulated,
     		@WebParam(name = "page") @XmlElement(required = true) int page) throws Exception;
 
     /**
