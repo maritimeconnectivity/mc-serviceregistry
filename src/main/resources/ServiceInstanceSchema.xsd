@@ -51,7 +51,7 @@
                                        service instance.
 
  				- status			Status of the service instance. One of the values 'provisional', 'released', 
-									'deprecated', 'deleted'.
+									'deprecated', 'deleted' or 'simulated'.
 
                 - description     A human readable short description of the service instance. The description
                                        shall contain an abstract of what a service implementation actually does.

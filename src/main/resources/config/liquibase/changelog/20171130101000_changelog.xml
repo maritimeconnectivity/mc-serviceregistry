@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+   <changeSet author="JAHN Josef" id="20171130101000-1">
+    <modifyDataType tableName="instance" columnName="comment" newDataType="TEXT"/>
+    <modifyDataType tableName="instance" columnName="keywords" newDataType="TEXT"/>
+    <modifyDataType tableName="design" columnName="comment" newDataType="TEXT"/>
+    <modifyDataType tableName="specification" columnName="comment" newDataType="TEXT"/>
+   </changeSet>
+  
+</databaseChangeLog>

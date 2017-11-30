@@ -70,7 +70,7 @@ jhipster:
   swagger:
     title: Maritime Cloud Service Registry API
     description: Maritime Cloud Service Registry, developed under the Horizon 2020 Project EfficienSea2, cofunded by the European Union.
-    version: 1.0
+    version: 0.7
     termsOfServiceUrl: null
     contactName: Frequentis AG
     contactUrl: http://www.frequentis.com

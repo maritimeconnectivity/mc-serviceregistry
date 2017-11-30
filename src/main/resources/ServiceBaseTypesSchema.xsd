@@ -87,6 +87,7 @@
 					released		the service specification/design/instance is officially released / in operation
 					deprecated	the service specification/design/instance is still available, but end of life is already envisaged.
 					deleted			the service specification/design/instance is not available any more.
+					simulated		the service specification/design/instance is to be used in a non-operational simulation environment only.
 			</documentation>
 		</annotation>
 		<restriction base="string">
@@ -94,6 +95,7 @@
 			<enumeration value="released"/>
 			<enumeration value="deprecated"/>
 			<enumeration value="deleted"/>
+			<enumeration value="simulated"/>
 		</restriction>
 	</simpleType>
 </schema>
