@@ -37,11 +37,33 @@ public interface InstanceRepository extends JpaRepository<Instance,Long> {
     @Query("select instance from Instance instance left join fetch instance.designs left join fetch instance.docs where instance.id =:id")
     Instance findOneWithEagerRelationships(@Param("id") Long id);
 
-    @Query("select distinct instance from Instance instance left join fetch instance.designs left join fetch instance.docs where instance.instanceId = :id")
+
+    @Query("select distinct instance from Instance instance left join fetch instance.designs left join fetch instance.docs where instance.instanceId = :id and instance.status != 'simulated' and instance.compliant = true")
     List<Instance> findByDomainIdEagerRelationships(@Param("id") String id);
 
-    @Query("select distinct instance from Instance instance left join fetch instance.designs left join fetch instance.docs where instance.instanceId = :id and instance.version = :version")
+    @Query("select distinct instance from Instance instance left join fetch instance.designs left join fetch instance.docs where instance.instanceId = :id and instance.status = 'simulated' and instance.compliant = true")
+    List<Instance> findSimulatedByDomainIdEagerRelationships(@Param("id") String id);
+
+
+    @Query("select distinct instance from Instance instance left join fetch instance.designs left join fetch instance.docs where instance.instanceId = :id and instance.status != 'simulated'")
+    List<Instance> findByDomainIdEagerRelationshipsWithNonCompliant(@Param("id") String id);
+
+    @Query("select distinct instance from Instance instance left join fetch instance.designs left join fetch instance.docs where instance.instanceId = :id and instance.status = 'simulated'")
+    List<Instance> findSimulatedByDomainIdEagerRelationshipsWithNonCompliant(@Param("id") String id);
+
+
+    @Query("select distinct instance from Instance instance left join fetch instance.designs left join fetch instance.docs where instance.instanceId = :id and instance.version = :version and instance.compliant = true and instance.status != 'simulated'")
     List<Instance> findByDomainIdAndVersionEagerRelationships(@Param("id") String id, @Param("version") String version);
+
+    @Query("select distinct instance from Instance instance left join fetch instance.designs left join fetch instance.docs where instance.instanceId = :id and instance.version = :version and instance.status != 'simulated'")
+    List<Instance> findByDomainIdAndVersionEagerRelationshipsWithNonCompliant(@Param("id") String id, @Param("version") String version);
+
+    @Query("select distinct instance from Instance instance left join fetch instance.designs left join fetch instance.docs where instance.instanceId = :id and instance.version = :version and instance.compliant = true and instance.status = 'simulated'")
+    List<Instance> findSimulatedByDomainIdAndVersionEagerRelationships(@Param("id") String id, @Param("version") String version);
+
+    @Query("select distinct instance from Instance instance left join fetch instance.designs left join fetch instance.docs where instance.instanceId = :id and instance.version = :version and instance.status = 'simulated'")
+    List<Instance> findSimulatedByDomainIdAndVersionEagerRelationshipsWithNonCompliant(@Param("id") String id, @Param("version") String version);
+
 
     @Query("select distinct instance from Instance instance where instance.instanceId = :id")
     List<Instance> findByDomainId(@Param("id") String id);

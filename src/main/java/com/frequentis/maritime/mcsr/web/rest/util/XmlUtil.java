@@ -61,8 +61,12 @@ public class XmlUtil {
         XPathFactory xPathFactory = XPathFactory.newInstance();
         XPath xPath = xPathFactory.newXPath();
 
-        Node item = ((Node) xPath.evaluate(xPathExpression, doc, XPathConstants.NODE)).getFirstChild();
-        item.setNodeValue(newValue);
+        Node result = (Node) xPath.evaluate(xPathExpression, doc, XPathConstants.NODE);
+        if(result == null) {
+            throw new TransformerException("Missing element");
+        } else {
+            result.getFirstChild().setNodeValue(newValue);
+        }
 
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
         StringWriter writer = new StringWriter();
