@@ -296,35 +296,35 @@ public class InstanceUtil {
             return;
         }
         try {
-        String xml = instance.getInstanceAsXml().getContent().toString();
-        XmlUtil.validateXml(xml, "ServiceInstanceSchema.xsd");
-        instance = parseInstanceAttributesFromXML(instance);
+            String xml = instance.getInstanceAsXml().getContent().toString();
+            XmlUtil.validateXml(xml, "ServiceInstanceSchema.xsd");
+            instance = parseInstanceAttributesFromXML(instance);
 
-        DesignImplementation document = parseInstanceDesignImplementationFromXML(instance);
-        if(document != null) {
-            Design findByDomainId = designService.findByDomainId(document.getDesignId(), document.getVersion());
-            if(findByDomainId != null) {
-                if(instance.getDesigns().isEmpty()) {
-                    instance.setDesigns(new HashSet<>());
+            DesignImplementation document = parseInstanceDesignImplementationFromXML(instance);
+            if(document != null) {
+                Design findByDomainId = designService.findByDomainId(document.getDesignId(), document.getVersion());
+                if(findByDomainId != null) {
+                    if(instance.getDesigns().isEmpty()) {
+                        instance.setDesigns(new HashSet<>());
+                    }
+                    instance.getDesigns().add(findByDomainId);
+                } else {
+                    // nothing
                 }
-                instance.getDesigns().add(findByDomainId);
-            } else {
-                // nothing
             }
-        }
 
-        if (instance.getDesigns() != null && instance.getDesigns().size() > 0) {
-            Design design = instance.getDesigns().iterator().next();
-            if (design != null) {
-                instance.setDesignId(design.getDesignId());
-                if (design.getSpecifications() != null && design.getSpecifications().size() > 0) {
-                    Specification specification = design.getSpecifications().iterator().next();
-                    if (specification != null) {
-                        instance.setSpecificationId(specification.getSpecificationId());
+            if (instance.getDesigns() != null && instance.getDesigns().size() > 0) {
+                Design design = instance.getDesigns().iterator().next();
+                if (design != null) {
+                    instance.setDesignId(design.getDesignId());
+                    if (design.getSpecifications() != null && design.getSpecifications().size() > 0) {
+                        Specification specification = design.getSpecifications().iterator().next();
+                        if (specification != null) {
+                            instance.setSpecificationId(specification.getSpecificationId());
+                        }
                     }
                 }
             }
-        }
         } catch (Exception e) {
             throw new XMLValidationException("ServiceInstance is not valid.", e);
         }

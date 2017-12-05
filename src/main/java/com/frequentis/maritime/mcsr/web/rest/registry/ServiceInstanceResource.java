@@ -140,10 +140,9 @@ public class ServiceInstanceResource {
         } else {
             entity = ResponseEntity.ok();
         }
-        entity
+        return entity
             .headers(HeaderUtil.createEntityCreationAlert("instance", instance.getId().toString()))
             .body(instance);
-        return entity.build();
     }
 
     /**
@@ -236,7 +235,7 @@ public class ServiceInstanceResource {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<List<Instance>> getAllInstancesById(@PathVariable String id, @RequestParam(defaultValue = "false") String includeDoc, 
+    public ResponseEntity<List<Instance>> getAllInstancesById(@PathVariable String id, @RequestParam(defaultValue = "false") String includeDoc,
             @RequestParam(defaultValue = "false") String includeNonCompliant,
             @RequestParam(defaultValue = "false") String displaySimulated,
 	    Pageable pageable)
