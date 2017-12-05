@@ -205,13 +205,15 @@ public class ServiceInstanceResource {
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @ApiOperation(value = "getInstance", notes = "Returns the service instance with the specified id and version. Use version 'latest' to get the newest one.")
-    public ResponseEntity<Instance> getInstance(@PathVariable String id, @PathVariable String version, @RequestParam(defaultValue = "false") String includeDoc) {
+    public ResponseEntity<Instance> getInstance(@PathVariable String id, @PathVariable String version, @RequestParam(defaultValue = "false") String includeDoc,
+            @RequestParam(defaultValue = "false") String includeNonCompliant,
+            @RequestParam(defaultValue = "false") String displaySimulated) {
         log.debug("REST request to get Instance via domain id {} and version {}", id, version);
         Instance instance = null;
         if (version.equalsIgnoreCase("latest")) {
-            instance = instanceService.findLatestVersionByDomainId(id);
+            instance = instanceService.findLatestVersionByDomainId(id, Boolean.valueOf(includeNonCompliant), Boolean.valueOf(displaySimulated));
         } else {
-            instance = instanceService.findByDomainId(id, version);
+            instance = instanceService.findByDomainId(id, version, Boolean.valueOf(includeNonCompliant), Boolean.valueOf(displaySimulated));
         }
         if (instance != null && "true".equalsIgnoreCase(includeDoc) == false) {
             instance.setDocs(null);
@@ -234,10 +236,13 @@ public class ServiceInstanceResource {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<List<Instance>> getAllInstancesById(@PathVariable String id, @RequestParam(defaultValue = "false") String includeDoc, Pageable pageable)
+    public ResponseEntity<List<Instance>> getAllInstancesById(@PathVariable String id, @RequestParam(defaultValue = "false") String includeDoc, 
+            @RequestParam(defaultValue = "false") String includeNonCompliant,
+            @RequestParam(defaultValue = "false") String displaySimulated,
+	    Pageable pageable)
         throws Exception, URISyntaxException {
         log.debug("REST request to get a page of Instances by id {}", id);
-        Page<Instance> page = instanceService.findAllByDomainId(id, pageable);
+        Page<Instance> page = instanceService.findAllByDomainId(id, Boolean.valueOf(includeNonCompliant), Boolean.valueOf(displaySimulated), pageable);
         if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
             for(Instance instance:page.getContent()) {
                 instance.setDocs(null);
@@ -259,9 +264,9 @@ public class ServiceInstanceResource {
         method = RequestMethod.DELETE,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Void> deleteInstance(@PathVariable String id, @PathVariable String version, @RequestHeader(value = "Authorization", required=false) String bearerToken) {
+    public ResponseEntity<Void> deleteInstance(@PathVariable String id, @PathVariable String version, @RequestParam(defaultValue = "false") String displaySimulated, @RequestHeader(value = "Authorization", required=false) String bearerToken) {
         log.debug("REST request to delete Instance id {} version {}", id, version);
-        Instance instance = instanceService.findByDomainId(id, version);
+        Instance instance = instanceService.findByDomainId(id, version, true, Boolean.valueOf(displaySimulated));
 
         String organizationId = "";
         try {
