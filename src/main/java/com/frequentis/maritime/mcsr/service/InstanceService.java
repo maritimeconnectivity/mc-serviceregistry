@@ -22,10 +22,11 @@ import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.geoShapeQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
+import java.util.List;
+
 //import static org.elasticsearch.common.geo.builders.ShapeBuilder.newPoint;
 
 import javax.inject.Inject;
-import javax.persistence.criteria.CriteriaBuilder;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -35,16 +36,13 @@ import org.elasticsearch.common.xcontent.NamedXContentRegistry;
 import org.elasticsearch.common.xcontent.XContentParser;
 import org.elasticsearch.common.xcontent.json.JsonXContent;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.QueryShardContext;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
 import com.frequentis.maritime.mcsr.domain.Instance;
 import com.frequentis.maritime.mcsr.repository.InstanceRepository;
 import com.frequentis.maritime.mcsr.repository.search.InstanceSearchRepository;
@@ -53,11 +51,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.geo.GeoShape;
 import org.springframework.data.elasticsearch.core.geo.GeoShapeModule;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
-import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 /**
@@ -195,6 +189,11 @@ public class InstanceService {
         log.debug("Request to update status of Instance : {}", id);
         Instance instance = instanceRepository.findOneWithEagerRelationships(id);
         instance.setStatus(status);
+        // Update also ES record
+        Instance esInstance = instanceSearchRepository.findOneByInstanceIdAndVersion(QueryParser.escape(instance.getInstanceId()), instance.getVersion());
+        esInstance.setStatus(status);
+
+        instanceSearchRepository.save(esInstance);
         save(instance);
     }
 
@@ -334,6 +333,15 @@ public class InstanceService {
      */
     public Instance findByDomainId(String domainId, String version) {
         return findByDomainId(domainId, version, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT, SEARCH_SIMULATED_DEFAULT);
+    }
+
+    public Instance findAllByDomainId(String domainId, String version) {
+        log.debug("Request to get Instance by domain id {} and version {} without restriction");
+        List<Instance> findByDomainIdAndVersion = instanceRepository.findByDomainIdAndVersion(domainId, version);
+        if(findByDomainIdAndVersion != null && !findByDomainIdAndVersion.isEmpty()) {
+            return findByDomainIdAndVersion.get(0);
+        }
+        return null;
     }
 
     /**

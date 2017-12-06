@@ -197,6 +197,8 @@ public class ServiceInstanceResource {
      *
      * @param id the domain id of the instance to retrieve
      * @param version the version of the instance to retrieve, "latest" for the highest version number
+     * @param includeNonCompliant include also non-compliant services (used only for "latest" version)
+     * @param displaySimulated display only simulated services (used only for "latest" version)
      * @return the ResponseEntity with status 200 (OK) and with body the instance, or with status 404 (Not Found)
      */
     @RequestMapping(value = "/serviceInstance/{id}/{version}/",
@@ -212,9 +214,9 @@ public class ServiceInstanceResource {
         if (version.equalsIgnoreCase("latest")) {
             instance = instanceService.findLatestVersionByDomainId(id, Boolean.valueOf(includeNonCompliant), Boolean.valueOf(displaySimulated));
         } else {
-            instance = instanceService.findByDomainId(id, version, Boolean.valueOf(includeNonCompliant), Boolean.valueOf(displaySimulated));
+            instance = instanceService.findAllByDomainId(id, version);
         }
-        if (instance != null && "true".equalsIgnoreCase(includeDoc) == false) {
+        if (instance != null && !Boolean.parseBoolean(includeDoc)) {
             instance.setDocs(null);
             instance.setInstanceAsDoc(null);
         }
@@ -242,7 +244,7 @@ public class ServiceInstanceResource {
         throws Exception, URISyntaxException {
         log.debug("REST request to get a page of Instances by id {}", id);
         Page<Instance> page = instanceService.findAllByDomainId(id, Boolean.valueOf(includeNonCompliant), Boolean.valueOf(displaySimulated), pageable);
-        if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
+        if (page != null && page.getContent() != null && !Boolean.parseBoolean(includeDoc)) {
             for(Instance instance:page.getContent()) {
                 instance.setDocs(null);
                 instance.setInstanceAsDoc(null);
@@ -263,10 +265,13 @@ public class ServiceInstanceResource {
         method = RequestMethod.DELETE,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Void> deleteInstance(@PathVariable String id, @PathVariable String version, @RequestParam(defaultValue = "false") String displaySimulated, @RequestHeader(value = "Authorization", required=false) String bearerToken) {
+    public ResponseEntity<Void> deleteInstance(@PathVariable String id, @PathVariable String version, @RequestHeader(value = "Authorization", required=false) String bearerToken) {
         log.debug("REST request to delete Instance id {} version {}", id, version);
-        Instance instance = instanceService.findByDomainId(id, version, true, Boolean.valueOf(displaySimulated));
+        Instance instance = instanceService.findAllByDomainId(id, version);
 
+        if(instance == null) {
+            return ResponseEntity.notFound().build();
+        }
         String organizationId = "";
         try {
             organizationId = HeaderUtil.extractOrganizationIdFromToken(bearerToken);
@@ -489,8 +494,6 @@ public class ServiceInstanceResource {
      * @param id the domain id of the instance to deprecate/activate/etc.
      * @param version the id of the instance to deprecate/activate/etc.
      * @param status the new status
-     * @param includeNonCompliant If is {@code true} then are included also non-compliant services in result set
-     * @param displaySimulated If is {@code true} then are listed only services with status {@code simulated}.
      * @return the ResponseEntity with status 200 (OK)
      */
     @RequestMapping(value = "/serviceInstance/{id}/{version}/status",
@@ -498,12 +501,10 @@ public class ServiceInstanceResource {
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<Void> updateInstanceStatus(@PathVariable String id, @PathVariable String version,
-            @RequestParam String status, @RequestHeader(value = "Authorization", required = false) String bearerToken,
-            @RequestParam(defaultValue = "false") String includeNonCompliant,
-            @RequestParam(defaultValue = "false") String displaySimulated) throws Exception {
+            @RequestParam String status, @RequestHeader(value = "Authorization", required = false) String bearerToken) throws Exception {
 
         log.debug("REST request to update status of Instance {} version {}", id, version);
-        Instance instance = instanceService.findByDomainId(id, version, Boolean.parseBoolean(includeNonCompliant), Boolean.parseBoolean(displaySimulated));
+        Instance instance = instanceService.findAllByDomainId(id, version);
 
         if(instance == null) {
             return ResponseEntity.notFound().build();

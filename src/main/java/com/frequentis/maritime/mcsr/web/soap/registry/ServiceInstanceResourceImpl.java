@@ -9,11 +9,14 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.frequentis.maritime.mcsr.domain.Instance;
+import com.frequentis.maritime.mcsr.domain.Xml;
 import com.frequentis.maritime.mcsr.service.DesignService;
 import com.frequentis.maritime.mcsr.service.InstanceService;
+import com.frequentis.maritime.mcsr.service.XmlService;
 import com.frequentis.maritime.mcsr.web.exceptions.GeometryParseException;
 import com.frequentis.maritime.mcsr.web.exceptions.XMLValidationException;
 import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
+import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 import com.frequentis.maritime.mcsr.web.soap.PageResponse;
 import com.frequentis.maritime.mcsr.web.soap.SoapHTTPUtil;
 import com.frequentis.maritime.mcsr.web.soap.converters.instance.InstanceDTOConverter;
@@ -46,6 +49,9 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 
 	@Inject
 	DesignService designService;
+
+	@Inject
+	XmlService xmlService;
 
 	@Inject
 	InstanceDTOConverter instanceDtoConverter;
@@ -127,7 +133,7 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 		if(version.equalsIgnoreCase("latest")) {
 			instance = instanceService.findLatestVersionByDomainId(id, includeNonCompliant, simulated);
 		} else {
-			instance = instanceService.findByDomainId(id, version, includeNonCompliant, simulated);
+			instance = instanceService.findAllByDomainId(id, version);
 		}
 		if (instance != null && !includeDoc) {
 			instance.setDocs(null);
@@ -152,10 +158,10 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 	}
 
 	@Override
-	public void deleteInstance(String id, String version, boolean includenonCompliant, boolean simulated) throws AccessDeniedException {
+	public void deleteInstance(String id, String version) throws AccessDeniedException {
 		log.debug("SOAP request to delete Instance id {} version {}", id, version);
 		String bearerToken = SoapHTTPUtil.currentBearerToken();
-		Instance instance = instanceService.findByDomainId(id, version, includenonCompliant, simulated);
+		Instance instance = instanceService.findAllByDomainId(id, version);
 
 		String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
 		if(!InstanceUtil.checkOrganizationId(instance, organizationId)) {
@@ -262,13 +268,29 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 	public void updateInstanceStatus(String id, String version, String status) throws AccessDeniedException {
         log.debug("SOAP request to update status of Instance {} version {}", id, version);
         String bearerToken = SoapHTTPUtil.currentBearerToken();
-        Instance instance = instanceService.findByDomainId(id, version);
+        Instance instance = instanceService.findAllByDomainId(id, version);
 
         String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
         if (!InstanceUtil.checkOrganizationId(instance, organizationId)) {
             String msg = "Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+instance.getOrganizationId();
             throw new AccessDeniedException(msg);
         }
+
+        Xml instanceXml = instance.getInstanceAsXml();
+        if(instanceXml != null && instanceXml.getContent() != null) {
+            try {
+                String xml = instanceXml.getContent().toString();
+                // Update the status value inside the xml definition
+                String resultXml = XmlUtil.updateXmlNode(status, xml, "/*[local-name()='serviceInstance']/*[local-name()='status']");
+                instanceXml.setContent(resultXml);
+                // Save XML
+                xmlService.save(instanceXml);
+                instance.setInstanceAsXml(instanceXml);
+            } catch (Exception e) {
+                log.error("Error while changing status in XML.", e);
+            }
+        }
+        instanceService.updateStatus(instance.getId(), status);
 	}
 
 	private void removeIncludedDoc(Page<Instance> instPage, boolean includeDoc) {
