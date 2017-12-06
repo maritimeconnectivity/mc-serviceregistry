@@ -422,7 +422,7 @@ public class ServiceInstanceResourceTest {
 		boolean exist = instanceInternal.getInstance(inst.instanceId, inst.version, false, true, false) != null;
 
 		// When
-		client.deleteInstance(inst.instanceId, inst.version, true, false);
+		client.deleteInstance(inst.instanceId, inst.version);
 
 		// Then
 		boolean existAfter = instanceInternal.getInstance(inst.instanceId, inst.version, false, true, false) != null;

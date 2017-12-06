@@ -49,6 +49,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.frequentis.maritime.mcsr.domain.Specification;
 import com.frequentis.maritime.mcsr.domain.Xml;
 import com.frequentis.maritime.mcsr.service.SpecificationService;
+import com.frequentis.maritime.mcsr.service.XmlService;
 import com.frequentis.maritime.mcsr.web.rest.SpecificationResource;
 import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
@@ -66,6 +67,9 @@ public class ServiceSpecificationResource {
 
 	@Inject
 	private SpecificationService specificationService;
+
+	@Inject
+	private XmlService xmlService;
 
 	/**
 	 * POST /serviceSpecification : Create a new specification.
@@ -302,10 +306,11 @@ public class ServiceSpecificationResource {
 		String xml = specificationXml.getContent().toString();
 		// Update the status value inside the xml definition
 		String resultXml = XmlUtil.updateXmlNode(status, xml,
-		        "/ServiceSpecificationSchema:serviceSpecification/status");
+		        "/*[local-name()='serviceSpecification']/*[local-name()='status']");
 		specificationXml.setContent(resultXml);
 		specification.setSpecAsXml(specificationXml);
 
+		xmlService.save(specificationXml);
 		specificationService.updateStatus(specification.getId(), status);
 		return ResponseEntity.ok().headers(HeaderUtil.createEntityStatusUpdateAlert("specification", id.toString()))
 		        .build();

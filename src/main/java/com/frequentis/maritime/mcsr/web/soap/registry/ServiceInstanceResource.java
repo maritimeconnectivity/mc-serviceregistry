@@ -94,13 +94,15 @@ public interface ServiceInstanceResource {
      * GET  /serviceInstance/:id/:version : get the "id" instance with version "version".
      * @param id the domain id of the instance to retrieve
      * @param version the version of the instance to retrieve, "latest" for the highest version number
+     * @param includeNonCompliant Includes also non-compliant (only for "latest" version)
+     * @param simulated If is {@code true} display only simulated services. Of is {@code false} display only unsimulated services. (only for "latest" version)
      * @return the ResponseEntity with status 200 (OK) and with body the instance, or with status 404 (Not Found)
      */
     public InstanceDTO getInstance(
     		@WebParam(name = "id") @XmlElement(required = true) String id,
     		@WebParam(name = "version") @XmlElement(required = true) String version,
     		@WebParam(name = "includeDoc") @XmlElement(required = true) boolean includeDoc,
-    		@WebParam(name = "includeNonCompliant") @XmlElement(required = false) boolean includeNonCompliant,
+            @WebParam(name = "includeNonCompliant") @XmlElement(required = false) boolean includeNonCompliant,
             @WebParam(name = "simulated") @XmlElement(required = false) boolean simulated);
 
     /**
@@ -126,9 +128,7 @@ public interface ServiceInstanceResource {
      */
     public void deleteInstance(
     		@WebParam(name = "id") @XmlElement(required = true) String id,
-    		@WebParam(name = "version") @XmlElement(required = true) String version,
-    		@WebParam(name = "includeNonCompliant") @XmlElement(required = false) boolean includeNonCompliant,
-            @WebParam(name = "simulated") @XmlElement(required = false) boolean simulated) throws AccessDeniedException;
+    		@WebParam(name = "version") @XmlElement(required = true) String version) throws AccessDeniedException;
 
     /**
      * SEARCH  /_search/serviceInstance?query=:query : search for the instance corresponding

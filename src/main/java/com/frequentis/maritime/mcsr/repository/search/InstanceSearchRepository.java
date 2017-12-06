@@ -28,6 +28,8 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
  */
 public interface InstanceSearchRepository extends ElasticsearchRepository<Instance, Long> {
 
+    Instance findOneByInstanceIdAndVersion(String id, String version);
+
     Page<Instance> findByKeywords(String keywords, Pageable pageable);
     Page<Instance> findByKeywordsAndCompliantTrue(String keywords, Pageable pageable);
     Page<Instance> findByKeywordsAndCompliantTrueAndStatus(String keywords, String status, Pageable pageable);
