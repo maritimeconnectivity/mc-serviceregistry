@@ -198,7 +198,6 @@ public class ServiceInstanceResource {
      * @param id the domain id of the instance to retrieve
      * @param version the version of the instance to retrieve, "latest" for the highest version number
      * @param includeNonCompliant include also non-compliant services (used only for "latest" version)
-     * @param displaySimulated display only simulated services (used only for "latest" version)
      * @return the ResponseEntity with status 200 (OK) and with body the instance, or with status 404 (Not Found)
      */
     @RequestMapping(value = "/serviceInstance/{id}/{version}/",
@@ -207,12 +206,11 @@ public class ServiceInstanceResource {
     @Timed
     @ApiOperation(value = "getInstance", notes = "Returns the service instance with the specified id and version. Use version 'latest' to get the newest one.")
     public ResponseEntity<Instance> getInstance(@PathVariable String id, @PathVariable String version, @RequestParam(defaultValue = "false") String includeDoc,
-            @RequestParam(defaultValue = "false") String includeNonCompliant,
-            @RequestParam(defaultValue = "false") String displaySimulated) {
+            @RequestParam(defaultValue = "false") String includeNonCompliant) {
         log.debug("REST request to get Instance via domain id {} and version {}", id, version);
         Instance instance = null;
         if (version.equalsIgnoreCase("latest")) {
-            instance = instanceService.findLatestVersionByDomainId(id, Boolean.valueOf(includeNonCompliant), Boolean.valueOf(displaySimulated));
+            instance = instanceService.findLatestVersionByDomainId(id, Boolean.valueOf(includeNonCompliant));
         } else {
             instance = instanceService.findAllByDomainId(id, version);
         }
@@ -239,11 +237,10 @@ public class ServiceInstanceResource {
     @Timed
     public ResponseEntity<List<Instance>> getAllInstancesById(@PathVariable String id, @RequestParam(defaultValue = "false") String includeDoc,
             @RequestParam(defaultValue = "false") String includeNonCompliant,
-            @RequestParam(defaultValue = "false") String displaySimulated,
 	    Pageable pageable)
         throws Exception, URISyntaxException {
         log.debug("REST request to get a page of Instances by id {}", id);
-        Page<Instance> page = instanceService.findAllByDomainId(id, Boolean.valueOf(includeNonCompliant), Boolean.valueOf(displaySimulated), pageable);
+        Page<Instance> page = instanceService.findAllByDomainId(id, Boolean.valueOf(includeNonCompliant), pageable);
         if (page != null && page.getContent() != null && !Boolean.parseBoolean(includeDoc)) {
             for(Instance instance:page.getContent()) {
                 instance.setDocs(null);
@@ -294,7 +291,6 @@ public class ServiceInstanceResource {
      * @param query the query of the instance search
      * @param includeDoc includes docs
      * @param includeNonCompliant does not exclude non-compliant service from search
-     * @param displaySimulated If is {@code true} then are listed only services with status {@code simulated}.
      * @return the result of the search
      */
     @RequestMapping(value = "/_search/serviceInstance",
@@ -304,11 +300,11 @@ public class ServiceInstanceResource {
     public ResponseEntity<List<Instance>> searchInstances(@RequestParam String query,
             @RequestParam(defaultValue = "false") String includeDoc,
             @RequestParam(defaultValue = "false") String includeNonCompliant,
-            @RequestParam(defaultValue = "false") String displaySimulated, Pageable pageable)
+            Pageable pageable)
             throws Exception, URISyntaxException {
 
         log.debug("REST request to search for a page of Instances for query {}", query);
-        Page<Instance> page = instanceService.search(query, Boolean.valueOf(includeNonCompliant), Boolean.valueOf(displaySimulated), pageable);
+        Page<Instance> page = instanceService.search(query, Boolean.valueOf(includeNonCompliant), pageable);
         if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
             for(Instance instance:page.getContent()) {
                 instance.setDocs(null);
@@ -325,7 +321,6 @@ public class ServiceInstanceResource {
      *
      * @param query the query of the instance keyword search
      * @param includeNonCompliant If is {@code true} then are included also non-compliant services in result set
-     * @param displaySimulated If is {@code true} then are listed only services with status {@code simulated}.
      * @return the result of the search
      */
     @RequestMapping(value = "/_searchKeywords/serviceInstance",
@@ -335,11 +330,11 @@ public class ServiceInstanceResource {
     public ResponseEntity<List<Instance>> searchInstancesByKeywords(@RequestParam String query,
             @RequestParam(defaultValue = "false") String includeDoc,
             @RequestParam(defaultValue = "false") String includeNonCompliant,
-            @RequestParam(defaultValue = "false") String displaySimulated, Pageable pageable)
+            Pageable pageable)
             throws Exception, URISyntaxException {
 
         log.debug("REST request to search for a page of Instances for keywords {}", query);
-        Page<Instance> page = instanceService.searchKeywords(query, Boolean.valueOf(includeNonCompliant), Boolean.valueOf(displaySimulated), pageable);
+        Page<Instance> page = instanceService.searchKeywords(query, Boolean.valueOf(includeNonCompliant), pageable);
         if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
             for(Instance instance:page.getContent()) {
                 instance.setDocs(null);
@@ -356,7 +351,6 @@ public class ServiceInstanceResource {
      *
      * @param query the query of the instance keyword search
      * @param includeNonCompliant If is {@code true} then are included also non-compliant services in result set
-     * @param displaySimulated If is {@code true} then are listed only services with status {@code simulated}.
      * @return the result of the search
      */
     @RequestMapping(value = "/_searchUnlocode/serviceInstance",
@@ -367,11 +361,11 @@ public class ServiceInstanceResource {
     public ResponseEntity<List<Instance>> searchInstancesByUnlocode(@RequestParam String query,
             @RequestParam(defaultValue = "false") String includeDoc,
             @RequestParam(defaultValue = "false") String includeNonCompliant,
-            @RequestParam(defaultValue = "false") String displaySimulated, Pageable pageable)
+            Pageable pageable)
         throws Exception, URISyntaxException {
 
         log.debug("REST request to search for a page of Instances for unlocode {}", query);
-        Page<Instance> page = instanceService.searchUnlocode(query, Boolean.valueOf(includeNonCompliant), Boolean.valueOf(displaySimulated), pageable);
+        Page<Instance> page = instanceService.searchUnlocode(query, Boolean.valueOf(includeNonCompliant), pageable);
         if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
             for(Instance instance:page.getContent()) {
                 instance.setDocs(null);
@@ -389,7 +383,6 @@ public class ServiceInstanceResource {
      * @param latitude the latitude of the search position
      * @param longitude the longitude of the search position
      * @param includeNonCompliant If is {@code true} then are included also non-compliant services in result set
-     * @param displaySimulated If is {@code true} then are listed only services with status {@code simulated}.
      * @return the result of the search
      */
     @RequestMapping(value = "/_searchLocation/serviceInstance",
@@ -401,11 +394,11 @@ public class ServiceInstanceResource {
             @RequestParam(defaultValue = "false") String includeDoc, @RequestParam String longitude,
             @RequestParam(defaultValue = "", required = false) String query,
             @RequestParam(defaultValue = "false") String includeNonCompliant,
-            @RequestParam(defaultValue = "false") String displaySimulated, Pageable pageable)
+            Pageable pageable)
             throws Exception, URISyntaxException {
 
         log.debug("REST request to get Instance by lat {} long {}", latitude, longitude);
-        Page<Instance> page = instanceService.findByLocation(Double.parseDouble(latitude), Double.parseDouble(longitude), query, Boolean.valueOf(includeNonCompliant), Boolean.valueOf(displaySimulated), pageable);
+        Page<Instance> page = instanceService.findByLocation(Double.parseDouble(latitude), Double.parseDouble(longitude), query, Boolean.valueOf(includeNonCompliant), pageable);
         if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
             for(Instance instance:page.getContent()) {
                 instance.setDocs(null);
@@ -424,7 +417,6 @@ public class ServiceInstanceResource {
      * @param geometry the search geometry in geojson format
      * @param query additional query filters in elasticsearch queryString syntax
      * @param includeNonCompliant If is {@code true} then are included also non-compliant services in result set
-     * @param displaySimulated If is {@code true} then are listed only services with status {@code simulated}.
      * @return the result of the search
      */
     @RequestMapping(value = "/_searchGeometryGeoJSON/serviceInstance",
@@ -436,11 +428,11 @@ public class ServiceInstanceResource {
             @RequestParam(defaultValue = "false") String includeDoc,
             @RequestParam(defaultValue = "", required = false) String query,
             @RequestParam(defaultValue = "false") String includeNonCompliant,
-            @RequestParam(defaultValue = "false") String displaySimulated, Pageable pageable)
+            Pageable pageable)
             throws Exception, URISyntaxException {
 
         log.debug("REST request to get Instance by geojson ", geometry);
-        Page<Instance> page = instanceService.findByGeoshape(geometry, query, Boolean.valueOf(includeNonCompliant), Boolean.valueOf(displaySimulated), pageable);
+        Page<Instance> page = instanceService.findByGeoshape(geometry, query, Boolean.valueOf(includeNonCompliant), pageable);
         if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
             for(Instance instance:page.getContent()) {
                 instance.setDocs(null);
@@ -458,7 +450,6 @@ public class ServiceInstanceResource {
      * @param geometry the search geometry in WKT format
      * @param query additional query filters in elasticsearch queryString syntax
      * @param includeNonCompliant If is {@code true} then are included also non-compliant services in result set
-     * @param displaySimulated If is {@code true} then are listed only services with status {@code simulated}.
      * @return the result of the search
      */
     @RequestMapping(value = "/_searchGeometryWKT/serviceInstance",
@@ -470,14 +461,14 @@ public class ServiceInstanceResource {
             @RequestParam(defaultValue = "", required = false) String query,
             @RequestParam(defaultValue = "false") String includeDoc,
             @RequestParam(defaultValue = "false") String includeNonCompliant,
-            @RequestParam(defaultValue = "false") String displaySimulated, Pageable pageable)
+            Pageable pageable)
             throws Exception, URISyntaxException {
 
         log.debug("REST request to get Instance by wkt ", geometry);
         String geoJson = null;
         geoJson = InstanceUtil.convertWKTtoGeoJson(geometry).toString();
         log.debug("Converted Geojson: " + geoJson);
-        Page<Instance> page = instanceService.findByGeoshape(geoJson, query, Boolean.valueOf(includeNonCompliant), Boolean.valueOf(displaySimulated), pageable);
+        Page<Instance> page = instanceService.findByGeoshape(geoJson, query, Boolean.valueOf(includeNonCompliant), pageable);
         if (page != null && page.getContent() != null && "true".equalsIgnoreCase(includeDoc) == false) {
             for(Instance instance:page.getContent()) {
                 instance.setDocs(null);

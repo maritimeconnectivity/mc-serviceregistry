@@ -62,7 +62,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class InstanceService {
     private final Logger log = LoggerFactory.getLogger(InstanceService.class);
     private static final boolean SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT = false;
-    private static final boolean SEARCH_SIMULATED_DEFAULT = false;
 
     @Inject
     private InstanceRepository instanceRepository;
@@ -205,7 +204,7 @@ public class InstanceService {
      *  @return the list of entities
      */
     public Page<Instance> search(String query, Pageable pageable) {
-        return search(query, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT, SEARCH_SIMULATED_DEFAULT, pageable);
+        return search(query, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT, pageable);
     }
 
     /**
@@ -213,7 +212,7 @@ public class InstanceService {
      *
      * <p>
      * Difference between searchAll and {@link #search(String, Pageable)} is that searchAll
-     * includes non-compliant services and service with status simulated
+     * includes non-compliant services
      * </p>
      *
      * @param query
@@ -234,24 +233,17 @@ public class InstanceService {
      *
      *  @param query the query of the search
      *  @param includeNonCompliant include also non-compliant services
-     *  @param displaySimulated If is {@code true} then are listed only services with status {@code simulated}.
      *  @param pageable
      *  @return the list of entities
      */
     @Transactional(readOnly = true)
-    public Page<Instance> search(String query, boolean includeNonCompliant, boolean displaySimulated, Pageable pageable) {
+    public Page<Instance> search(String query, boolean includeNonCompliant, Pageable pageable) {
         log.debug("Request to search for a page of Instances for query {}", query);
         BoolQueryBuilder qb =  QueryBuilders.boolQuery();
         qb.must(queryStringQuery(query));
 
         if(!includeNonCompliant) {
             qb.must(boolQuery().filter(QueryBuilders.termQuery("compliant", "true")));
-        }
-
-        if(displaySimulated) {
-            qb.must(boolQuery().filter(QueryBuilders.termQuery("status", "simulated")));
-        } else {
-            qb.mustNot(boolQuery().filter(QueryBuilders.termQuery("status", "simulated")));
         }
 
         return instanceSearchRepository.search(qb, pageable);
@@ -264,7 +256,7 @@ public class InstanceService {
      *  @return the list of entities
      */
     public Page<Instance> searchKeywords(String keywords, Pageable pageable) {
-        return searchKeywords(keywords, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT, SEARCH_SIMULATED_DEFAULT, pageable);
+        return searchKeywords(keywords, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT, pageable);
     }
 
     /**
@@ -272,21 +264,16 @@ public class InstanceService {
      *
      *  @param keywords the keywords of the search
      *  @param includeNonCompliant include also non-compliant services
-     *  @param displaySimulated If is {@code true} then are listed only services with status {@code simulated}.
      *  @return the list of entities
      */
     @Transactional(readOnly = true)
-    public Page<Instance> searchKeywords(String keywords, boolean includeNonCompliant, boolean displaySimulated, Pageable pageable) {
+    public Page<Instance> searchKeywords(String keywords, boolean includeNonCompliant, Pageable pageable) {
         log.debug("Request to search for a page of Instances for keywords  {}", keywords);
 
-        if(includeNonCompliant && displaySimulated) {
-            return instanceSearchRepository.findByKeywordsAndStatus(keywords, "simulated", pageable);
-        } else if (includeNonCompliant && !displaySimulated) {
-            return instanceSearchRepository.findByKeywordsAndStatusNot(keywords, "simulated", pageable);
-        } else if (!includeNonCompliant && displaySimulated) {
-            return instanceSearchRepository.findByKeywordsAndCompliantTrueAndStatus(keywords, "simulated", pageable);
+        if(includeNonCompliant) {
+            return instanceSearchRepository.findByKeywords(keywords, pageable);
         } else {
-            return instanceSearchRepository.findByKeywordsAndCompliantTrueAndStatusNot(keywords, "simulated", pageable);
+            return instanceSearchRepository.findByKeywordsAndCompliantTrue(keywords, pageable);
         }
     }
 
@@ -297,7 +284,7 @@ public class InstanceService {
      *  @return the list of entities
      */
     public Page<Instance> searchUnlocode(String unlocode, Pageable pageable) {
-        return searchUnlocode(unlocode, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT, SEARCH_SIMULATED_DEFAULT, pageable);
+        return searchUnlocode(unlocode, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT, pageable);
     }
 
     /**
@@ -305,21 +292,16 @@ public class InstanceService {
      *
      *  @param unlocode the unlocode of the search
      *  @param includeNonCompliant include also non-compliant services
-     *  @param displaySimulated If is {@code true} then are listed only services with status {@code simulated}.
      *  @return the list of entities
      */
     @Transactional(readOnly = true)
-    public Page<Instance> searchUnlocode(String unlocode, boolean includeNonCompliant, boolean displaySimulated, Pageable pageable) {
+    public Page<Instance> searchUnlocode(String unlocode, boolean includeNonCompliant, Pageable pageable) {
         log.debug("Request to search for a page of Instances for unlocode {}", unlocode);
 
-        if(includeNonCompliant && displaySimulated) {
-            return instanceSearchRepository.findByUnlocodeAndStatus(unlocode, "simulated", pageable);
-        } else if (includeNonCompliant && !displaySimulated) {
-            return instanceSearchRepository.findByUnlocodeAndStatusNot(unlocode, "simulated", pageable);
-        } else if (!includeNonCompliant && displaySimulated) {
-            return instanceSearchRepository.findByUnlocodeAndCompliantTrueAndStatus(unlocode, "simulated", pageable);
+        if(includeNonCompliant ) {
+            return instanceSearchRepository.findByUnlocode(unlocode, pageable);
         } else {
-            return instanceSearchRepository.findByUnlocodeAndCompliantTrueAndStatusNot(unlocode, "simulated", pageable);
+            return instanceSearchRepository.findByUnlocodeAndCompliantTrue(unlocode, pageable);
         }
 
     }
@@ -332,7 +314,7 @@ public class InstanceService {
      *  @return the entity
      */
     public Instance findByDomainId(String domainId, String version) {
-        return findByDomainId(domainId, version, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT, SEARCH_SIMULATED_DEFAULT);
+        return findByDomainId(domainId, version, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT);
     }
 
     public Instance findAllByDomainId(String domainId, String version) {
@@ -350,21 +332,16 @@ public class InstanceService {
      *  @param domainId the domain specific id of the instance
      *  @param version the version identifier of the instance
      *  @param includeNonCompliant include also non-compliant services
-     *  @param displaySimulated If is {@code true} then are listed only services with status {@code simulated}.
      *  @return the entity
      */
     @Transactional(readOnly = true)
-    public Instance findByDomainId(String domainId, String version, boolean includeNonCompliant, boolean displaySimulated) {
+    public Instance findByDomainId(String domainId, String version, boolean includeNonCompliant) {
         log.debug("Request to get Instance by domain id {} and version {}", domainId, version);
         Instance instance = null;
         try {
             Iterable<Instance> instances;
-            if(includeNonCompliant && displaySimulated) {
-                instances = instanceRepository.findSimulatedByDomainIdAndVersionEagerRelationshipsWithNonCompliant(domainId, version);
-            } else if (includeNonCompliant && !displaySimulated) {
+            if(includeNonCompliant) {
                 instances = instanceRepository.findByDomainIdAndVersionEagerRelationshipsWithNonCompliant(domainId, version);
-            } else if (!includeNonCompliant && displaySimulated) {
-                instances = instanceRepository.findSimulatedByDomainIdAndVersionEagerRelationships(domainId, version);
             } else {
                 instances = instanceRepository.findByDomainIdAndVersionEagerRelationships(domainId, version);
             }
@@ -386,7 +363,7 @@ public class InstanceService {
      *  @return the entity
      */
     public Instance findLatestVersionByDomainId(String domainId) {
-        return findLatestVersionByDomainId(domainId, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT, SEARCH_SIMULATED_DEFAULT);
+        return findLatestVersionByDomainId(domainId, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT);
     }
 
     /**
@@ -394,23 +371,18 @@ public class InstanceService {
      *
      *  @param domainId the domain specific id of the instance
      *  @param includeNonCompliant include also non-compliant services
-     *  @param displaySimulated If is {@code true} then are listed only services with status {@code simulated}.
      *  @return the entity
      */
     @Transactional(readOnly = true)
-    public Instance findLatestVersionByDomainId(String domainId, boolean includeNonCompliant, boolean displaySimulated) {
+    public Instance findLatestVersionByDomainId(String domainId, boolean includeNonCompliant) {
         log.debug("Request to get Instance by domain id {}", domainId);
         Instance instance = null;
         DefaultArtifactVersion latestVersion = new DefaultArtifactVersion("0.0");
         try {
 
             Iterable<Instance> instances;
-            if(includeNonCompliant && displaySimulated) {
-                instances = instanceRepository.findSimulatedByDomainIdEagerRelationshipsWithNonCompliant(domainId);
-            } else if (includeNonCompliant && !displaySimulated) {
+            if(includeNonCompliant) {
                 instances = instanceRepository.findByDomainIdEagerRelationshipsWithNonCompliant(domainId);
-            } else if (!includeNonCompliant && displaySimulated) {
-                instances = instanceRepository.findSimulatedByDomainIdEagerRelationships(domainId);
             } else {
                 instances = instanceRepository.findByDomainIdEagerRelationships(domainId);
             }
@@ -438,7 +410,7 @@ public class InstanceService {
      *  @return the list of entities
      */
     public Page<Instance> findAllByDomainId(String domainId, Pageable pageable) {
-        return findAllByDomainId(domainId, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT, SEARCH_SIMULATED_DEFAULT, pageable);
+        return findAllByDomainId(domainId, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT, pageable);
     }
 
     /**
@@ -446,11 +418,10 @@ public class InstanceService {
      *
      *  @param domainId the domain specific id of the instance
      *  @param includeNonCompliant include also non-compliant services
-     *  @param displaySimulated If is {@code true} then are listed only services with status {@code simulated}.
      *  @return the list of entities
      */
     @Transactional(readOnly = true)
-    public Page<Instance> findAllByDomainId(String domainId, boolean includeNonCompliant, boolean displaySimulated, Pageable pageable) {
+    public Page<Instance> findAllByDomainId(String domainId, boolean includeNonCompliant, Pageable pageable) {
         log.debug("Request to get Instance by domain id {}", QueryParser.escape(domainId));
         Page<Instance> instances = null;
 
@@ -458,11 +429,6 @@ public class InstanceService {
         qb.must(queryStringQuery("instanceId:" + QueryParser.escape(domainId)));
         if(!includeNonCompliant) {
             qb.must(boolQuery().filter(QueryBuilders.termQuery("compliant", true)));
-        }
-        if(displaySimulated) {
-            qb.must(boolQuery().filter(QueryBuilders.termQuery("status", "simulated")));
-        } else {
-            qb.mustNot(boolQuery().filter(QueryBuilders.termQuery("status", "simulated")));
         }
 
         try {
@@ -482,7 +448,7 @@ public class InstanceService {
      *  @return the entity
      */
     public Page<Instance> findByLocation(double latitude, double longitude, String query, Pageable pageable) throws Exception {
-        return findByLocation(latitude, longitude, query, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT, SEARCH_SIMULATED_DEFAULT, pageable);
+        return findByLocation(latitude, longitude, query, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT, pageable);
     }
 
     /**
@@ -491,11 +457,10 @@ public class InstanceService {
      *  @param latitude search latitude
      *  @param longitude search longitude
      *  @param includeNonCompliant include also non-compliant services
-     *  @param displaySimulated If is {@code true} then are listed only services with status {@code simulated}.
      *  @return the entity
      */
     @Transactional(readOnly = true)
-    public Page<Instance> findByLocation(double latitude, double longitude, String query, boolean includeNonCompliant, boolean displaySimulated, Pageable pageable) throws Exception {
+    public Page<Instance> findByLocation(double latitude, double longitude, String query, boolean includeNonCompliant, Pageable pageable) throws Exception {
         log.debug("Request to get Instance by lat {} long {} and query {}", latitude, longitude, query);
         Page<Instance> instances = null;
         Geometry g;
@@ -508,11 +473,6 @@ public class InstanceService {
             .must(queryStringQuery(query));
         if(!includeNonCompliant) {
             qb.must(boolQuery().filter(QueryBuilders.termQuery("compliant", true)));
-        }
-        if(displaySimulated) {
-            qb.must(boolQuery().filter(QueryBuilders.termQuery("status", "simulated")));
-        } else {
-            qb.mustNot(boolQuery().filter(QueryBuilders.termQuery("status", "simulated")));
         }
 
         instances = instanceSearchRepository.search(qb, pageable);
@@ -527,7 +487,7 @@ public class InstanceService {
      */
     @Transactional(readOnly = true)
     public Page<Instance> findByGeoshape(String geoJson, String query, Pageable pageable) throws Exception {
-        return findByGeoshape(geoJson, query, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT, SEARCH_SIMULATED_DEFAULT, pageable);
+        return findByGeoshape(geoJson, query, SEARCH_INCLUDE_NONCOMPLIANT_BY_DEFAULT, pageable);
     }
 
     /**
@@ -535,11 +495,10 @@ public class InstanceService {
      *
      *  @param geoJson search geometry in geojson format
      *  @param includeNonCompliant include also non-compliant services
-     *  @param displaySimulated If is {@code true} then are listed only services with status {@code simulated}.
      *  @return the entity
      */
     @Transactional(readOnly = true)
-    public Page<Instance> findByGeoshape(String geoJson, String query, boolean includeNonCompliant, boolean displaySimulated, Pageable pageable) throws Exception {
+    public Page<Instance> findByGeoshape(String geoJson, String query, boolean includeNonCompliant, Pageable pageable) throws Exception {
         log.debug("Request to get Instance by query {} and geojson {}", query, geoJson);
         Page<Instance> instances = null;
 
@@ -557,11 +516,6 @@ public class InstanceService {
             .must(queryStringQuery(query));
         if(!includeNonCompliant) {
             qb.must(boolQuery().filter(QueryBuilders.termQuery("compliant", true)));
-        }
-        if(displaySimulated) {
-            qb.must(boolQuery().filter(QueryBuilders.termQuery("status", "simulated")));
-        } else {
-            qb.mustNot(boolQuery().filter(QueryBuilders.termQuery("status", "simulated")));
         }
         instances = instanceSearchRepository.search(qb, pageable);
 
