@@ -276,21 +276,12 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
             throw new AccessDeniedException(msg);
         }
 
-        Xml instanceXml = instance.getInstanceAsXml();
-        if(instanceXml != null && instanceXml.getContent() != null) {
-            try {
-                String xml = instanceXml.getContent().toString();
-                // Update the status value inside the xml definition
-                String resultXml = XmlUtil.updateXmlNode(status, xml, "/*[local-name()='serviceInstance']/*[local-name()='status']");
-                instanceXml.setContent(resultXml);
-                // Save XML
-                xmlService.save(instanceXml);
-                instance.setInstanceAsXml(instanceXml);
-            } catch (Exception e) {
-                log.error("Error while changing status in XML.", e);
-            }
+        try {
+            instanceService.updateStatus(instance.getId(), status);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
-        instanceService.updateStatus(instance.getId(), status);
+        
 	}
 
 	private void removeIncludedDoc(Page<Instance> instPage, boolean includeDoc) {

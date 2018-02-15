@@ -22,11 +22,15 @@ import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.geoShapeQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
+import java.io.IOException;
 import java.util.List;
 
 //import static org.elasticsearch.common.geo.builders.ShapeBuilder.newPoint;
 
 import javax.inject.Inject;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -44,8 +48,10 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.frequentis.maritime.mcsr.domain.Instance;
+import com.frequentis.maritime.mcsr.domain.Xml;
 import com.frequentis.maritime.mcsr.repository.InstanceRepository;
 import com.frequentis.maritime.mcsr.repository.search.InstanceSearchRepository;
+import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 import com.vividsolutions.jts.geom.Geometry;
 
 import org.springframework.data.domain.Page;
@@ -54,6 +60,7 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.geo.GeoShapeModule;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.xml.sax.SAXException;
 /**
  * Service Implementation for managing Instance.
  */
@@ -70,6 +77,11 @@ public class InstanceService {
     private InstanceSearchRepository instanceSearchRepository;
     @Inject
     private ElasticsearchOperations elasticsearchOperations;
+    
+    @Inject
+    private XmlService xmlService;
+    
+    
 
     private String wholeWorldGeoJson = "{\n" +
         "  \"type\": \"Polygon\",\n" +
@@ -183,14 +195,29 @@ public class InstanceService {
      *
      *  @param id the id of the entity
      *  @param status the status of the entity
+     * @throws Exception 
      */
-    public void updateStatus(Long id, String status) {
+    public void updateStatus(Long id, String status) throws Exception {
         log.debug("Request to update status of Instance : {}", id);
         Instance instance = instanceRepository.findOneWithEagerRelationships(id);
+        
+        Xml instanceXml = instance.getInstanceAsXml();
+        if(instanceXml != null && instanceXml.getContent() != null) {
+            String xml = instanceXml.getContent().toString();
+            //Update the status value inside the xml definition
+            String resultXml = XmlUtil.updateXmlNode(status, xml, "/*[local-name()='serviceInstance']/*[local-name()='status']");
+            instanceXml.setContent(resultXml);
+            // Save XML
+            xmlService.save(instanceXml);
+            instance.setInstanceAsXml(instanceXml);
+        }
+        
         instance.setStatus(status);
+        instance.setInstanceAsXml(instanceXml);
         // Update also ES record
         Instance esInstance = instanceSearchRepository.findOneByInstanceIdAndVersion(QueryParser.escape(instance.getInstanceId()), instance.getVersion());
         esInstance.setStatus(status);
+        esInstance.setInstanceAsXml(instanceXml);
 
         instanceSearchRepository.save(esInstance);
         save(instance);

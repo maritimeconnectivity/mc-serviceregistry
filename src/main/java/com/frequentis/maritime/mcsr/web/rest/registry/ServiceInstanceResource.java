@@ -512,16 +512,6 @@ public class ServiceInstanceResource {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        Xml instanceXml = instance.getInstanceAsXml();
-        if(instanceXml != null && instanceXml.getContent() != null) {
-            String xml = instanceXml.getContent().toString();
-            //Update the status value inside the xml definition
-            String resultXml = XmlUtil.updateXmlNode(status, xml, "/*[local-name()='serviceInstance']/*[local-name()='status']");
-            instanceXml.setContent(resultXml);
-            // Save XML
-            xmlService.save(instanceXml);
-            instance.setInstanceAsXml(instanceXml);
-        }
         instanceService.updateStatus(instance.getId(), status);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityStatusUpdateAlert("instance", id.toString())).build();
     }
