@@ -260,7 +260,7 @@ public class InstanceUtil {
 
                 unLoCode.status = status;
                 if (unLoCode.latitude != invalid && unLoCode.longitude != invalid) {
-                    UnLoCodeMap.put(country + " " + location, unLoCode);
+                    UnLoCodeMap.put(country + location, unLoCode);
                 }
             } catch (Exception e) {
                 log.error("Error parsing UnLoCode mapping file: ", e);
