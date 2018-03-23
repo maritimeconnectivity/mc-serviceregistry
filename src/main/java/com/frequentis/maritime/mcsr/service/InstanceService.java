@@ -216,10 +216,12 @@ public class InstanceService {
         instance.setInstanceAsXml(instanceXml);
         // Update also ES record
         Instance esInstance = instanceSearchRepository.findOneByInstanceIdAndVersion(QueryParser.escape(instance.getInstanceId()), instance.getVersion());
-        esInstance.setStatus(status);
-        esInstance.setInstanceAsXml(instanceXml);
+        if(esInstance != null) {
+            esInstance.setStatus(status);
+            esInstance.setInstanceAsXml(instanceXml);
 
-        instanceSearchRepository.save(esInstance);
+            instanceSearchRepository.save(esInstance);
+        }
         save(instance);
     }
 
