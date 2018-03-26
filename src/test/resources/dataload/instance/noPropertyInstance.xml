@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><ServiceInstanceSchema:serviceInstance xmlns:ServiceInstanceSchema="http://efficiensea2.org/mari
+time-cloud/service-registry/v1/ServiceInstanceSchema.xsd" xmlns:ServiceSpecificationSchema="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceSpecificationSchema.xsd" xmlns:xsi="htt
+p://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://efficiensea2.org/maritime-cloud/service-registry/v1/ServiceInstanceSchema.xsd ServiceInstanceSchema.xml">
+        <ServiceInstanceSchema:id>urn:mrn:stm:service:instance:sma:vis:mmsi:002659991</ServiceInstanceSchema:id>
+        <ServiceInstanceSchema:version>1.0.0</ServiceInstanceSchema:version>
+        <ServiceInstanceSchema:name>Gothenburg SC Support ECDIS 1 WSAM</ServiceInstanceSchema:name>
+        <ServiceInstanceSchema:status>provisional</ServiceInstanceSchema:status>
+        <ServiceInstanceSchema:description>Gothenburg Shore Centre Support ECDIS from Wartsila SAM</ServiceInstanceSchema:description>
+        <ServiceInstanceSchema:keywords>ECDIS,VIS,Voyage Information Service,RTZ,TXT,S124</ServiceInstanceSchema:keywords>
+        <ServiceInstanceSchema:URL>https://smavis.stmvalidation.eu/SEGOT_SC_ECDIS_WSAM</ServiceInstanceSchema:URL>
+        <ServiceInstanceSchema:MMSI>002659991</ServiceInstanceSchema:MMSI>
+        <ServiceInstanceSchema:IMO/>
+        <ServiceInstanceSchema:serviceType>Evaluation Service</ServiceInstanceSchema:serviceType>
+        <ServiceInstanceSchema:requiresAuthorization>true</ServiceInstanceSchema:requiresAuthorization>
+        <ServiceInstanceSchema:offersServiceLevel>
+                <ServiceInstanceSchema:availability>24</ServiceInstanceSchema:availability>
+                <ServiceInstanceSchema:name>High</ServiceInstanceSchema:name>
+                <ServiceInstanceSchema:description>High availablity</ServiceInstanceSchema:description>
+        </ServiceInstanceSchema:offersServiceLevel>
+        <ServiceInstanceSchema:coversAreas>
+                <ServiceInstanceSchema:coversArea>
+                        <ServiceInstanceSchema:name>The World</ServiceInstanceSchema:name>
+                        <ServiceInstanceSchema:description>Worldwide coverage</ServiceInstanceSchema:description>
+                        <ServiceInstanceSchema:geometryAsWKT/>
+                </ServiceInstanceSchema:coversArea>
+        </ServiceInstanceSchema:coversAreas>
+        <ServiceInstanceSchema:implementsServiceDesign>
+                <ServiceInstanceSchema:id>urn:mrn:stm:service:design:sma:vis-rest-2.2</ServiceInstanceSchema:id>
+                <ServiceInstanceSchema:version>2.2</ServiceInstanceSchema:version>
+        </ServiceInstanceSchema:implementsServiceDesign>
+        <ServiceInstanceSchema:producedBy>
+                <ServiceSpecificationSchema:id>urn:mrn:stm:org:sma</ServiceSpecificationSchema:id>
+                <ServiceSpecificationSchema:name>SMA</ServiceSpecificationSchema:name>
+                <ServiceSpecificationSchema:description/>
+                <ServiceSpecificationSchema:contactInfo>per.lofbom@sjofartsverket.se</ServiceSpecificationSchema:contactInfo>
+                <ServiceSpecificationSchema:organizationId>urn:mrn:stm:org:sma</ServiceSpecificationSchema:organizationId>
+                <ServiceSpecificationSchema:isCommercial>false</ServiceSpecificationSchema:isCommercial>
+        </ServiceInstanceSchema:producedBy>
+        <ServiceInstanceSchema:providedBy>
+                <ServiceSpecificationSchema:id>urn:mrn:stm:org:sma</ServiceSpecificationSchema:id>
+                <ServiceSpecificationSchema:name>SMA</ServiceSpecificationSchema:name>
+                <ServiceSpecificationSchema:description/>
+                <ServiceSpecificationSchema:contactInfo>per.lofbom@sjofartsverket.se</ServiceSpecificationSchema:contactInfo>
+                <ServiceSpecificationSchema:organizationId>urn:mrn:stm:org:sma</ServiceSpecificationSchema:organizationId>
+                <ServiceSpecificationSchema:isCommercial>false</ServiceSpecificationSchema:isCommercial>
+        </ServiceInstanceSchema:providedBy>
+</ServiceInstanceSchema:serviceInstance>

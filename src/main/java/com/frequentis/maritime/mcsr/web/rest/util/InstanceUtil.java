@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.frequentis.maritime.mcsr.domain.Design;
 import com.frequentis.maritime.mcsr.domain.Instance;
 import com.frequentis.maritime.mcsr.domain.Specification;
+import com.frequentis.maritime.mcsr.domain.Xml;
 import com.frequentis.maritime.mcsr.service.DesignService;
 import com.frequentis.maritime.mcsr.web.exceptions.DesignDocumentDoesNotExistException;
 import com.frequentis.maritime.mcsr.web.exceptions.GeometryParseException;
@@ -204,11 +205,12 @@ public class InstanceUtil {
                 instance.setGeometry(pointJson);
                 //insert the WKT geometry into the XML
 //TODO: Check if this is actually neccessary, ATM this doesn't create missing xml nodes and it might be better to not modify the XML anyway
-//                Xml instanceXml = instance.getInstanceAsXml();
-//                String xml = instanceXml.getContent().toString();
-//                String resultXml = updateXmlNode(pointWKT, xml, "/ServiceInstanceSchema:serviceInstance/coversArea/coversArea/geometryAsWKT");
-//                instanceXml.setContent(resultXml);
-//                instance.setInstanceAsXml(instanceXml);
+                Xml instanceXml = instance.getInstanceAsXml();
+                String xml = instanceXml.getContent().toString();
+                //String resultXml = XmlUtil.updateXmlNode(pointWKT, xml, "/ServiceInstanceSchema:serviceInstance/coversArea/coversArea/geometryAsWKT");
+                String resultXml = XmlUtil.updateXmlNode(pointWKT, xml, "/*[local-name()='serviceInstance']/*[local-name()='coversArea']/*[local-name()='coversArea']/*[local-name()='geometryAsWKT']");
+                instanceXml.setContent(resultXml);
+                instance.setInstanceAsXml(instanceXml);
             }
         } catch (Exception ex) {
             log.error("Error parsing point geometry generated from UnLoCode mapping " + pointWKT + ": ", ex);

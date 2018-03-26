@@ -350,8 +350,8 @@ public class ServiceInstanceResourceTest {
 		}
 
 		// When
-		InstanceDTO o = instanceInternal.getInstance(instance.instanceId, instance.version, true, true, false);
-		InstanceDTO o2 = instanceInternal.getInstance(instance.instanceId, instance.version, false, true, false);
+		InstanceDTO o = instanceInternal.getInstance(instance.instanceId, instance.version, true, true);
+		InstanceDTO o2 = instanceInternal.getInstance(instance.instanceId, instance.version, false, true);
 
 		// Then
 		assertEquals(instance.name, o.name);
@@ -406,7 +406,7 @@ public class ServiceInstanceResourceTest {
 		}
 
 		// When
-		PageDTO<InstanceDTO> resultPage = client.getAllInstancesById(instances[0].instanceId, false, true, false, 0);
+		PageDTO<InstanceDTO> resultPage = client.getAllInstancesById(instances[0].instanceId, false, true, 0);
 
 		// Then
 		assertEquals(itemCount, resultPage.itemTotalCount);
@@ -419,13 +419,13 @@ public class ServiceInstanceResourceTest {
 	public void deleteInstance() throws ProcessingException, Exception {
 		// Given
 		InstanceDTO inst = instanceInternal.createInstance(prepareValidWithXML());
-		boolean exist = instanceInternal.getInstance(inst.instanceId, inst.version, false, true, false) != null;
+		boolean exist = instanceInternal.getInstance(inst.instanceId, inst.version, false, true) != null;
 
 		// When
 		client.deleteInstance(inst.instanceId, inst.version);
 
 		// Then
-		boolean existAfter = instanceInternal.getInstance(inst.instanceId, inst.version, false, true, false) != null;
+		boolean existAfter = instanceInternal.getInstance(inst.instanceId, inst.version, false, true) != null;
 		assertEquals(true, exist);
 		assertEquals(false, existAfter);
 
@@ -445,7 +445,7 @@ public class ServiceInstanceResourceTest {
 		}
 
 		// When
-		long count = client.searchInstances("name:" + prefix + "*", false, true, false, 0).itemTotalCount;
+		long count = client.searchInstances("name:" + prefix + "*", false, true, 0).itemTotalCount;
 		// Then
 		assertEquals(instanceCount, count);
 	}
@@ -465,7 +465,7 @@ public class ServiceInstanceResourceTest {
 			instanceInternal.createInstance(prepareValidWithXML());
 		}
 		// When
-		PageDTO<InstanceDTO> result = client.searchInstancesByKeywords(customKeyword, false, true, false, 0);
+		PageDTO<InstanceDTO> result = client.searchInstancesByKeywords(customKeyword, false, true, 0);
 		// Then
 		assertEquals(instanceCount, result.itemTotalCount);
 	}
@@ -489,7 +489,7 @@ public class ServiceInstanceResourceTest {
 		instanceInternal.createInstance(prepareValidWithXML(oi));
 
 		// When
-		PageDTO<InstanceDTO> result = client.searchInstancesByUnlocode(randomPrefix + "FR", false, true, false, 0);
+		PageDTO<InstanceDTO> result = client.searchInstancesByUnlocode(randomPrefix + "FR", false, true, 0);
 
 		// Then
 		assertEquals(1, result.itemTotalCount);
@@ -510,7 +510,7 @@ public class ServiceInstanceResourceTest {
 
 		// When
 		PageDTO<InstanceDTO> result = client.searchInstancesByLocation("26.31311263768267", "-70.048828125",
-		        "name:" + iv.name, false, true, false, 0);
+		        "name:" + iv.name, false, true, 0);
 
 		// Then
 		assertEquals(1, result.itemTotalCount);
@@ -535,9 +535,9 @@ public class ServiceInstanceResourceTest {
 		        + "[ 14.411916732788084, 50.11573500084129 ], " + "[ 14.372949600219725, 50.11711093052596 ] ] ] }";
 
 		// When
-		PageDTO<InstanceDTO> resultPage = client.searchInstancesByGeometryGeojson(polygon, "name:" + iv.name, false, true, false, 0);
+		PageDTO<InstanceDTO> resultPage = client.searchInstancesByGeometryGeojson(polygon, "name:" + iv.name, false, true, 0);
 		PageDTO<InstanceDTO> badResultPage = client.searchInstancesByGeometryGeojson(badPolygon, "name:" + iv.name,
-		        false, true, false, 0);
+		        false, true, 0);
 
 		// Then
 		assertEquals(1, resultPage.itemTotalCount);
@@ -564,8 +564,8 @@ public class ServiceInstanceResourceTest {
 		        + "14.421186447143555 50.096330182758116))";
 
 		// When
-		PageDTO<InstanceDTO> resultPage = client.searchInstancesByGeometryWKT(polygon, "name:" + iv.name, false, true, false, 0);
-		PageDTO<InstanceDTO> badResultPage = client.searchInstancesByGeometryWKT(badPolygon, "name:" + iv.name, false, true, false,
+		PageDTO<InstanceDTO> resultPage = client.searchInstancesByGeometryWKT(polygon, "name:" + iv.name, false, true, 0);
+		PageDTO<InstanceDTO> badResultPage = client.searchInstancesByGeometryWKT(badPolygon, "name:" + iv.name, false, true,
 		        0);
 
 		// Then
