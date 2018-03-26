@@ -58,6 +58,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.geo.GeoShapeModule;
+import org.springframework.data.mapping.context.InvalidPersistentPropertyPath;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.SAXException;
@@ -199,28 +200,41 @@ public class InstanceService {
      */
     public void updateStatus(Long id, String status) throws Exception {
         log.debug("Request to update status of Instance : {}", id);
-        Instance instance = instanceRepository.findOneWithEagerRelationships(id);
-        
-        Xml instanceXml = instance.getInstanceAsXml();
-        if(instanceXml != null && instanceXml.getContent() != null) {
-            String xml = instanceXml.getContent().toString();
-            //Update the status value inside the xml definition
-            String resultXml = XmlUtil.updateXmlNode(status, xml, "/*[local-name()='serviceInstance']/*[local-name()='status']");
-            instanceXml.setContent(resultXml);
-            // Save XML
-            xmlService.save(instanceXml);
+        try {
+            Instance instance = instanceRepository.findOneWithEagerRelationships(id);
+            
+            Xml instanceXml = instance.getInstanceAsXml();
+            if(instanceXml != null && instanceXml.getContent() != null) {
+                String xml = instanceXml.getContent().toString();
+                //Update the status value inside the xml definition
+                String resultXml = XmlUtil.updateXmlNode(status, xml, "/*[local-name()='serviceInstance']/*[local-name()='status']");
+                instanceXml.setContent(resultXml);
+                // Save XML
+                xmlService.save(instanceXml);
+                instance.setInstanceAsXml(instanceXml);
+            }
+            
+            instance.setStatus(status);
             instance.setInstanceAsXml(instanceXml);
+            // Update also ES record
+            Instance esInstance = instanceSearchRepository.findOneByInstanceIdAndVersion(QueryParser.escape(instance.getInstanceId()), instance.getVersion());
+            if(esInstance != null) {
+                esInstance.setStatus(status);
+                esInstance.setInstanceAsXml(instanceXml);
+    
+                instanceSearchRepository.save(esInstance);
+            }
+            save(instance);
+        } catch (InvalidPersistentPropertyPath e) {
+            log.error("Problem during instance status update.", e);
+            log.error("   Source: ", e.getSource());
+            log.error("   ResolvedPath:  ", e.getResolvedPath());
+            log.error("   ResolvedPath:  ", e.getUnresolvableSegment());
+            throw e;
+        } catch (Throwable e) {
+            log.error("Problem during instance status update.", e);
+            throw e;
         }
-        
-        instance.setStatus(status);
-        instance.setInstanceAsXml(instanceXml);
-        // Update also ES record
-        Instance esInstance = instanceSearchRepository.findOneByInstanceIdAndVersion(QueryParser.escape(instance.getInstanceId()), instance.getVersion());
-        esInstance.setStatus(status);
-        esInstance.setInstanceAsXml(instanceXml);
-
-        instanceSearchRepository.save(esInstance);
-        save(instance);
     }
 
     /**

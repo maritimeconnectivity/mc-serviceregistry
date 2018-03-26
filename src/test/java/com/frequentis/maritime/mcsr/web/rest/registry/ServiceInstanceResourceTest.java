@@ -39,6 +39,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Test class for the ServiceInstanceResource REST controller.
@@ -248,7 +249,8 @@ public class ServiceInstanceResourceTest {
         Xml xml = new Xml();
         xml.setContent(instanceXmlEmptyCoverage);
         i.setInstanceAsXml(xml);
-        InstanceUtil.applyUnLoCodeMapping(i, "AD CAN");
+        InstanceUtil.applyUnLoCodeMapping(i, "ADCAN");
+        assertNotNull(i.getGeometry());
         assertThat(i.getGeometry().toString().length() > 0).isTrue();
         assertEquals("{\"type\":\"Point\",\"coordinates\":[1.35,42.34]}", i.getGeometry().toString());
     }
