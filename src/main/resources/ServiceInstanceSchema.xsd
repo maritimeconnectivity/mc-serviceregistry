@@ -105,10 +105,10 @@
 			<element name="offersServiceLevel" type="ServiceInstanceSchema:ServiceLevel" minOccurs="1" maxOccurs="1"/>
 			<element name="coversAreas" minOccurs="1" maxOccurs="1">
 				<complexType>
-					<choice>
-						<element name="coversArea" type="ServiceInstanceSchema:CoverageArea" minOccurs="1" maxOccurs="unbounded"/>
-						<element name="unLoCode" type="string" minOccurs="1" maxOccurs="1"/>
-					</choice>
+					<sequence>
+						<element name="coversArea" type="ServiceInstanceSchema:CoverageArea" minOccurs="0" maxOccurs="unbounded"/>
+						<element name="unLoCode" type="string" minOccurs="0" maxOccurs="1"/>
+					</sequence>
 				</complexType>
 			</element>
 			<element name="implementsServiceDesign" type="ServiceInstanceSchema:ServiceDesignReference" minOccurs="0" maxOccurs="1"/>

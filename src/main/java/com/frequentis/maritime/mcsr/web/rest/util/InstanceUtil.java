@@ -143,13 +143,19 @@ public class InstanceUtil {
 
         String unLoCode = xPath.compile("/*[local-name()='serviceInstance']/*[local-name()='coversAreas']/*[local-name()='unLoCode']").evaluate(doc, XPathConstants.STRING).toString();
         String geometryAsWKT = xPath.compile("/*[local-name()='serviceInstance']/*[local-name()='coversAreas']/*[local-name()='coversArea']/*[local-name()='geometryAsWKT']").evaluate(doc);
+
+        //UN/LOCODE and Coverage Geometry are supported simultaneously. However, for geo-searches, Coverage takes precedence over UN/LOCODE.
         if (unLoCode != null && unLoCode.length() > 0) {
             instance.setUnlocode(unLoCode);
-            mapUnLoCodeToLocation(instance, unLoCode);
-        } else if (geometryAsWKT != null && geometryAsWKT.length() > 0) {
+        }
+
+        if (geometryAsWKT != null && geometryAsWKT.length() > 0) {
             JsonNode geometryAsGeoJson = convertWKTtoGeoJson(geometryAsWKT);
             instance.setGeometry(geometryAsGeoJson);
+        } else if (unLoCode != null && unLoCode.length() > 0) {
+            mapUnLoCodeToLocation(instance, unLoCode);
         }
+
         return instance;
     }
 
@@ -204,10 +210,8 @@ public class InstanceUtil {
                 //Update the json geometry so E2 can find it
                 instance.setGeometry(pointJson);
                 //insert the WKT geometry into the XML
-//TODO: Check if this is actually neccessary, ATM this doesn't create missing xml nodes and it might be better to not modify the XML anyway
                 Xml instanceXml = instance.getInstanceAsXml();
                 String xml = instanceXml.getContent().toString();
-                //String resultXml = XmlUtil.updateXmlNode(pointWKT, xml, "/ServiceInstanceSchema:serviceInstance/coversArea/coversArea/geometryAsWKT");
                 String resultXml = XmlUtil.updateXmlNode(pointWKT, xml, "/*[local-name()='serviceInstance']/*[local-name()='coversArea']/*[local-name()='coversArea']/*[local-name()='geometryAsWKT']");
                 instanceXml.setContent(resultXml);
                 instance.setInstanceAsXml(instanceXml);
