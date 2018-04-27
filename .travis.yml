@@ -11,7 +11,7 @@ before_install:
   - wget "https://github.com/hefay/spring-data-elasticsearch/archive/frq.zip" -O tmp_sda/spring-data-frq.zip
   - unzip tmp_sda/spring-data-frq.zip -d tmp_sda
   - cd tmp_sda/spring-data-elasticsearch-frq
-  - mvn clean install -DskipTests
+  - mvn clean install -DskipTests -q
   - cd ../..
   - rm -rf tmp_sda
 
@@ -24,7 +24,7 @@ install:
   - mvn -N io.takari:maven:wrapper
 
 script: 
-  - ./mvnw compile
+  - ./mvnw compile -q
   - ./mvnw test
 #  - ./mvnw spring-boot:run -Drun.profiles=integration &
 #  - sleep 30s
