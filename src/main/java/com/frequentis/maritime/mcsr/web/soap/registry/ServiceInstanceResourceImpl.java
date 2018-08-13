@@ -110,6 +110,14 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 			return createInstance(instanceDto);
 		}
 
+	        Instance instance = instanceParameterConverter.convert(instanceDto);
+		String bearerToken = SoapHTTPUtil.currentBearerToken();
+    		if (!InstanceUtil.checkRolePermissions(instance.getOrganizationId(), bearerToken)) {
+		    String msg = "Cannot delete entity, organization ID does not match that of entity: "+instance.getOrganizationId();
+		    log.warn(msg);
+        	    throw new AccessDeniedException(msg);
+    		}
+
 		return saveInstance(instanceDto);
 	}
 
@@ -160,16 +168,13 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 	@Override
 	public void deleteInstance(String id, String version) throws AccessDeniedException {
 		log.debug("SOAP request to delete Instance id {} version {}", id, version);
-		String bearerToken = SoapHTTPUtil.currentBearerToken();
 		Instance instance = instanceService.findAllByDomainId(id, version);
-
-		String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
-		if(!InstanceUtil.checkOrganizationId(instance, organizationId)) {
-			String msg = "Cannot delete entity, organization ID "+organizationId+" does not match that of entity: "+instance.getOrganizationId();
-			log.warn(msg);
-            throw new AccessDeniedException(msg);
-		}
-
+		String bearerToken = SoapHTTPUtil.currentBearerToken();
+	        if (!InstanceUtil.checkRolePermissions(instance.getOrganizationId(), bearerToken)) {
+		    String msg = "Cannot delete entity, organization ID does not match that of entity: "+instance.getOrganizationId();
+		    log.warn(msg);
+	            throw new AccessDeniedException(msg);
+	        }
 		instanceService.delete(instance.getId());
 	}
 
@@ -267,12 +272,12 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 	@Override
 	public void updateInstanceStatus(String id, String version, String status) throws AccessDeniedException {
         log.debug("SOAP request to update status of Instance {} version {}", id, version);
-        String bearerToken = SoapHTTPUtil.currentBearerToken();
         Instance instance = instanceService.findAllByDomainId(id, version);
 
-        String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
-        if (!InstanceUtil.checkOrganizationId(instance, organizationId)) {
-            String msg = "Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+instance.getOrganizationId();
+	String bearerToken = SoapHTTPUtil.currentBearerToken();
+        if (!InstanceUtil.checkRolePermissions(instance.getOrganizationId(), bearerToken)) {
+	    String msg = "Cannot delete entity, organization ID does not match that of entity: "+instance.getOrganizationId();
+	    log.warn(msg);
             throw new AccessDeniedException(msg);
         }
 

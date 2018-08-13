@@ -23,6 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 
+import java.io.UnsupportedEncodingException;
+import java.io.IOException;
+import java.util.ArrayList;
 import javax.xml.bind.DatatypeConverter;
 
 /**
@@ -63,7 +66,7 @@ public class HeaderUtil {
         return headers;
     }
 
-    public static String extractOrganizationIdFromToken(String tokenHeader) throws Exception {
+    private static JsonNode getJsonFromToken(String tokenHeader) throws UnsupportedEncodingException, IOException {
         String payload = tokenHeader.substring(tokenHeader.indexOf('.') + 1, tokenHeader.indexOf('.', tokenHeader.indexOf('.') + 1));
         //Make sure string length is a multiple of 4 to avoid issue in parseBase64Binary function
         while (payload.length()%4 != 0) {
@@ -72,6 +75,44 @@ public class HeaderUtil {
         String tokenJson = new String(DatatypeConverter.parseBase64Binary(payload), "UTF-8");
         ObjectMapper mapper = new ObjectMapper();
         JsonNode json = mapper.readTree(tokenJson);
-        return json.get("org").textValue();
+	return json;
+    }
+
+    public static String extractOrganizationIdFromToken(String tokenHeader) throws Exception {
+	try {
+            JsonNode json = HeaderUtil.getJsonFromToken(tokenHeader);
+	    return json.get("org").textValue();
+	} catch (Exception e) {
+	    log.warn("Error extracting Organization from Token:", e);
+	}
+	return "";
+    }
+
+    public static ArrayList<String> getRolesFromToken(String tokenHeader) throws Exception {
+        JsonNode json = HeaderUtil.getJsonFromToken(tokenHeader);
+	JsonNode roles = json.get("roles");
+	ArrayList result = new ArrayList<String>();
+	if (roles.isArray()) {
+            for (final JsonNode role : roles) {
+                result.add(role.textValue());
+            }
+        } else {
+            result.add(roles.textValue());
+        }
+        return result;
+    }
+
+    public static ArrayList<String> getActingOnBehalfOfFromToken(String tokenHeader) throws Exception {
+        JsonNode json = HeaderUtil.getJsonFromToken(tokenHeader);
+	JsonNode aobs  = json.get("acting_on_behalf_of");
+	ArrayList result = new ArrayList<String>();
+	if (aobs.isArray()) {
+            for (final JsonNode aob : aobs) {
+                result.add(aob.textValue());
+            }
+        } else {
+            result.add(aobs.textValue());
+        }
+        return result;
     }
 }

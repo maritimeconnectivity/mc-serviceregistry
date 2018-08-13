@@ -14,6 +14,7 @@ import com.frequentis.maritime.mcsr.domain.Xml;
 import com.frequentis.maritime.mcsr.service.SpecificationService;
 import com.frequentis.maritime.mcsr.service.XmlService;
 import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
+import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 import com.frequentis.maritime.mcsr.web.soap.PageResponse;
 import com.frequentis.maritime.mcsr.web.soap.SoapHTTPUtil;
@@ -23,6 +24,7 @@ import com.frequentis.maritime.mcsr.web.soap.converters.specification.Specificat
 import com.frequentis.maritime.mcsr.web.soap.dto.PageDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.specification.SpecificationDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.specification.SpecificationDescriptorDTO;
+import com.frequentis.maritime.mcsr.web.soap.errors.AccessDeniedException;
 import com.frequentis.maritime.mcsr.web.soap.errors.ProcessingException;
 import com.frequentis.maritime.mcsr.web.soap.errors.XmlValidateException;
 import com.frequentis.maritime.mcsr.web.util.WebUtils;
@@ -81,11 +83,13 @@ public class ServiceSpecificationResourceImpl implements ServiceSpecificationRes
         }
 
         Specification specification = specificationConverter.convertReverse(specificationDTO);
-        String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
-        if (specification.getOrganizationId() != null && specification.getOrganizationId().length() > 0 && !organizationId.equals(specification.getOrganizationId())) {
-            log.warn("Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+specification.getOrganizationId());
-            throw new IllegalAccessException();
+        if (!InstanceUtil.checkRolePermissions(specification.getOrganizationId(), bearerToken)) {
+            String msg = "Cannot delete entity, organization ID does not match that of entity: "+specification.getOrganizationId();
+            log.warn(msg);
+            throw new AccessDeniedException(msg);
         }
+
+
         String xml = specification.getSpecAsXml().getContent().toString();
         log.info("XML:" + xml);
         XmlUtil.validateXml(xml, "ServiceSpecificationSchema.xsd");
@@ -124,21 +128,16 @@ public class ServiceSpecificationResourceImpl implements ServiceSpecificationRes
     }
 
     @Override
-    public void deleteSpecification(String id, String version) throws IllegalAccessException {
+    public void deleteSpecification(String id, String version) throws IllegalAccessException, AccessDeniedException {
         log.debug("SOAP request to delete a specification {} of version {}", id, version);
         String bearerToken = SoapHTTPUtil.currentBearerToken();
         
         Specification specification = specificationService.findByDomainId(id, version);
 
-        String organizationId = "";
-        try {
-            organizationId = HeaderUtil.extractOrganizationIdFromToken(bearerToken);
-        } catch (Exception e) {
-            log.warn("No organizationId could be parsed from the bearer token");
-        }
-        if (specification.getOrganizationId() != null && specification.getOrganizationId().length() > 0 && !organizationId.equals(specification.getOrganizationId())) {
-            log.warn("Cannot delete entity, organization ID "+organizationId+" does not match that of entity: "+specification.getOrganizationId());
-            throw new IllegalAccessException();
+        if (!InstanceUtil.checkRolePermissions(specification.getOrganizationId(), bearerToken)) {
+            String msg = "Cannot delete entity, organization ID does not match that of entity: "+specification.getOrganizationId();
+            log.warn(msg);
+            throw new AccessDeniedException(msg);
         }
 
         specificationService.delete(specification.getId());
@@ -153,15 +152,15 @@ public class ServiceSpecificationResourceImpl implements ServiceSpecificationRes
     }
 
     @Override
-    public void updateSpecificationStatus(String id, String version, String status) throws IllegalAccessException, ProcessingException {
+    public void updateSpecificationStatus(String id, String version, String status) throws IllegalAccessException, ProcessingException, AccessDeniedException {
         log.debug("SOAP request to update status of Specification {} of version {}", id, version);
         String bearerToken = SoapHTTPUtil.currentBearerToken();
         Specification specification = specificationService.findByDomainId(id, version);
 
-        String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
-        if (specification.getOrganizationId() != null && specification.getOrganizationId().length() > 0 && !organizationId.equals(specification.getOrganizationId())) {
-            log.warn("Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+specification.getOrganizationId());
-            throw new IllegalAccessException();
+        if (!InstanceUtil.checkRolePermissions(specification.getOrganizationId(), bearerToken)) {
+            String msg = "Cannot delete entity, organization ID does not match that of entity: "+specification.getOrganizationId();
+            log.warn(msg);
+            throw new AccessDeniedException(msg);
         }
 
         // @TODO This shoud be moved to the service layer

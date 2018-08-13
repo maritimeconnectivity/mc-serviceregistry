@@ -10,6 +10,7 @@ import com.frequentis.maritime.mcsr.domain.Specification;
 import com.frequentis.maritime.mcsr.web.soap.dto.PageDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.specification.SpecificationDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.specification.SpecificationDescriptorDTO;
+import com.frequentis.maritime.mcsr.web.soap.errors.AccessDeniedException;
 
 @WebService(targetNamespace = "com.frequentis.maritime.mcsr.web.soap.registry.ServiceInstanceResource", name = "ServiceSpecification")
 public interface ServiceSpecificationResource {
@@ -43,7 +44,7 @@ public interface ServiceSpecificationResource {
     @WebMethod
     public void deleteSpecification(
             @WebParam(name = "specificationId") @XmlElement(required = true) String id,
-            @WebParam(name = "version") @XmlElement(required = true) String version) throws IllegalAccessException;
+            @WebParam(name = "version") @XmlElement(required = true) String version) throws IllegalAccessException, AccessDeniedException;
 
     @WebMethod
     @WebResult(name = "specifications")
@@ -55,6 +56,6 @@ public interface ServiceSpecificationResource {
     public void updateSpecificationStatus(
             @WebParam(name = "specificationId") @XmlElement(required = true) String id,
             @WebParam(name = "version") @XmlElement(required = true) String version,
-            @WebParam(name = "status") @XmlElement(required = true) String status) throws IllegalAccessException, Exception;
+            @WebParam(name = "status") @XmlElement(required = true) String status) throws IllegalAccessException, AccessDeniedException, Exception;
 
 }

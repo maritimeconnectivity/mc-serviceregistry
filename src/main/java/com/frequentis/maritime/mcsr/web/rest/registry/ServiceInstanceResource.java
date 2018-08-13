@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ArrayList;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -97,6 +98,10 @@ public class ServiceInstanceResource {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("instance", "idexists", "A new instance cannot already have an ID")).body(null);
         }
 
+        if (!InstanceUtil.checkRolePermissions(instance.getOrganizationId(), bearerToken)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
         return saveInstance(instance, bearerToken, true);
     }
 
@@ -162,6 +167,10 @@ public class ServiceInstanceResource {
         log.debug("REST request to update Instance : {}", instance);
         if (instance.getId() == null) {
             return createInstance(instance, bearerToken);
+        }
+
+        if (!InstanceUtil.checkRolePermissions(instance.getOrganizationId(), bearerToken)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         return saveInstance(instance, bearerToken, false);
@@ -269,14 +278,7 @@ public class ServiceInstanceResource {
         if(instance == null) {
             return ResponseEntity.notFound().build();
         }
-        String organizationId = "";
-        try {
-            organizationId = HeaderUtil.extractOrganizationIdFromToken(bearerToken);
-        } catch (Exception e) {
-            log.warn("No organizationId could be parsed from the bearer token");
-        }
-        if (instance.getOrganizationId() != null && instance.getOrganizationId().length() > 0 && !organizationId.equals(instance.getOrganizationId())) {
-            log.warn("Cannot delete entity, organization ID "+organizationId+" does not match that of entity: "+instance.getOrganizationId());
+        if (!InstanceUtil.checkRolePermissions(instance.getOrganizationId(), bearerToken)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
@@ -501,14 +503,7 @@ public class ServiceInstanceResource {
             return ResponseEntity.notFound().build();
         }
 
-        String organizationId = "";
-        try {
-            organizationId = HeaderUtil.extractOrganizationIdFromToken(bearerToken);
-        } catch (Exception e) {
-            log.warn("No organizationId could be parsed from the bearer token");
-        }
-        if (instance.getOrganizationId() != null && instance.getOrganizationId().length() > 0 && !organizationId.equals(instance.getOrganizationId())) {
-            log.warn("Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+instance.getOrganizationId());
+        if (!InstanceUtil.checkRolePermissions(instance.getOrganizationId(), bearerToken)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
@@ -526,7 +521,5 @@ public class ServiceInstanceResource {
         errorMap.put("status", "400");
         return ResponseEntity.badRequest().body(errorMap);
     }
-
-
 
 }

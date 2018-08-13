@@ -25,19 +25,6 @@ public final class DesignUtils {
 
 	/**
 	 *
-	 * @param design
-	 * @param id
-	 * @return {@code true} if organization id match or {@code false}
-	 */
-	public static boolean matchOrganizationId(Design design, String id) {
-		if(design.getOrganizationId() != null && design.getOrganizationId().length() > 0 && !id.equals(design.getOrganizationId())) {
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 *
 	 * @param design Design where
 	 * @param status
 	 * @throws Exception

@@ -14,6 +14,7 @@ import com.frequentis.maritime.mcsr.domain.Design;
 import com.frequentis.maritime.mcsr.domain.util.DesignUtils;
 import com.frequentis.maritime.mcsr.service.DesignService;
 import com.frequentis.maritime.mcsr.service.XmlService;
+import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 import com.frequentis.maritime.mcsr.web.soap.PageResponse;
 import com.frequentis.maritime.mcsr.web.soap.SoapHTTPUtil;
@@ -98,11 +99,11 @@ public class TechnicalDesignResourceImpl implements TechnicalDesignResource {
 		}
 		Design design = designConverter.convertReverse(designDto);
 
-		String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
-		if(!DesignUtils.matchOrganizationId(design, organizationId)) {
-			log.warn("");
-			throw new AccessDeniedException("");
-		}
+                if (!InstanceUtil.checkRolePermissions(design.getOrganizationId(), bearerToken)) {
+                    String msg = "Cannot delete entity, organization ID does not match that of entity: "+design.getOrganizationId();
+                    log.warn(msg);
+                    throw new AccessDeniedException(msg);
+                }
 
 		String xml = design.getDesignAsXml().getContent().toString();
 		log.info("XML: " + xml);
@@ -174,12 +175,12 @@ public class TechnicalDesignResourceImpl implements TechnicalDesignResource {
 			return;
 		}
 
-		String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
+                if (!InstanceUtil.checkRolePermissions(design.getOrganizationId(), bearerToken)) {
+                    String msg = "Cannot delete entity, organization ID does not match that of entity: "+design.getOrganizationId();
+                    log.warn(msg);
+                    throw new AccessDeniedException(msg);
+                }
 
-		if(!DesignUtils.matchOrganizationId(design, organizationId)) {
-			log.warn("Cannot delete entity, organization ID "+organizationId+" does not match that of entity: "+design.getOrganizationId());
-			throw new AccessDeniedException("Cannot delete entity, organization ID "+organizationId+" does not match that of entity: "+design.getOrganizationId());
-		}
 		designService.delete(design.getId());
 	}
 
@@ -202,14 +203,11 @@ public class TechnicalDesignResourceImpl implements TechnicalDesignResource {
 		String bearerToken = SoapHTTPUtil.currentBearerToken();
 		Design design = designService.findByDomainId(id, version);
 
-		String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
-		if(!DesignUtils.matchOrganizationId(design, organizationId)) {
-			log.warn("Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+design.getOrganizationId());
-			throw new AccessDeniedException("Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+design.getOrganizationId());
-		}
-
-		// Ommited - no effect
-        // DesignUtils.updateXmlStatusValue(design, status);
+                if (!InstanceUtil.checkRolePermissions(design.getOrganizationId(), bearerToken)) {
+                    String msg = "Cannot delete entity, organization ID does not match that of entity: "+design.getOrganizationId();
+                    log.warn(msg);
+                    throw new AccessDeniedException(msg);
+                }
 
 		designService.updateStatus(design.getId(), status);
 	}

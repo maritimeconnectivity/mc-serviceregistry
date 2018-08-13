@@ -47,6 +47,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -340,6 +341,51 @@ public class InstanceUtil {
         } catch (Exception e) {
             throw new GeometryParseException("GeometryParse error.", e);
         }
+    }
+
+    /**
+     * Check if the role and organization information contained within the bearer token allows that user to make changes
+     * on an entity owned by the specified organization ID
+     *
+     */
+    public static boolean checkRolePermissions(String entityOrganizationId, String bearerToken) {
+	String organizationId = "";
+        ArrayList<String> roles = new ArrayList();
+        ArrayList<String> aobs = new ArrayList();
+        try {
+            organizationId = HeaderUtil.extractOrganizationIdFromToken(bearerToken);
+        } catch (Exception e) {
+            log.warn("No organizationId could be parsed from the bearer token");
+        }
+        try {
+            roles = HeaderUtil.getRolesFromToken(bearerToken);
+        } catch (Exception e) {
+            log.warn("No roles could be parsed from the bearer token");
+        }
+        try {
+            aobs = HeaderUtil.getActingOnBehalfOfFromToken(bearerToken);
+        } catch (Exception e) {
+            log.warn("No act-on-behalf-of data could be parsed from the bearer token");
+        }
+
+	if (!roles.contains("ROLE_SITE_ADMIN") && !roles.contains("ROLE_ORG_ADMIN") && !roles.contains("ROLE_ENTITY_ADMIN") && !roles.contains("ROLE_SERVICE_ADMIN")) {
+            log.warn("User does not have the neccessary roles to perform this operation");
+	    return false;
+	}
+
+        if (entityOrganizationId != null && entityOrganizationId.length() > 0 && !organizationId.equals(entityOrganizationId)) {
+	    if (!aobs.contains(entityOrganizationId)) {
+		if (roles.contains("ROLE_SERVICE_ADMIN")) {
+		    return true;
+		}
+                log.warn("User is not part or acting on behalf of Organization ID "+organizationId);
+		return false;
+	    } else {
+		return true;
+	    }
+        }
+	return true;
+
     }
 
 

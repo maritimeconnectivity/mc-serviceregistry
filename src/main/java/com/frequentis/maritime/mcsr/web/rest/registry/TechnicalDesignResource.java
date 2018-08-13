@@ -50,6 +50,7 @@ import com.frequentis.maritime.mcsr.domain.Design;
 import com.frequentis.maritime.mcsr.domain.util.DesignUtils;
 import com.frequentis.maritime.mcsr.service.DesignService;
 import com.frequentis.maritime.mcsr.web.rest.DesignResource;
+import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
@@ -114,8 +115,7 @@ public class TechnicalDesignResource {
         }
 
         String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
-        if (!DesignUtils.matchOrganizationId(design, organizationId)) {
-            log.warn("Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+design.getOrganizationId());
+        if (!InstanceUtil.checkRolePermissions(design.getOrganizationId(), bearerToken)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
@@ -227,8 +227,7 @@ public class TechnicalDesignResource {
         Design design = designService.findByDomainId(id, version);
 
         String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
-        if (!DesignUtils.matchOrganizationId(design, organizationId)) {
-            log.warn("Cannot delete entity, organization ID "+organizationId+" does not match that of entity: "+design.getOrganizationId());
+        if (!InstanceUtil.checkRolePermissions(design.getOrganizationId(), bearerToken)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
@@ -272,8 +271,7 @@ public class TechnicalDesignResource {
         Design design = designService.findByDomainId(id, version);
 
         String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
-        if (!DesignUtils.matchOrganizationId(design, organizationId)) {
-            log.warn("Cannot update entity, organization ID "+organizationId+" does not match that of entity: "+design.getOrganizationId());
+        if (!InstanceUtil.checkRolePermissions(design.getOrganizationId(), bearerToken)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 

@@ -51,6 +51,7 @@ import com.frequentis.maritime.mcsr.domain.Xml;
 import com.frequentis.maritime.mcsr.service.SpecificationService;
 import com.frequentis.maritime.mcsr.service.XmlService;
 import com.frequentis.maritime.mcsr.web.rest.SpecificationResource;
+import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
@@ -134,12 +135,10 @@ public class ServiceSpecificationResource {
 		} catch (Exception e) {
 			log.warn("No organizationId could be parsed from the bearer token");
 		}
-		if (specification.getOrganizationId() != null && specification.getOrganizationId().length() > 0
-		        && !organizationId.equals(specification.getOrganizationId())) {
-			log.warn("Cannot update entity, organization ID " + organizationId + " does not match that of entity: "
-			        + specification.getOrganizationId());
-			return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-		}
+	        if (!InstanceUtil.checkRolePermissions(specification.getOrganizationId(), bearerToken)) {
+		    return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+	        }
+
 		String xml = specification.getSpecAsXml().getContent().toString();
 		log.info("XML:" + xml);
 		XmlUtil.validateXml(xml, "ServiceSpecificationSchema.xsd");
@@ -238,12 +237,9 @@ public class ServiceSpecificationResource {
 		} catch (Exception e) {
 			log.warn("No organizationId could be parsed from the bearer token");
 		}
-		if (specification.getOrganizationId() != null && specification.getOrganizationId().length() > 0
-		        && !organizationId.equals(specification.getOrganizationId())) {
-			log.warn("Cannot delete entity, organization ID " + organizationId + " does not match that of entity: "
-			        + specification.getOrganizationId());
-			return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-		}
+	        if (!InstanceUtil.checkRolePermissions(specification.getOrganizationId(), bearerToken)) {
+		    return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+	        }
 
 		specificationService.delete(specification.getId());
 		return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("specification", id.toString()))
@@ -295,12 +291,9 @@ public class ServiceSpecificationResource {
 		} catch (Exception e) {
 			log.warn("No organizationId could be parsed from the bearer token");
 		}
-		if (specification.getOrganizationId() != null && specification.getOrganizationId().length() > 0
-		        && !organizationId.equals(specification.getOrganizationId())) {
-			log.warn("Cannot update entity, organization ID " + organizationId + " does not match that of entity: "
-			        + specification.getOrganizationId());
-			return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-		}
+	        if (!InstanceUtil.checkRolePermissions(specification.getOrganizationId(), bearerToken)) {
+		    return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+	        }
 
 		Xml specificationXml = specification.getSpecAsXml();
 		String xml = specificationXml.getContent().toString();
