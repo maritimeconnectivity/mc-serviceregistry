@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -76,6 +77,14 @@ public class Design implements Serializable {
     @Column(name = "version", nullable = false)
     @Field(type = FieldType.text, index = true, fielddata = true)
     private String version;
+
+    @Column(name = "published_at", nullable = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
+    private String publishedAt;
+
+    @Column(name = "last_updated_at", nullable = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
+    private String lastUpdatedAt;
 
     @NotNull
     @Column(name = "comment", nullable = false)
@@ -149,6 +158,22 @@ public class Design implements Serializable {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public String getLastUpdatedAt() {
+        return lastUpdatedAt;
+    }
+
+    public void setLastUpdatedAt(String lastUpdatedAt) {
+        this.lastUpdatedAt = lastUpdatedAt;
+    }
+
+    public String getPublishedAt() {
+        return publishedAt;
+    }
+
+    public void setPublishedAt(String publishedAt) {
+        this.publishedAt = publishedAt;
     }
 
     public String getComment() {
@@ -257,6 +282,8 @@ public class Design implements Serializable {
             "id=" + id +
             ", name='" + name + "'" +
             ", version='" + version + "'" +
+            ", publishedAt='" + publishedAt + "'" +
+            ", lastUpdatedAt='" + lastUpdatedAt + "'" +
             ", comment='" + comment + "'" +
             ", designId='" + designId + "'" +
             ", status='" + status + "'" +

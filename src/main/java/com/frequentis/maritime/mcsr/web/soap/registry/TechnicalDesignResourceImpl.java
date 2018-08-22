@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.frequentis.maritime.mcsr.domain.Design;
-import com.frequentis.maritime.mcsr.domain.util.DesignUtils;
 import com.frequentis.maritime.mcsr.service.DesignService;
 import com.frequentis.maritime.mcsr.service.XmlService;
 import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
@@ -26,6 +25,7 @@ import com.frequentis.maritime.mcsr.web.soap.dto.design.DesignDescriptorDTO;
 import com.frequentis.maritime.mcsr.web.soap.errors.AccessDeniedException;
 import com.frequentis.maritime.mcsr.web.soap.errors.XmlValidateException;
 import com.frequentis.maritime.mcsr.web.util.WebUtils;
+import com.frequentis.maritime.mcsr.domain.util.EntityUtils;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -79,9 +79,18 @@ public class TechnicalDesignResourceImpl implements TechnicalDesignResource {
 		} catch (Exception e) {
 			throw new XmlValidateException("Design XML validation failed.", e);
 		}
+
+                if (!InstanceUtil.checkRolePermissions(design.getOrganizationId(), bearerToken)) {
+                    String msg = "User does not have permission to create designs for organization: "+design.getOrganizationId();
+                    log.warn(msg);
+                    throw new AccessDeniedException(msg);
+                }
+
+    		design.setPublishedAt(EntityUtils.getCurrentUTCTimeISO8601());
+    		design.setLastUpdatedAt(design.getPublishedAt());
+
 		xmlService.save(design.getDesignAsXml());
 
-		design.setOrganizationId(organizationId);
 		Design result = designService.save(design);
 		return designDescriptorConverter.convert(result);
 	}
@@ -100,7 +109,7 @@ public class TechnicalDesignResourceImpl implements TechnicalDesignResource {
 		Design design = designConverter.convertReverse(designDto);
 
                 if (!InstanceUtil.checkRolePermissions(design.getOrganizationId(), bearerToken)) {
-                    String msg = "Cannot delete entity, organization ID does not match that of entity: "+design.getOrganizationId();
+                    String msg = "Cannot update entity, organization ID does not match that of entity: "+design.getOrganizationId();
                     log.warn(msg);
                     throw new AccessDeniedException(msg);
                 }
@@ -108,6 +117,11 @@ public class TechnicalDesignResourceImpl implements TechnicalDesignResource {
 		String xml = design.getDesignAsXml().getContent().toString();
 		log.info("XML: " + xml);
 		XmlUtil.validateXml(xml, SCHEMA_SERVICE_DESIGN);
+
+    		design.setLastUpdatedAt(EntityUtils.getCurrentUTCTimeISO8601());
+    		if (design.getPublishedAt() == null) {
+        	    design.setPublishedAt(design.getLastUpdatedAt());
+    		}
 
 		Design result = designService.save(design);
 		return designDescriptorConverter.convert(result);

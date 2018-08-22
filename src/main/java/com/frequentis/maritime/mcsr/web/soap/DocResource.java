@@ -11,6 +11,7 @@ import org.apache.cxf.annotations.WSDLDocumentation;
 import com.frequentis.maritime.mcsr.web.soap.dto.PageDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.doc.DocDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.doc.DocDescriptorDTO;
+import com.frequentis.maritime.mcsr.web.soap.errors.ProcessingException;
 
 @WebService(targetNamespace = "http://target.namespace/", name = "Doc")
 public interface DocResource {
@@ -21,11 +22,11 @@ public interface DocResource {
 
     @WebMethod
     @WSDLDocumentation("This method crate new document.")
-    public DocDescriptorDTO createDoc(@WebParam(name = "document") @XmlElement(required = true) DocDTO doc);
+    public DocDescriptorDTO createDoc(@WebParam(name = "document") @XmlElement(required = true) DocDTO doc) throws ProcessingException;
 
     @WebMethod
     @WSDLDocumentation("This method update the document.")
-    public DocDescriptorDTO updateDoc(@WebParam(name = "document") @XmlElement(required = true) DocDTO doc);
+    public DocDescriptorDTO updateDoc(@WebParam(name = "document") @XmlElement(required = true) DocDTO doc) throws ProcessingException;
 
     @WebMethod
     @WebResult(name = "document")

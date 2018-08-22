@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.Date;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -59,11 +60,11 @@ import org.springframework.data.elasticsearch.core.geo.GeoShape;
 import io.swagger.annotations.ApiModel;
 
 /**
- * Holds a description of an service instance.An instance can be compatible to one or morespecification templates.It has at least a technical representation of thedescriptiion in form of an XML and a filled out templateas e.g. word document.
+ * Holds a description of an service instance.An instance can be compatible to one or more specification templates. It has at least a technical representation of thedescriptiion in form of an XML and a filled out templateas e.g. word document.
  *
  */
 @ApiModel(description = ""
-    + "Holds a description of an service instance.An instance can be compatible to one or morespecification templates.It has at least a technical representation of thedescriptiion in form of an XML and a filled out templateas e.g. word document."
+    + "Holds a description of an service instance.An instance can be compatible to one or more specification templates. It has at least a technical representation of thedescriptiion in form of an XML and a filled out templateas e.g. word document."
     + "")
 @Entity
 @Table(name = "instance")
@@ -87,6 +88,14 @@ public class Instance implements Serializable {
     @Column(name = "version", nullable = true)
     @Field(type = FieldType.text, index = true, fielddata = true)
     private String version;
+
+    @Column(name = "published_at", nullable = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
+    private String publishedAt;
+
+    @Column(name = "last_updated_at", nullable = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
+    private String lastUpdatedAt;
 
     @NotNull
     @Column(name = "comment", nullable = true)
@@ -209,6 +218,22 @@ public class Instance implements Serializable {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public String getLastUpdatedAt() {
+        return lastUpdatedAt;
+    }
+
+    public void setLastUpdatedAt(String lastUpdatedAt) {
+        this.lastUpdatedAt = lastUpdatedAt;
+    }
+
+    public String getPublishedAt() {
+        return publishedAt;
+    }
+
+    public void setPublishedAt(String publishedAt) {
+        this.publishedAt = publishedAt;
     }
 
     public String getComment() {
@@ -394,6 +419,8 @@ public class Instance implements Serializable {
             "id=" + id +
             ", name='" + name + "'" +
             ", version='" + version + "'" +
+            ", publishedAt='" + publishedAt + "'" +
+            ", lastUpdatedAt='" + lastUpdatedAt + "'" +
             ", comment='" + comment + "'" +
             ", geometry='" + geometry + "'" +
             ", geometryContentType='" + geometryContentType + "'" +

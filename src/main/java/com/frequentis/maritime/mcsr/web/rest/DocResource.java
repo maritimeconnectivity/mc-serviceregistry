@@ -74,6 +74,14 @@ public class DocResource {
         if (doc.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("doc", "idexists", "A new doc cannot already have an ID")).body(null);
         }
+        if (doc.getFilecontentContentType() == null ||
+	    (doc.getFilecontentContentType() != "application/pdf" &&
+	    doc.getFilecontentContentType() != "application/vnd.openxmlformats-officedocument.wordprocessingml.document" &&
+	    doc.getFilecontentContentType() != "application/vnd.oasis.opendocument.text"
+	    )
+	) {
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("doc", "formaterror", "Unsupported document format. Only PDF, ODT or DOCX are allowed.")).body(null);
+        }
         Doc result = docService.save(doc);
         return ResponseEntity.created(new URI("/api/docs/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("doc", result.getId().toString()))

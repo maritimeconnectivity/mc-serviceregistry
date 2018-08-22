@@ -18,6 +18,7 @@ import com.frequentis.maritime.mcsr.web.soap.converters.doc.DocDescriptorDTOConv
 import com.frequentis.maritime.mcsr.web.soap.dto.PageDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.doc.DocDTO;
 import com.frequentis.maritime.mcsr.web.soap.dto.doc.DocDescriptorDTO;
+import com.frequentis.maritime.mcsr.web.soap.errors.ProcessingException;
 
 @Component("docResourceSoap")
 @Transactional
@@ -44,8 +45,16 @@ public class DocResourceImpl implements DocResource {
     }
 
     @Override
-    public DocDescriptorDTO createDoc(DocDTO doc) {
+    public DocDescriptorDTO createDoc(DocDTO doc) throws ProcessingException {
     	log.debug("SOAP request to create Doc : {}", doc);
+        if (doc.filecontentContentType == null ||
+            (doc.filecontentContentType != "application/pdf" &&
+            doc.filecontentContentType != "application/vnd.openxmlformats-officedocument.wordprocessingml.document" &&
+            doc.filecontentContentType != "application/vnd.oasis.opendocument.text"
+            )
+        ) {
+    	    throw new ProcessingException("Unsupported document format. Only PDF, ODT or DOCX are allowed");
+        }
         Doc newDoc = new Doc();
         newDoc.setFilecontent(doc.filecontent);
         newDoc.setComment(doc.comment);
@@ -56,8 +65,16 @@ public class DocResourceImpl implements DocResource {
     }
 
     @Override
-    public DocDescriptorDTO updateDoc(DocDTO doc) {
+    public DocDescriptorDTO updateDoc(DocDTO doc) throws ProcessingException {
         log.debug("SOAP request to update Doc : {}", doc);
+        if (doc.filecontentContentType == null ||
+            (doc.filecontentContentType != "application/pdf" &&
+            doc.filecontentContentType != "application/vnd.openxmlformats-officedocument.wordprocessingml.document" &&
+            doc.filecontentContentType != "application/vnd.oasis.opendocument.text"
+            )
+        ) {
+    	    throw new ProcessingException("Unsupported document format. Only PDF, ODT or DOCX are allowed");
+        }
         Doc newDoc = new Doc();
         if (doc.id == null) {
             return createDoc(doc);

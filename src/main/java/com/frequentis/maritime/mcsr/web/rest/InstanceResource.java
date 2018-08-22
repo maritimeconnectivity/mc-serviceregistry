@@ -41,6 +41,7 @@ import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
 import com.frequentis.maritime.mcsr.web.soap.converters.instance.InstanceDTOConverter;
 import com.frequentis.maritime.mcsr.web.soap.dto.instance.InstanceDTO;
+import com.frequentis.maritime.mcsr.domain.util.EntityUtils;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -93,6 +94,8 @@ public class InstanceResource {
         if (instance.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("instance", "idexists", "A new instance cannot already have an ID")).body(null);
         }
+	instance.setPublishedAt(EntityUtils.getCurrentUTCTimeISO8601());
+	instance.setLastUpdatedAt(instance.getPublishedAt());
 
         return saveInstance(instance, true);
 
@@ -116,6 +119,10 @@ public class InstanceResource {
         if (instance.getId() == null) {
             return createInstance(instance);
         }
+	instance.setLastUpdatedAt(EntityUtils.getCurrentUTCTimeISO8601());
+	if (instance.getPublishedAt() == null) {
+	    instance.setPublishedAt(instance.getLastUpdatedAt());
+	}
 
         return saveInstance(instance, false);
     }

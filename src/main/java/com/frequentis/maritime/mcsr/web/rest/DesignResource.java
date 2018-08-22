@@ -47,6 +47,7 @@ import com.frequentis.maritime.mcsr.service.DesignService;
 import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
+import com.frequentis.maritime.mcsr.domain.util.EntityUtils;
 
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -91,6 +92,9 @@ public class DesignResource {
                     .body(design);
             }
         }
+        design.setPublishedAt(EntityUtils.getCurrentUTCTimeISO8601());
+        design.setLastUpdatedAt(design.getPublishedAt());
+
         Design result = designService.save(design);
         return ResponseEntity.created(new URI("/api/designs/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("design", result.getId().toString()))
@@ -126,6 +130,11 @@ public class DesignResource {
                     .headers(HeaderUtil.createFailureAlert("design", e.getMessage(), e.toString()))
                     .body(design);
             }
+        }
+
+        design.setLastUpdatedAt(EntityUtils.getCurrentUTCTimeISO8601());
+        if (design.getPublishedAt() == null) {
+            design.setPublishedAt(design.getLastUpdatedAt());
         }
 
         Design result = designService.save(design);

@@ -47,7 +47,6 @@ import org.springframework.web.context.request.WebRequest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.frequentis.maritime.mcsr.domain.Design;
-import com.frequentis.maritime.mcsr.domain.util.DesignUtils;
 import com.frequentis.maritime.mcsr.service.DesignService;
 import com.frequentis.maritime.mcsr.web.rest.DesignResource;
 import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
@@ -55,6 +54,7 @@ import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 import com.frequentis.maritime.mcsr.web.util.WebUtils;
+import com.frequentis.maritime.mcsr.domain.util.EntityUtils;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -88,7 +88,9 @@ public class TechnicalDesignResource {
         String xml = design.getDesignAsXml().getContent().toString();
         log.info("XML:" + xml);
         XmlUtil.validateXml(xml, "ServiceDesignSchema.xsd");
-        design.setOrganizationId(organizationId);
+	design.setPublishedAt(EntityUtils.getCurrentUTCTimeISO8601());
+	design.setLastUpdatedAt(design.getPublishedAt());
+
         Design result = designService.save(design);
         return ResponseEntity.created(new URI("/api/technicalDesign/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("design", result.getId().toString()))
@@ -122,8 +124,13 @@ public class TechnicalDesignResource {
         String xml = design.getDesignAsXml().getContent().toString();
         log.info("XML:" + xml);
         XmlUtil.validateXml(xml, "ServiceDesignSchema.xsd");
+	design.setLastUpdatedAt(EntityUtils.getCurrentUTCTimeISO8601());
+        if (design.getPublishedAt() == null) {
+            design.setPublishedAt(design.getLastUpdatedAt());
+        }
 
         Design result = designService.save(design);
+
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert("design", design.getId().toString()))
             .body(result);
@@ -274,9 +281,6 @@ public class TechnicalDesignResource {
         if (!InstanceUtil.checkRolePermissions(design.getOrganizationId(), bearerToken)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-
-        // Ommited - no effect
-        // DesignUtils.updateXmlStatusValue(design, status);
 
         designService.updateStatus(design.getId(), status);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("design", id.toString())).build();

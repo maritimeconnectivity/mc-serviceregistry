@@ -29,6 +29,7 @@ import com.frequentis.maritime.mcsr.web.soap.errors.InstanceAlreadyExistExceptio
 import com.frequentis.maritime.mcsr.web.soap.errors.ProcessingException;
 import com.frequentis.maritime.mcsr.web.soap.errors.XmlValidateException;
 import com.frequentis.maritime.mcsr.web.util.WebUtils;
+import com.frequentis.maritime.mcsr.domain.util.EntityUtils;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -65,11 +66,11 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 			throws AccessDeniedException, InstanceAlreadyExistException, XmlValidateException, ProcessingException {
 		log.debug("SOAP request to create instance");
 
-		return saveInstance(instanceDto);
+		return saveInstance(instanceDto, true);
 	}
 
-	private InstanceDTO saveInstance(InstanceParameterDTO instanceDto) throws XmlValidateException, InstanceAlreadyExistException {
-	       String bearerToken = SoapHTTPUtil.currentBearerToken();
+	private InstanceDTO saveInstance(InstanceParameterDTO instanceDto, boolean isNew) throws XmlValidateException, InstanceAlreadyExistException, AccessDeniedException {
+	        String bearerToken = SoapHTTPUtil.currentBearerToken();
 	        String organizationId = WebUtils.extractOrganizationIdFromToken(bearerToken, log);
 	        if(instanceDto.id != null) {
 	            throw new InstanceAlreadyExistException("A new instance cannot already have an ID");
@@ -80,7 +81,21 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 	            throw new XmlValidateException("Instance must be created as XML (instanceAsXml must not be null)");
 	        }
 
-	        instance.setOrganizationId(organizationId);
+    		if (!InstanceUtil.checkRolePermissions(instance.getOrganizationId(), bearerToken)) {
+		    String msg = "User does not have permission to create instances for organization: "+instance.getOrganizationId();
+		    log.warn(msg);
+        	    throw new AccessDeniedException(msg);
+    		}
+
+		if (isNew) {
+		    instance.setPublishedAt(EntityUtils.getCurrentUTCTimeISO8601());
+		    instance.setLastUpdatedAt(instance.getPublishedAt());
+		} else {
+    		    instance.setLastUpdatedAt(EntityUtils.getCurrentUTCTimeISO8601());
+    		    if (instance.getPublishedAt() == null) {
+        		instance.setPublishedAt(instance.getLastUpdatedAt());
+    		    }
+		}
 
 	        try {
 	            InstanceUtil.prepareInstanceForSave(instance, designService);
@@ -113,12 +128,12 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
 	        Instance instance = instanceParameterConverter.convert(instanceDto);
 		String bearerToken = SoapHTTPUtil.currentBearerToken();
     		if (!InstanceUtil.checkRolePermissions(instance.getOrganizationId(), bearerToken)) {
-		    String msg = "Cannot delete entity, organization ID does not match that of entity: "+instance.getOrganizationId();
+		    String msg = "Cannot update entity, organization ID does not match that of entity: "+instance.getOrganizationId();
 		    log.warn(msg);
         	    throw new AccessDeniedException(msg);
     		}
 
-		return saveInstance(instanceDto);
+		return saveInstance(instanceDto, false);
 	}
 
 	@Override

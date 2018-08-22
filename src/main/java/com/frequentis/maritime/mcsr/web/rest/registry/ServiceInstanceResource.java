@@ -44,6 +44,7 @@ import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.InstanceUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
+import com.frequentis.maritime.mcsr.domain.util.EntityUtils;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -101,7 +102,8 @@ public class ServiceInstanceResource {
         if (!InstanceUtil.checkRolePermissions(instance.getOrganizationId(), bearerToken)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-
+	instance.setPublishedAt(EntityUtils.getCurrentUTCTimeISO8601());
+	instance.setLastUpdatedAt(instance.getPublishedAt());
         return saveInstance(instance, bearerToken, true);
     }
 
@@ -112,8 +114,6 @@ public class ServiceInstanceResource {
         } catch (Exception e) {
             log.warn("No organizationId could be parsed from the bearer token");
         }
-
-        instance.setOrganizationId(organizationId);
 
         try {
             InstanceUtil.prepareInstanceForSave(instance, designService);
@@ -171,6 +171,11 @@ public class ServiceInstanceResource {
 
         if (!InstanceUtil.checkRolePermissions(instance.getOrganizationId(), bearerToken)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+	instance.setLastUpdatedAt(EntityUtils.getCurrentUTCTimeISO8601());
+        if (instance.getPublishedAt() == null) {
+            instance.setPublishedAt(instance.getLastUpdatedAt());
         }
 
         return saveInstance(instance, bearerToken, false);

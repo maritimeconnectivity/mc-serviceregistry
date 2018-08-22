@@ -28,7 +28,7 @@ import com.frequentis.maritime.mcsr.web.soap.errors.AccessDeniedException;
 import com.frequentis.maritime.mcsr.web.soap.errors.ProcessingException;
 import com.frequentis.maritime.mcsr.web.soap.errors.XmlValidateException;
 import com.frequentis.maritime.mcsr.web.util.WebUtils;
-
+import com.frequentis.maritime.mcsr.domain.util.EntityUtils;
 
 @Component("serviceSpecificationResourceSoap")
 @Transactional
@@ -67,7 +67,15 @@ public class ServiceSpecificationResourceImpl implements ServiceSpecificationRes
         	throw new XmlValidateException("Specification must have a valid XML body", e);
         }
 
-        specification.setOrganizationId(organizationId);
+        if (!InstanceUtil.checkRolePermissions(specification.getOrganizationId(), bearerToken)) {
+            String msg = "User does not have permission to create specifications for organization: "+specification.getOrganizationId();
+            log.warn(msg);
+            throw new AccessDeniedException(msg);
+        }
+
+        specification.setPublishedAt(EntityUtils.getCurrentUTCTimeISO8601());
+        specification.setLastUpdatedAt(specification.getPublishedAt());
+
         xmlService.save(specification.getSpecAsXml());
         specificationService.save(specification);
         return specificationDescriptorConverter.convert(specification);
@@ -84,15 +92,19 @@ public class ServiceSpecificationResourceImpl implements ServiceSpecificationRes
 
         Specification specification = specificationConverter.convertReverse(specificationDTO);
         if (!InstanceUtil.checkRolePermissions(specification.getOrganizationId(), bearerToken)) {
-            String msg = "Cannot delete entity, organization ID does not match that of entity: "+specification.getOrganizationId();
+            String msg = "Cannot update entity, organization ID does not match that of entity: "+specification.getOrganizationId();
             log.warn(msg);
             throw new AccessDeniedException(msg);
         }
 
-
         String xml = specification.getSpecAsXml().getContent().toString();
         log.info("XML:" + xml);
         XmlUtil.validateXml(xml, "ServiceSpecificationSchema.xsd");
+
+        specification.setLastUpdatedAt(EntityUtils.getCurrentUTCTimeISO8601());
+        if (specification.getPublishedAt() == null) {
+            specification.setPublishedAt(specification.getLastUpdatedAt());
+        }
 
         specificationService.save(specification);
         return specificationDescriptorConverter.convert(specification);

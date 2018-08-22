@@ -47,6 +47,7 @@ import com.frequentis.maritime.mcsr.service.SpecificationService;
 import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.PaginationUtil;
 import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
+import com.frequentis.maritime.mcsr.domain.util.EntityUtils;
 
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -89,6 +90,8 @@ public class SpecificationResource {
                 .headers(HeaderUtil.createFailureAlert("specification", e.getMessage(), e.toString()))
                 .body(specification);
         }
+        specification.setPublishedAt(EntityUtils.getCurrentUTCTimeISO8601());
+        specification.setLastUpdatedAt(specification.getPublishedAt());
         Specification result = specificationService.save(specification);
         return ResponseEntity.created(new URI("/api/specifications/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("specification", result.getId().toString()))
@@ -123,6 +126,11 @@ public class SpecificationResource {
                 .headers(HeaderUtil.createFailureAlert("specification", e.getMessage(), e.toString()))
                 .body(specification);
         }
+        specification.setLastUpdatedAt(EntityUtils.getCurrentUTCTimeISO8601());
+        if (specification.getPublishedAt() == null) {
+            specification.setPublishedAt(specification.getLastUpdatedAt());
+        }
+
         Specification result = specificationService.save(specification);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert("specification", specification.getId().toString()))

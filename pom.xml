@@ -11,7 +11,7 @@
 
     <groupId>com.frequentis.maritime.mcsr</groupId>
     <artifactId>mcsr</artifactId>
-    <version>0.7-SNAPSHOT</version>
+    <version>0.8-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>Mcsr</name>
 

@@ -59,6 +59,8 @@ import com.frequentis.maritime.mcsr.web.rest.util.XmlUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
+import com.frequentis.maritime.mcsr.domain.util.EntityUtils;
+
 @RestController
 @RequestMapping("/api")
 @Api
@@ -102,7 +104,8 @@ public class ServiceSpecificationResource {
 		log.info("XML:" + xml);
 		XmlUtil.validateXml(xml, "ServiceSpecificationSchema.xsd");
 
-		specification.setOrganizationId(organizationId);
+		specification.setPublishedAt(EntityUtils.getCurrentUTCTimeISO8601());
+		specification.setLastUpdatedAt(specification.getPublishedAt());
 		Specification result = specificationService.save(specification);
 		return ResponseEntity.created(new URI("/api/specifications/" + result.getId()))
 		        .headers(HeaderUtil.createEntityCreationAlert("specification", result.getId().toString())).body(result);
@@ -142,6 +145,11 @@ public class ServiceSpecificationResource {
 		String xml = specification.getSpecAsXml().getContent().toString();
 		log.info("XML:" + xml);
 		XmlUtil.validateXml(xml, "ServiceSpecificationSchema.xsd");
+
+		specification.setLastUpdatedAt(EntityUtils.getCurrentUTCTimeISO8601());
+		if (specification.getPublishedAt() == null) {
+    		    specification.setPublishedAt(specification.getLastUpdatedAt());
+	        }
 
 		Specification result = specificationService.save(specification);
 		return ResponseEntity.ok()

@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.Date;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -48,6 +49,7 @@ import org.springframework.data.elasticsearch.annotations.FieldIndex;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import io.swagger.annotations.ApiModel;
+
 /**
  * Holds a logical description of a service. A specification can be compatible to one or more
  * specification templates. It has at least a technical representation of the service
@@ -80,6 +82,14 @@ public class Specification implements Serializable {
     @Column(name = "version", nullable = false)
     @Field(type = FieldType.text, index = true, fielddata = true)
     private String version;
+
+    @Column(name = "published_at", nullable = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
+    private String publishedAt;
+
+    @Column(name = "last_updated_at", nullable = true)
+    @Field(type = FieldType.text, index = true, fielddata = true)
+    private String lastUpdatedAt;
 
     @NotNull
     @Column(name = "comment", nullable = false)
@@ -145,6 +155,22 @@ public class Specification implements Serializable {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public String getLastUpdatedAt() {
+        return lastUpdatedAt;
+    }
+
+    public void setLastUpdatedAt(String lastUpdatedAt) {
+        this.lastUpdatedAt = lastUpdatedAt;
+    }
+
+    public String getPublishedAt() {
+        return publishedAt;
+    }
+
+    public void setPublishedAt(String publishedAt) {
+        this.publishedAt = publishedAt;
     }
 
     public String getComment() {
@@ -245,6 +271,8 @@ public class Specification implements Serializable {
             "id=" + id +
             ", name='" + name + "'" +
             ", version='" + version + "'" +
+            ", publishedAt='" + publishedAt + "'" +
+            ", lastUpdatedAt='" + lastUpdatedAt + "'" +
             ", comment='" + comment + "'" +
             ", keywords='" + keywords + "'" +
             ", specificationId='" + specificationId + "'" +
