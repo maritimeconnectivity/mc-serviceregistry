@@ -40,6 +40,8 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Setting;
+import org.springframework.data.elasticsearch.annotations.Mapping;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 import com.frequentis.maritime.mcsr.domain.Xml;
@@ -60,6 +62,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Table(name = "design")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Document(indexName = "design")
+@Setting(settingPath = "analyzer-settings.json")
 public class Design implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -95,6 +98,7 @@ public class Design implements Serializable {
     @Column(name = "design_id", nullable = false)
     @Field(type = FieldType.keyword, index = true)
     @JsonProperty("designId")
+    @Mapping(mappingPath = "keyword-mapping.json")
     private String designId;
 
     @Column(name = "status")
@@ -104,6 +108,7 @@ public class Design implements Serializable {
     @Column(name = "organization_id")
     @Field(type = FieldType.keyword, index = true)
     @JsonProperty("organizationId")
+    @Mapping(mappingPath = "keyword-mapping.json")
     private String organizationId;
 
     @OneToOne

@@ -44,6 +44,8 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Setting;
+import org.springframework.data.elasticsearch.annotations.Mapping;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldIndex;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -64,6 +66,7 @@ import io.swagger.annotations.ApiModel;
 @Table(name = "specification")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Document(indexName = "specification")
+@Setting(settingPath = "analyzer-settings.json")
 public class Specification implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -98,12 +101,14 @@ public class Specification implements Serializable {
 
     @Column(name = "keywords")
     @Field(type = FieldType.text, index = true, fielddata = true)
+    @Mapping(mappingPath = "keyword-mapping.json")
     private String keywords;
 
     @NotNull
     @Column(name = "specification_id", nullable = false)
     @JsonProperty("specificationId")
     @Field(type = FieldType.keyword, index = true)
+    @Mapping(mappingPath = "keyword-mapping.json")
     private String specificationId;
 
     @Column(name = "status")
@@ -113,6 +118,7 @@ public class Specification implements Serializable {
     @Column(name = "organization_id")
     @JsonProperty("organizationId")
     @Field(type = FieldType.keyword, index = true)
+    @Mapping(mappingPath = "keyword-mapping.json")
     private String organizationId;
 
     @OneToOne

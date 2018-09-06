@@ -1,0 +1,16 @@
+{
+    "index": {
+	"analysis": {
+	    "normalizer": {
+		"caseinsensitive_normalizer": {
+		    "type": "custom",
+		    "filter": [
+			"lowercase",
+			"asciifolding"
+		    ]
+		}
+	    }
+	}
+    }
+}
+			

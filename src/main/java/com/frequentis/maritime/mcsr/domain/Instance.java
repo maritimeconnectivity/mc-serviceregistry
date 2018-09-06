@@ -53,6 +53,8 @@ import com.frequentis.maritime.mcsr.domain.util.JsonNodeGeoShapeConverter;
 
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.Setting;
+import org.springframework.data.elasticsearch.annotations.Mapping;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.data.elasticsearch.annotations.GeoShapeField;
 import org.springframework.data.elasticsearch.core.geo.GeoShape;
@@ -70,6 +72,7 @@ import io.swagger.annotations.ApiModel;
 @Table(name = "instance")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Document(indexName = "instance")
+@Setting(settingPath = "analyzer-settings.json")
 public class Instance implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -114,10 +117,12 @@ public class Instance implements Serializable {
     @Column(name = "instance_id", nullable = true)
     @JsonProperty("instanceId")
     @Field(type = FieldType.keyword, index = true)
+    @Mapping(mappingPath = "keyword-mapping.json")
     private String instanceId;
 
     @Column(name = "keywords")
     @Field(type = FieldType.text, index = true, fielddata = true)
+    @Mapping(mappingPath = "keyword-mapping.json")
     private String keywords;
 
     @Column(name = "status")
@@ -127,10 +132,12 @@ public class Instance implements Serializable {
     @Column(name = "organization_id")
     @JsonProperty("organizationId")
     @Field(type = FieldType.keyword, index = true)
+    @Mapping(mappingPath = "keyword-mapping.json")
     private String organizationId;
 
     @Column(name = "unlocode")
     @Field(type = FieldType.keyword, index = true)
+    @Mapping(mappingPath = "keyword-mapping.json")
     private String unlocode;
 
     @Column(name = "endpoint_uri")
@@ -159,11 +166,13 @@ public class Instance implements Serializable {
     @Column(name = "design_id")
     @JsonProperty("designId")
     @Field(type = FieldType.keyword, index = true)
+    @Mapping(mappingPath = "keyword-mapping.json")
     private String designId;
 
     @Column(name = "specification_id")
     @JsonProperty("specificationId")
     @Field(type = FieldType.keyword, index = true)
+    @Mapping(mappingPath = "keyword-mapping.json")
     private String specificationId;
 
     @OneToOne
