@@ -101,7 +101,6 @@ public class Specification implements Serializable {
 
     @Column(name = "keywords")
     @Field(type = FieldType.text, index = true, fielddata = true)
-    @Mapping(mappingPath = "keyword-mapping.json")
     private String keywords;
 
     @NotNull
