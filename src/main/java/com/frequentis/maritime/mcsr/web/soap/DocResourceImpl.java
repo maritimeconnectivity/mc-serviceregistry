@@ -68,9 +68,9 @@ public class DocResourceImpl implements DocResource {
     public DocDescriptorDTO updateDoc(DocDTO doc) throws ProcessingException {
         log.debug("SOAP request to update Doc : {}", doc);
         if (doc.filecontentContentType == null ||
-            (doc.filecontentContentType != "application/pdf" &&
-            doc.filecontentContentType != "application/vnd.openxmlformats-officedocument.wordprocessingml.document" &&
-            doc.filecontentContentType != "application/vnd.oasis.opendocument.text"
+            (doc.filecontentContentType.equalsIgnoreCase("application/pdf") &&
+            doc.filecontentContentType.equalsIgnoreCase("application/vnd.openxmlformats-officedocument.wordprocessingml.document") &&
+            doc.filecontentContentType.equalsIgnoreCase("application/vnd.oasis.opendocument.text")
             )
         ) {
     	    throw new ProcessingException("Unsupported document format. Only PDF, ODT or DOCX are allowed");
