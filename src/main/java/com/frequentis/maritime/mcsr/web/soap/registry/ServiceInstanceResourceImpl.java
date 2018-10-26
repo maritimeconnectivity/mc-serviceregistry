@@ -87,6 +87,8 @@ public class ServiceInstanceResourceImpl implements ServiceInstanceResource {
         	    throw new AccessDeniedException(msg);
     		}
 
+		instance.setOrganizationId(organizationId);
+
 		if (isNew) {
 		    instance.setPublishedAt(EntityUtils.getCurrentUTCTimeISO8601());
 		    instance.setLastUpdatedAt(instance.getPublishedAt());

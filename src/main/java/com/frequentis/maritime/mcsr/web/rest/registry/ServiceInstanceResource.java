@@ -115,6 +115,8 @@ public class ServiceInstanceResource {
             log.warn("No organizationId could be parsed from the bearer token");
         }
 
+        instance.setOrganizationId(organizationId);
+
         try {
             InstanceUtil.prepareInstanceForSave(instance, designService);
             JsonNode geometry = instance.getGeometry();
