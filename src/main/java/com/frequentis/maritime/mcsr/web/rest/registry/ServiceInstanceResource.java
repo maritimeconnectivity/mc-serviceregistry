@@ -38,6 +38,7 @@ import com.frequentis.maritime.mcsr.domain.Xml;
 import com.frequentis.maritime.mcsr.service.DesignService;
 import com.frequentis.maritime.mcsr.service.InstanceService;
 import com.frequentis.maritime.mcsr.service.XmlService;
+import com.frequentis.maritime.mcsr.service.DocService;
 import com.frequentis.maritime.mcsr.web.exceptions.GeometryParseException;
 import com.frequentis.maritime.mcsr.web.exceptions.XMLValidationException;
 import com.frequentis.maritime.mcsr.web.rest.util.HeaderUtil;
@@ -81,6 +82,9 @@ public class ServiceInstanceResource {
 
     @Inject
     private XmlService xmlService;
+
+    @Inject
+    private DocService docService;
 
     /**
      * POST  /serviceInstance : Create a new instance.
@@ -126,16 +130,25 @@ public class ServiceInstanceResource {
 
         } catch (XMLValidationException e) {
             log.error("Error parsing xml: ", e);
+	    if (newInstance) {
+		cleanupInstance(instance);
+	    }
             return ResponseEntity.badRequest()
                 .headers(HeaderUtil.createFailureAlert("instance", e.getMessage(), e.toString()))
                 .body(instance);
         } catch (GeometryParseException e) {
             instanceService.save(instance);
             log.error("Error parsing geometry: ", e);
+	    if (newInstance) {
+		cleanupInstance(instance);
+	    }
             return ResponseEntity.badRequest()
                 .headers(HeaderUtil.createFailureAlert("instance", e.getMessage(), e.toString()))
                 .body(instance);
         } catch (Exception e) {
+	    if (newInstance) {
+		cleanupInstance(instance);
+	    }
             return ResponseEntity.badRequest()
                     .headers(HeaderUtil.createFailureAlert("instance", e.getMessage(), e.toString()))
                     .body(instance);
@@ -150,6 +163,16 @@ public class ServiceInstanceResource {
         return entity
             .headers(HeaderUtil.createEntityCreationAlert("instance", instance.getId().toString()))
             .body(instance);
+    }
+
+    private void cleanupInstance(Instance instance) {
+	try {
+            xmlService.delete(instance.getInstanceAsXml().getId());
+            docService.delete(instance.getInstanceAsDoc().getId());
+            instanceService.delete(instance.getId());
+	} catch (Exception e) {
+            log.warn("Exception on cleanup.", e);
+	}
     }
 
     /**
@@ -432,7 +455,7 @@ public class ServiceInstanceResource {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    @ApiOperation(value = "searchInstancesByGeometryGeojson", notes = "Returns all service instances matching the specified GeoJson shape.")
+    @ApiOperation(value = "searchInstancesByGeometryGeojson", notes = "Returns all service instances matching the specified GeoJson shape. Note that geometries have to follow the right-hand rule for inclusion, and left-hand rule for exclusion of areas.")
     public ResponseEntity<?> searchInstancesByGeometryGeojson(@RequestParam String geometry,
             @RequestParam(defaultValue = "false") String includeDoc,
             @RequestParam(defaultValue = "", required = false) String query,
@@ -465,7 +488,7 @@ public class ServiceInstanceResource {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    @ApiOperation(value = "searchInstancesByGeometryWKT", notes = "Returns all service instances matching the specified WKT shape.")
+    @ApiOperation(value = "searchInstancesByGeometryWKT", notes = "Returns all service instances matching the specified WKT shape. Note that geometries have to follow the right-hand rule for inclusion, and left-hand rule for exclusion of areas.")
     public ResponseEntity<?> searchInstancesByGeometryWKT(@RequestParam String geometry,
             @RequestParam(defaultValue = "", required = false) String query,
             @RequestParam(defaultValue = "false") String includeDoc,
