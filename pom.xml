@@ -23,7 +23,7 @@
     	<elasticsearch.version>5.4.0</elasticsearch.version>
         <assertj-core.version>3.3.0</assertj-core.version>
         <awaitility.version>1.7.0</awaitility.version>
-        <commons-io.version>2.4</commons-io.version>
+        <commons-io.version>2.7</commons-io.version>
         <commons-lang.version>2.6</commons-lang.version>
         <cucumber.version>1.2.4</cucumber.version>
         <frontend-maven-plugin.version>1.0</frontend-maven-plugin.version>
